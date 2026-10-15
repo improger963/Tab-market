@@ -24,7 +24,7 @@ export default function StickyMobileBuyBar({
   useEffect(() => {
     const targetElement = document.getElementById(targetButtonId);
     if (!targetElement) {
-      // If target element is not found, show only after scrolling down 300px
+      // Fallback: Show when scrolled down past 350px
       const handleScroll = () => {
         setIsVisible(window.scrollY > 350);
       };
@@ -34,7 +34,7 @@ export default function StickyMobileBuyBar({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // If main button is NOT intersecting and is above the viewport (boundingClientRect.top < 0)
+        // Visible when main button is above viewport
         setIsVisible(!entry.isIntersecting && entry.boundingClientRect.top < 0);
       },
       {
@@ -58,18 +58,24 @@ export default function StickyMobileBuyBar({
     setTimeout(() => setJustAdded(false), 1500);
   };
 
-  if (!isVisible) return null;
-
   return (
-    <div className="lg:hidden fixed bottom-14 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200/90 p-3 shadow-2xl transition-all duration-300 animate-in slide-in-from-bottom-6">
+    <div
+      className={`lg:hidden fixed bottom-15 sm:bottom-16 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 shadow-2xl transition-all duration-300 ease-out transform ${
+        isVisible
+          ? 'translate-y-0 opacity-100 pointer-events-auto'
+          : 'translate-y-full opacity-0 pointer-events-none'
+      }`}
+    >
       <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
-        {/* Left: Thumbnail & Price */}
+        {/* Left: Mini product thumbnail, title, and formatted AMD price */}
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <img
-            src={product.images[0]}
-            alt={product.title}
-            className="w-11 h-11 rounded-xl object-cover bg-slate-100 border border-slate-200 shrink-0"
-          />
+          <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+            <img
+              src={product.images[0]}
+              alt={product.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div className="min-w-0">
             <h4 className="text-xs font-bold text-slate-900 truncate leading-tight">
               {product.title}
@@ -85,20 +91,20 @@ export default function StickyMobileBuyBar({
           </div>
         </div>
 
-        {/* Right: Buy Button */}
+        {/* Right: High-contrast "Ավելացնել" button with shopping bag icon */}
         <button
           type="button"
           onClick={handleAdd}
-          className="min-h-[44px] px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 active:scale-95 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 shrink-0 cursor-pointer"
+          className="min-h-[48px] px-5 py-2.5 rounded-2xl bg-slate-950 hover:bg-cyan-600 active:scale-95 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 shrink-0 cursor-pointer"
         >
           {justAdded ? (
             <>
-              <Check className="w-4 h-4 text-emerald-200" />
+              <Check className="w-4 h-4 text-emerald-400" />
               <span>Ավելացվեց</span>
             </>
           ) : (
             <>
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-4 h-4 text-cyan-400" />
               <span>Ավելացնել</span>
             </>
           )}

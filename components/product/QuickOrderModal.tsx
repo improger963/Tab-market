@@ -53,7 +53,7 @@ export default function QuickOrderModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 overflow-y-auto flex items-end sm:items-center justify-center p-0 sm:p-4"
       role="dialog"
       aria-modal="true"
     >
@@ -63,12 +63,17 @@ export default function QuickOrderModal({
         className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity animate-in fade-in"
       />
 
-      {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-10 animate-in zoom-in-95 duration-200">
+      {/* Modal Dialog / Mobile Bottom Sheet */}
+      <div className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-10 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 max-h-[92vh] flex flex-col">
+        {/* Mobile drag handle */}
+        <div className="sm:hidden flex justify-center pt-2.5 pb-1 bg-slate-950">
+          <div className="w-12 h-1.5 rounded-full bg-slate-700" />
+        </div>
+
         {/* Header */}
-        <div className="p-5 bg-slate-950 text-white flex items-center justify-between border-b border-slate-800">
+        <div className="p-4 sm:p-5 bg-slate-950 text-white flex items-center justify-between border-b border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30">
               <Zap className="w-4 h-4 fill-cyan-400" />
             </div>
             <div>
@@ -80,7 +85,8 @@ export default function QuickOrderModal({
           <button
             type="button"
             onClick={onClose}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl transition-colors cursor-pointer"
+            aria-label="Փակել"
+            className="min-h-[48px] min-w-[48px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -132,7 +138,7 @@ export default function QuickOrderModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Օրինակ՝ Արթուր Գասպարյան"
-                  className="w-full h-11 px-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-cyan-500 font-medium"
+                  className="w-full h-12 px-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus-cobalt font-medium"
                 />
               </div>
 
@@ -141,7 +147,7 @@ export default function QuickOrderModal({
                   Հեռախոսահամար *
                 </label>
                 <div className="relative flex items-center">
-                  <div className="absolute left-3 flex items-center gap-1.5 text-xs font-bold text-slate-500 pointer-events-none">
+                  <div className="absolute left-3.5 flex items-center gap-1.5 text-xs font-bold text-slate-500 pointer-events-none">
                     <span>🇦🇲 +374</span>
                     <span className="text-slate-300">|</span>
                   </div>
@@ -151,7 +157,7 @@ export default function QuickOrderModal({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="XX XX-XX-XX"
-                    className="w-full h-11 pl-20 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                    className="w-full h-12 pl-22 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus-cobalt"
                   />
                 </div>
               </div>
@@ -165,7 +171,7 @@ export default function QuickOrderModal({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full min-h-[48px] py-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 active:scale-98 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+                className="w-full min-h-[50px] py-3.5 rounded-2xl bg-cyan-600 hover:bg-cyan-700 active:scale-98 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <span>Գրանցվում է...</span>

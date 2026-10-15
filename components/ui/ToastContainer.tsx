@@ -21,17 +21,17 @@ export default function ToastContainer() {
   return (
     <div
       aria-live="polite"
-      className="fixed z-50 pointer-events-none flex flex-col gap-2.5 max-w-sm w-full bottom-20 sm:bottom-6 right-3 left-3 sm:left-auto sm:right-6"
+      className="fixed z-50 pointer-events-none flex flex-col gap-2.5 max-w-sm w-full top-4 left-4 right-4 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto mx-auto sm:mx-0"
     >
       <AnimatePresence mode="popLayout">
         {toasts.map((toast) => (
           <motion.div
             key={toast.id}
             layout
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 15, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 450, damping: 30 }}
+            exit={{ opacity: 0, y: -15, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 32 }}
             className="pointer-events-auto w-full bg-slate-900/95 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-2xl border border-slate-700/80 flex items-center justify-between gap-3"
           >
             {/* Left Content */}
@@ -48,7 +48,7 @@ export default function ToastContainer() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-cyan-400">
                       <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
-                      <span>{toast.title}</span>
+                      <span>{toast.title || 'Ավելացվել է զամբյուղ'}</span>
                     </div>
                     <div className="text-xs font-bold text-slate-100 truncate mt-0.5">
                       {toast.product.title}
@@ -64,8 +64,8 @@ export default function ToastContainer() {
                     <CheckCircle2 className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-xs font-bold text-slate-100">{toast.title}</div>
-                    <div className="text-[11px] text-slate-400 truncate">{toast.message}</div>
+                    <div className="text-xs font-bold text-slate-100">{toast.title || 'Պատճենված է'}</div>
+                    <div className="text-[11px] text-cyan-200 truncate">{toast.message}</div>
                   </div>
                 </>
               ) : (
@@ -92,9 +92,9 @@ export default function ToastContainer() {
                     openDrawer();
                     removeToast(toast.id);
                   }}
-                  className="min-h-[36px] px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer"
+                  className="min-h-[36px] px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
                 >
-                  <span>Զամբյուղ</span>
+                  <span>Դիտել Զամբյուղը</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               )}

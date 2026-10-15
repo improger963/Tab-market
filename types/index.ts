@@ -10,7 +10,7 @@ export interface Product {
   slug: string; // SEO friendly URL slug
   categorySlug: string;
   categoryName: string;
-  brand: string; // e.g. GANZER, LEDEME, VIEIR, BRAVAT, VALTEC, BAXI
+  brand: string; // e.g. GANZER, LEDEME, VIEIR, BRAVAT, VALTEC, BAXI, CERSANIT, GEBERIT
   price: number; // In Armenian Dram (AMD / ֏)
   oldPrice?: number; // Pre-discount price in AMD
   inStock: boolean;
@@ -20,6 +20,23 @@ export interface Product {
   shortDesc: string;
   specs: Record<string, string>; // e.g. Նյութ (Material), Միացում (Diameter), Քարթրիջ (Cartridge), Երաշխիք (Warranty)
   isFeatured?: boolean;
+  rating?: number; // Customer star rating (e.g. 4.9)
+  reviewsCount?: number; // Count of verified customer reviews
+  finish?: 'chrome' | 'gold' | 'black' | 'gunmetal' | 'white' | 'mirror';
+  isNew?: boolean;
+}
+
+export interface Review {
+  id: string;
+  productId: number;
+  author: string;
+  location: string; // e.g. "Երևան, Դավթաշեն", "Երևան, Արաբկիր"
+  rating: number; // 1-5
+  date: string;
+  title: string;
+  content: string;
+  isVerifiedPlumber?: boolean; // Վարպետ / Սանտեխնիկ
+  isVerifiedPurchase?: boolean; // Ստուգված Գնում Մելքումովի 40/1-ում
 }
 
 export interface Category {

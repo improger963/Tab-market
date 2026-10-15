@@ -7,9 +7,17 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, Product } from '../types';
 
+export interface CouponData {
+  code: string;
+  discountPercent: number; // e.g. 10 or 15
+  freeShipping: boolean;
+  description: string;
+}
+
 export interface CartState {
   items: CartItem[];
   isDrawerOpen: boolean;
+  appliedCoupon: CouponData | null;
 
   // Actions
   addItem: (product: Product, qty?: number) => void;
@@ -19,10 +27,15 @@ export interface CartState {
   openDrawer: () => void;
   closeDrawer: () => void;
   toggleDrawer: () => void;
+  applyCoupon: (code: string) => { success: boolean; message: string };
+  removeCoupon: () => void;
 
   // Computed getters
-  totalPrice: () => number;
+  totalPrice: () => number; // raw items subtotal
   totalCount: () => number;
+  getDiscountAmount: () => number;
+  getFinalTotal: (baseShippingCost: number) => number;
+  getEffectiveShippingCost: (baseShippingCost: number) => number;
 }
 
 export const useCart = create<CartState>()(
@@ -30,6 +43,7 @@ export const useCart = create<CartState>()(
     (set, get) => ({
       items: [],
       isDrawerOpen: false,
+      appliedCoupon: null,
 
       addItem: (product: Product, qty: number = 1) => {
         if (qty <= 0) return;
@@ -39,7 +53,6 @@ export const useCart = create<CartState>()(
         if (existingIndex > -1) {
           const updatedItems = [...currentItems];
           const newQty = updatedItems[existingIndex].quantity + qty;
-          // Ensure we don't exceed stock if finite stock
           const finalQty = product.stockQuantity > 0 
             ? Math.min(newQty, product.stockQuantity) 
             : newQty;
@@ -84,7 +97,7 @@ export const useCart = create<CartState>()(
       },
 
       clearCart: () => {
-        set({ items: [] });
+        set({ items: [], appliedCoupon: null });
       },
 
       openDrawer: () => {
@@ -99,6 +112,52 @@ export const useCart = create<CartState>()(
         set({ isDrawerOpen: !get().isDrawerOpen });
       },
 
+      applyCoupon: (codeRaw: string) => {
+        const code = codeRaw.trim().toUpperCase();
+        if (!code) {
+          return { success: false, message: 'Խնդրում ենք մուտքագրել պրոմոկոդ' };
+        }
+
+        if (code === 'TAB10') {
+          const coupon: CouponData = {
+            code: 'TAB10',
+            discountPercent: 10,
+            freeShipping: false,
+            description: '10% զեղչ պատվերի ամբողջ արժեքից',
+          };
+          set({ appliedCoupon: coupon });
+          return { success: true, message: '«TAB10» կիրառված է: 10% զեղչ ամբողջ զամբյուղի համար!' };
+        }
+
+        if (code === 'VARPET') {
+          const coupon: CouponData = {
+            code: 'VARPET',
+            discountPercent: 15,
+            freeShipping: false,
+            description: '15% հատուկ վարպետական զեղչ',
+          };
+          set({ appliedCoupon: coupon });
+          return { success: true, message: '«VARPET» կիրառված է: 15% մասնագիտական զեղչ!' };
+        }
+
+        if (code === 'FREE') {
+          const coupon: CouponData = {
+            code: 'FREE',
+            discountPercent: 0,
+            freeShipping: true,
+            description: 'Անվճար առաքում ամբողջ ՀՀ տարածքում',
+          };
+          set({ appliedCoupon: coupon });
+          return { success: true, message: '«FREE» կիրառված է: Անվճար առաքում ՀՀ բոլոր մարզեր!' };
+        }
+
+        return { success: false, message: 'Անվավեր պրոմոկոդ: Փորձեք TAB10, VARPET կամ FREE' };
+      },
+
+      removeCoupon: () => {
+        set({ appliedCoupon: null });
+      },
+
       totalPrice: () => {
         return get().items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
       },
@@ -106,12 +165,31 @@ export const useCart = create<CartState>()(
       totalCount: () => {
         return get().items.reduce((sum, item) => sum + item.quantity, 0);
       },
+
+      getDiscountAmount: () => {
+        const subtotal = get().totalPrice();
+        const coupon = get().appliedCoupon;
+        if (!coupon || coupon.discountPercent <= 0) return 0;
+        return Math.round((subtotal * coupon.discountPercent) / 100);
+      },
+
+      getEffectiveShippingCost: (baseShippingCost: number) => {
+        const coupon = get().appliedCoupon;
+        if (coupon && coupon.freeShipping) return 0;
+        return baseShippingCost;
+      },
+
+      getFinalTotal: (baseShippingCost: number) => {
+        const subtotal = get().totalPrice();
+        const discount = get().getDiscountAmount();
+        const effectiveShipping = get().getEffectiveShippingCost(baseShippingCost);
+        return Math.max(0, subtotal - discount + effectiveShipping);
+      },
     }),
     {
       name: 'tab-cart-storage',
       storage: createJSONStorage(() => localStorage),
-      // Only persist cart items, not the ephemeral drawer UI state
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ items: state.items, appliedCoupon: state.appliedCoupon }),
     }
   )
 );

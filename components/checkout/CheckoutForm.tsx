@@ -84,7 +84,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 value={data.fullName}
                 onChange={(e) => updateField('fullName', e.target.value)}
                 placeholder="օր.՝ Արմեն Գասպարյան"
-                className="w-full h-11 pl-10 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-cyan-500 transition-all"
+                className="w-full h-12 pl-10 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus-cobalt transition-all"
               />
               <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
@@ -95,7 +95,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
               Հեռախոսահամար <span className="text-rose-500">*</span>
             </label>
             <div className="relative flex items-center">
-              <div className="absolute left-3 flex items-center gap-1 text-xs font-bold text-slate-500 pointer-events-none">
+              <div className="absolute left-3.5 flex items-center gap-1.5 text-xs font-bold text-slate-500 pointer-events-none">
                 <span>🇦🇲 +374</span>
                 <span className="text-slate-300">|</span>
               </div>
@@ -105,7 +105,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 value={data.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
                 placeholder="XX XX-XX-XX"
-                className="w-full h-11 pl-20 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-cyan-500 transition-all"
+                className="w-full h-12 pl-22 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus-cobalt transition-all"
               />
             </div>
           </div>
@@ -120,7 +120,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 value={data.email}
                 onChange={(e) => updateField('email', e.target.value)}
                 placeholder="օր.՝ info@domain.am"
-                className="w-full h-11 pl-10 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-cyan-500 transition-all"
+                className="w-full h-12 pl-10 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus-cobalt transition-all"
               />
               <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
@@ -250,7 +250,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                   value={data.addressStreet}
                   onChange={(e) => updateField('addressStreet', e.target.value)}
                   placeholder="օր.՝ Կոմիտասի պող. 25"
-                  className="w-full h-10 px-3 rounded-xl bg-white border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
                 />
               </div>
 
@@ -263,7 +263,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                   value={data.addressApartment}
                   onChange={(e) => updateField('addressApartment', e.target.value)}
                   placeholder="բն. 14, 2-րդ մուտք, 4-րդ հարկ"
-                  className="w-full h-10 px-3 rounded-xl bg-white border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
                 />
               </div>
             </div>
@@ -282,7 +282,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 <select
                   value={data.marz}
                   onChange={(e) => updateField('marz', e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-white border border-slate-200 text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold focus-cobalt cursor-pointer"
                 >
                   <option value="">Ընտրեք մարզը</option>
                   {ARMENIAN_MARZES.map((m) => (
@@ -303,7 +303,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                   value={data.city}
                   onChange={(e) => updateField('city', e.target.value)}
                   placeholder="օր.՝ Աբովյան"
-                  className="w-full h-10 px-3 rounded-xl bg-white border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
                 />
               </div>
 
@@ -317,7 +317,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                   value={data.addressStreet}
                   onChange={(e) => updateField('addressStreet', e.target.value)}
                   placeholder="օր.՝ Հանրապետության 12"
-                  className="w-full h-10 px-3 rounded-xl bg-white border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
                 />
               </div>
             </div>
@@ -455,7 +455,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 value={data.companyName}
                 onChange={(e) => updateField('companyName', e.target.value)}
                 placeholder="օր.՝ Շինէքսպերտ ՍՊԸ"
-                className="w-full h-10 px-3 rounded-xl bg-white border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
               />
             </div>
 
@@ -470,7 +470,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 value={data.companyTIN}
                 onChange={(e) => updateField('companyTIN', e.target.value.replace(/\D/g, ''))}
                 placeholder="օր.՝ 02589412"
-                className="w-full h-10 px-3 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold focus-cobalt"
               />
             </div>
           </div>

@@ -4,16 +4,20 @@ import React, { useState } from 'react';
 import { ShoppingBag, Copy, Check, Layers, FileText, MapPin, X } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/store/useCart';
+import { useToast } from '@/store/useToast';
 import { formatAMD } from '@/lib/utils';
+import StickyMobileBuyBar from '@/components/product/StickyMobileBuyBar';
 
 export default function ProductDetailClient({ product }: { product: Product }) {
   const { addItem, openDrawer } = useCart();
+  const { showCartToast, showCopyToast } = useToast();
   const [copiedCode, setCopiedCode] = useState(false);
   const [isCadZoomed, setIsCadZoomed] = useState(false);
 
   const handleCopyCode = () => {
     navigator.clipboard?.writeText(product.code);
     setCopiedCode(true);
+    showCopyToast(product.code);
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
@@ -130,9 +134,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
           <div className="space-y-2.5">
             <button
+              id="main-add-to-cart-btn"
               type="button"
               onClick={() => {
                 addItem(product, 1);
+                showCartToast(product, 1);
                 openDrawer();
               }}
               className="min-h-[48px] w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 active:scale-98 text-white font-bold text-sm uppercase tracking-wider transition-all shadow-md cursor-pointer"
@@ -210,6 +216,9 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           </div>
         </div>
       )}
+
+      {/* Sticky Mobile Buy Bar */}
+      <StickyMobileBuyBar product={product} />
     </>
   );
 }

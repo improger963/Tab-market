@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import MobileNav from '@/components/layout/MobileNav';
 import CartDrawer from '@/components/cart/CartDrawer';
+import ToastContainer from '@/components/ui/ToastContainer';
 import '@/src/index.css';
 
 const inter = Inter({
@@ -67,6 +68,7 @@ export default function RootLayout({
         <Footer />
         <MobileNav />
         <CartDrawer />
+        <ToastContainer />
       </body>
     </html>
   );

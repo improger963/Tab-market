@@ -146,7 +146,7 @@ export default function LiveSearch() {
           onKeyDown={handleKeyDown}
           placeholder="Որոնել ըստ ՀԾ Կոդի (օր. 31297) կամ մոդելի..."
           aria-label="Որոնել սանտեխնիկա"
-          className="w-full h-11 pl-11 pr-24 rounded-xl bg-slate-100 hover:bg-slate-200/70 focus:bg-white text-slate-900 text-sm border border-slate-200 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 focus:outline-hidden transition-all duration-200 placeholder:text-slate-400 font-normal"
+          className="w-full h-11 pl-11 pr-24 rounded-xl bg-slate-100 hover:bg-slate-200/70 focus:bg-white text-slate-900 text-sm border border-slate-200 focus-cobalt focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 transition-all duration-200 placeholder:text-slate-400 font-normal"
         />
 
         {/* Left search icon */}

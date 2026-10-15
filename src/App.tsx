@@ -10,12 +10,17 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import MobileNav from '@/components/layout/MobileNav';
 import CartDrawer from '@/components/cart/CartDrawer';
+import ToastContainer from '@/components/ui/ToastContainer';
 import ProductCard from '@/components/product/ProductCard';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductDetailView from '@/components/product/ProductDetailView';
 import CatalogView from '@/components/catalog/CatalogView';
 import HomePage from '@/app/page';
 import CheckoutPage from '@/app/checkout/page';
+import WishlistPage from '@/app/wishlist/page';
+import ComparePage from '@/app/compare/page';
+import ProductReviews from '@/components/product/ProductReviews';
+import RecentlyViewed from '@/components/product/RecentlyViewed';
 import { Product } from '@/types';
 import { products } from '@/data/products';
 import { useCart } from '@/store/useCart';
@@ -64,6 +69,12 @@ export default function App() {
     }
     if (currentPath === '/checkout') {
       return { page: 'checkout' };
+    }
+    if (currentPath === '/wishlist') {
+      return { page: 'wishlist' };
+    }
+    if (currentPath === '/compare') {
+      return { page: 'compare' };
     }
     return { page: 'home' };
   }, [currentPath]);
@@ -207,6 +218,12 @@ export default function App() {
                 ))}
             </div>
           </div>
+
+          {/* Customer Reviews & Social Proof */}
+          <ProductReviews product={currentProduct} />
+
+          {/* Recently Viewed Carousel */}
+          <RecentlyViewed currentProductId={currentProduct.id} />
         </main>
       )}
 
@@ -238,6 +255,20 @@ export default function App() {
       {route.page === 'checkout' && (
         <main className="flex-1 w-full animate-in fade-in-50 duration-200">
           <CheckoutPage />
+        </main>
+      )}
+
+      {/* VIEW 5: WISHLIST PAGE */}
+      {route.page === 'wishlist' && (
+        <main className="flex-1 w-full animate-in fade-in-50 duration-200">
+          <WishlistPage />
+        </main>
+      )}
+
+      {/* VIEW 6: PRODUCT COMPARISON PAGE */}
+      {route.page === 'compare' && (
+        <main className="flex-1 w-full animate-in fade-in-50 duration-200">
+          <ComparePage />
         </main>
       )}
 
@@ -298,6 +329,9 @@ export default function App() {
 
       {/* 3. Global Shell: Slide-Over Cart Drawer */}
       <CartDrawer />
+
+      {/* Global Shell: Toast Notifications */}
+      <ToastContainer />
 
       {/* 4. Global Shell: Footer */}
       <Footer />

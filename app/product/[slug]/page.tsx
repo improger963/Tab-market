@@ -7,6 +7,8 @@ import { products } from '@/data/products';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductDetailView from '@/components/product/ProductDetailView';
 import ProductCard from '@/components/product/ProductCard';
+import ProductReviews from '@/components/product/ProductReviews';
+import RecentlyViewed from '@/components/product/RecentlyViewed';
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -129,6 +131,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
       </div>
 
+      {/* Customer & Plumber Reviews */}
+      <ProductReviews product={product} />
+
       {/* Related Products Section */}
       {relatedProducts.length > 0 && (
         <section className="space-y-6 pt-10 border-t border-slate-200">
@@ -148,6 +153,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
         </section>
       )}
+
+      {/* Recently Viewed Carousel */}
+      <RecentlyViewed currentProductId={product.id} />
     </div>
   );
 }

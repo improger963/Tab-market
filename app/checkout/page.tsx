@@ -7,6 +7,7 @@ import { useCart } from '@/store/useCart';
 import CheckoutForm, { CheckoutFormData } from '@/components/checkout/CheckoutForm';
 import OrderSummary from '@/components/checkout/OrderSummary';
 import OrderSuccess from '@/components/checkout/OrderSuccess';
+import RecentlyViewed from '@/components/product/RecentlyViewed';
 
 export default function CheckoutPage() {
   const { items, totalPrice } = useCart();
@@ -162,6 +163,9 @@ export default function CheckoutPage() {
           />
         </div>
       </div>
+
+      {/* Recently Viewed Carousel */}
+      <RecentlyViewed />
     </div>
   );
 }

@@ -1,8 +1,17 @@
 'use client';
 
-import React from 'react';
-import { ShieldCheck, Warehouse, ArrowRight, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  ShieldCheck,
+  Warehouse,
+  ArrowRight,
+  Loader2,
+  Tag,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react';
 import { useCart } from '@/store/useCart';
+import { useToast } from '@/store/useToast';
 import { formatAMD } from '@/lib/utils';
 import { DeliveryType } from './CheckoutForm';
 
@@ -19,11 +28,39 @@ export default function OrderSummary({
   isSubmitting,
   onSubmit,
 }: OrderSummaryProps) {
-  const { items, totalPrice, totalCount } = useCart();
+  const {
+    items,
+    totalPrice,
+    totalCount,
+    appliedCoupon,
+    applyCoupon,
+    removeCoupon,
+    getDiscountAmount,
+    getEffectiveShippingCost,
+    getFinalTotal,
+  } = useCart();
+
+  const { showToast } = useToast();
+  const [couponInput, setCouponInput] = useState('');
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   const count = totalCount();
   const subtotal = totalPrice();
-  const finalTotal = subtotal + shippingCost;
+  const discountAmount = getDiscountAmount();
+  const effectiveShipping = getEffectiveShippingCost(shippingCost);
+  const finalTotal = getFinalTotal(shippingCost);
+
+  const handleApplyPromo = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCouponError(null);
+    const res = applyCoupon(couponInput);
+    if (res.success) {
+      showToast(res.message, 'Պրոմոկոդ');
+      setCouponInput('');
+    } else {
+      setCouponError(res.message);
+    }
+  };
 
   return (
     <div className="sticky top-24 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-6">
@@ -38,7 +75,7 @@ export default function OrderSummary({
       </div>
 
       {/* Compact Scrollable List of Items */}
-      <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto pr-1">
+      <div className="divide-y divide-slate-100 max-h-64 overflow-y-auto pr-1">
         {items.map((item) => (
           <div key={item.product.id} className="py-3 flex gap-3 text-xs">
             <img
@@ -69,6 +106,62 @@ export default function OrderSummary({
         ))}
       </div>
 
+      {/* Interactive Promo Code Form */}
+      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+        <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 block">
+          Պրոմոկոդ կամ Կուպոն
+        </span>
+        {!appliedCoupon ? (
+          <form onSubmit={handleApplyPromo} className="flex gap-2">
+            <div className="relative flex-1">
+              <Tag className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={couponInput}
+                onChange={(e) => {
+                  setCouponInput(e.target.value);
+                  setCouponError(null);
+                }}
+                placeholder="TAB10, VARPET, FREE"
+                className="w-full h-9 pl-9 pr-3 rounded-xl bg-white border border-slate-200 text-xs font-bold uppercase placeholder:normal-case placeholder:font-normal focus-cobalt"
+              />
+            </div>
+            <button
+              type="submit"
+              className="px-4 h-9 rounded-xl bg-slate-900 hover:bg-cyan-600 text-white text-xs font-bold transition-all cursor-pointer"
+            >
+              Կիրառել
+            </button>
+          </form>
+        ) : (
+          <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs text-emerald-950">
+            <div className="flex items-center gap-2 min-w-0">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="truncate">
+                <span className="font-extrabold uppercase">{appliedCoupon.code}</span>
+                <span className="text-[11px] text-emerald-700 ml-1.5">
+                  ({appliedCoupon.description})
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={removeCoupon}
+              className="text-[11px] text-rose-600 hover:underline font-bold ml-2 shrink-0 cursor-pointer"
+            >
+              Հեռացնել
+            </button>
+          </div>
+        )}
+
+        {couponError && (
+          <p className="text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            <span>{couponError}</span>
+          </p>
+        )}
+      </div>
+
       {/* Cost Breakdown */}
       <div className="border-t border-slate-200 pt-4 space-y-2 text-xs">
         <div className="flex justify-between text-slate-600">
@@ -78,15 +171,22 @@ export default function OrderSummary({
           </span>
         </div>
 
+        {appliedCoupon && discountAmount > 0 && (
+          <div className="flex justify-between text-emerald-700 font-bold">
+            <span>Զեղչ ({appliedCoupon.code})՝</span>
+            <span className="tabular-nums">-{formatAMD(discountAmount)}</span>
+          </div>
+        )}
+
         <div className="flex justify-between text-slate-600">
           <span>Առաքման արժեք՝</span>
           <span className="font-bold tabular-nums">
-            {shippingCost === 0 ? (
+            {effectiveShipping === 0 ? (
               <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-black">
-                ԱՆՎՃԱՐ
+                {appliedCoupon?.freeShipping ? 'ԱՆՎՃԱՐ (FREE)' : 'ԱՆՎՃԱՐ'}
               </span>
             ) : (
-              <span className="text-slate-900">{formatAMD(shippingCost)}</span>
+              <span className="text-slate-900">{formatAMD(effectiveShipping)}</span>
             )}
           </span>
         </div>

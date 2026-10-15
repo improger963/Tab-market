@@ -13,6 +13,8 @@ import {
 import { products } from '@/data/products';
 import { categories } from '@/data/categories';
 import ProductCard from '@/components/product/ProductCard';
+import ProductCardSkeleton from '@/components/ui/ProductCardSkeleton';
+import CatalogFilterSkeleton from '@/components/ui/CatalogFilterSkeleton';
 import FilterSidebar, { FilterState } from './FilterSidebar';
 
 interface CatalogViewProps {
@@ -43,6 +45,11 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
   const [sortBy, setSortBy] = useState<'popular' | 'price-asc' | 'price-desc'>('popular');
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Sync if initialCategorySlug changes
   useEffect(() => {
@@ -308,17 +315,27 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Desktop Sticky Sidebar */}
         <aside className="hidden lg:block lg:col-span-3 sticky top-24 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs max-h-[calc(100vh-7rem)] overflow-y-auto">
-          <FilterSidebar
-            filters={filters}
-            onChange={setFilters}
-            onReset={resetFilters}
-            priceBounds={priceBounds}
-          />
+          {!isMounted ? (
+            <CatalogFilterSkeleton />
+          ) : (
+            <FilterSidebar
+              filters={filters}
+              onChange={setFilters}
+              onReset={resetFilters}
+              priceBounds={priceBounds}
+            />
+          )}
         </aside>
 
         {/* Product Grid Area */}
         <div className="lg:col-span-9 space-y-6">
-          {filteredProducts.length === 0 ? (
+          {!isMounted ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : filteredProducts.length === 0 ? (
             /* Empty State */
             <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-lg mx-auto space-y-4 shadow-sm">
               <div className="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">

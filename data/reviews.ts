@@ -1,0 +1,81 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { Review } from '../types';
+
+export const initialReviews: Review[] = [
+  {
+    id: 'rev-1',
+    productId: 1,
+    author: 'Վահան Գրիգորյան',
+    location: 'Երևան, Դավթաշեն',
+    rating: 5,
+    date: '2 շաբաթ առաջ',
+    title: 'Լատունը ծանր է, մագնիսը հիանալի է բռնում',
+    content: 'Տեղադրեցինք Մելքումովի սրահից գնելուց հետո, որակը գերազանց է, լատունը ծանր է: Ճկվող խողովակը շատ հարմար է մեծ կաթսաները լվանալիս: Իսկական գերմանական ինժեներիա:',
+    isVerifiedPlumber: true,
+    isVerifiedPurchase: true,
+  },
+  {
+    id: 'rev-2',
+    productId: 1,
+    author: 'Աննա Հարությունյան',
+    location: 'Երևան, Կենտրոն',
+    rating: 5,
+    date: '1 ամիս առաջ',
+    title: 'Խոհանոցի գլխավոր զարդը',
+    content: 'Մատ սև ծածկույթի վրա ջրի կաթիլների հետքեր չեն մնում, ինչը շատ կարևոր էր: Շնորհակալություն Մելքումովի սրահի տղաներին խորհրդատվության համար:',
+    isVerifiedPlumber: false,
+    isVerifiedPurchase: true,
+  },
+  {
+    id: 'rev-3',
+    productId: 6,
+    author: 'Արամ Սարգսյան (Սանտեխնիկ-վարպետ)',
+    location: 'Երևան, Արաբկիր',
+    rating: 5,
+    date: '3 օր առաջ',
+    title: 'Թերմոստատը ճշգրիտ պահում է 38 աստիճանը',
+    content: 'Շենքում ջրի ճնշման տատանումներ կան, բայց այս BRAVAT թերմոստատով ջուրը երբեք չի եռում կամ սառչում: Տեղադրումը շատ հեշտ էր, բոլոր էքսցենտրիկները լատունից են:',
+    isVerifiedPlumber: true,
+    isVerifiedPurchase: true,
+  },
+  {
+    id: 'rev-4',
+    productId: 10,
+    author: 'Գագիկ Մխիթարյան',
+    location: 'Երևան, Ավան',
+    rating: 5,
+    date: '2 շաբաթ առաջ',
+    title: 'Tornado Rimless լվացումը իդեալական մաքրում է',
+    content: 'Նախկինում ունեի եզրով զուգարանակոնք, անընդհատ կեղտ էր հավաքվում: Սրա մոտ անեզր է, 360 աստիճան հորձանուտով լվանում է առաջին իսկ անգամից: Սանֆարֆորը շատ հարթ է:',
+    isVerifiedPlumber: false,
+    isVerifiedPurchase: true,
+  },
+  {
+    id: 'rev-5',
+    productId: 15,
+    author: 'Կարեն Բաբայան (Ջեռուցման Ինժեներ)',
+    location: 'Երևան, Մալաթիա-Սեբաստիա',
+    rating: 5,
+    date: '1 շաբաթ առաջ',
+    title: 'Իտալական իսկական BAXI՝ հուսալի պլատայով',
+    content: 'Արդեն 12-րդ BAXI LUNA կաթսան եմ տեղադրում tab.am-ից գնված: ՀԾ կոդով միանգամից ստացա Մելքումովի պահեստից, պաշտոնական երաշխիքային կտրոնով: Գազի ծախսը շատ խնայող է:',
+    isVerifiedPlumber: true,
+    isVerifiedPurchase: true,
+  },
+  {
+    id: 'rev-6',
+    productId: 19,
+    author: 'Արսեն Գալստյան',
+    location: 'Կոտայք, Ձորաղբյուր',
+    rating: 5,
+    date: '3 շաբաթ առաջ',
+    title: 'EVOH թթվածնային պատնեշը անհրաժեշտություն է',
+    content: 'Տաք հատակը մոնտաժեցինք 200 քմ տան մեջ: Խողովակը շատ ճկուն է, ծալվելուց չի կոտրվում: Համակարգը ճնշման տակ փորձարկեցինք 8 բարով, իդեալական պահեց:',
+    isVerifiedPlumber: true,
+    isVerifiedPurchase: true,
+  },
+];

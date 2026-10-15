@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion } from 'motion/react';
 import {
   ShoppingBag,
   Zap,
@@ -13,12 +14,17 @@ import {
   FileCheck2,
   Plus,
   Minus,
-  FileText,
-  Clock,
+  Heart,
+  ArrowLeftRight,
+  Star,
+  Award,
 } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
+import { useWishlist } from '@/store/useWishlist';
+import { useCompare } from '@/store/useCompare';
+import { useRecentlyViewed } from '@/store/useRecentlyViewed';
 import { formatAMD } from '@/lib/utils';
 import QuickOrderModal from './QuickOrderModal';
 import StickyMobileBuyBar from './StickyMobileBuyBar';
@@ -29,10 +35,22 @@ interface ProductDetailViewProps {
 
 export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const { addItem, openDrawer } = useCart();
-  const { showCartToast, showCopyToast } = useToast();
+  const { showCartToast, showCopyToast, showToast } = useToast();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { isInCompare, toggleCompare } = useCompare();
+  const { addProduct } = useRecentlyViewed();
+
   const [quantity, setQuantity] = useState(1);
   const [copiedCode, setCopiedCode] = useState(false);
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false);
+
+  const isWishlisted = isInWishlist(product.id);
+  const isCompared = isInCompare(product.id);
+
+  // Track in recently viewed on mount
+  useEffect(() => {
+    addProduct(product);
+  }, [product, addProduct]);
 
   // Compute discount percentage
   const discountPercent =
@@ -53,6 +71,20 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
     openDrawer();
   };
 
+  const handleToggleWishlist = () => {
+    const added = toggleWishlist(product);
+    if (added) {
+      showToast('Ավելացվեց սիրվածների ցանկում', product.title);
+    } else {
+      showToast('Հեռացվեց սիրվածների ցանկից', product.title);
+    }
+  };
+
+  const handleToggleCompare = () => {
+    const res = toggleCompare(product);
+    showToast(res.message, product.title);
+  };
+
   return (
     <div className="space-y-6">
       {/* Sticky Buy Box Card */}
@@ -65,9 +97,17 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           >
             {product.categoryName}
           </Link>
-          <span className="text-xs font-extrabold uppercase tracking-widest text-slate-400">
-            {product.brand}
-          </span>
+
+          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-500">
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <span className="text-slate-800">{product.rating || 4.9}</span>
+            <a
+              href="#reviews-section"
+              className="text-slate-400 text-[11px] hover:underline cursor-pointer"
+            >
+              ({product.reviewsCount || 16} կարծիք)
+            </a>
+          </div>
         </div>
 
         {/* Title */}
@@ -75,7 +115,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           {product.title}
         </h1>
 
-        {/* ArmSoft ERP SKU Strip with 1-Click Copy */}
+        {/* ArmSoft ERP SKU Strip + Actions */}
         <div className="flex items-center gap-2.5 flex-wrap">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 text-white font-mono text-xs font-bold shadow-2xs">
             <span className="text-cyan-400">ՀԾ ԿՈԴ:</span>
@@ -86,7 +126,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             type="button"
             onClick={handleCopyCode}
             title="Պատճենել ՀԾ Կոդը"
-            className="min-h-[36px] px-3 py-1.5 rounded-xl border border-slate-200 hover:border-cyan-300 bg-slate-50 hover:bg-cyan-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="min-h-[44px] px-3.5 py-2 rounded-xl border border-slate-200 hover:border-cyan-300 bg-slate-50 hover:bg-cyan-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             {copiedCode ? (
               <>
@@ -100,6 +140,40 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               </>
             )}
           </button>
+
+          {/* Wishlist Button */}
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.9 }}
+            onClick={handleToggleWishlist}
+            className={`min-h-[44px] px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              isWishlisted
+                ? 'bg-rose-50 text-rose-600 border-rose-200'
+                : 'bg-slate-50 hover:bg-white text-slate-700 border-slate-200 hover:border-rose-200'
+            }`}
+          >
+            <Heart
+              className={`w-3.5 h-3.5 ${
+                isWishlisted ? 'fill-rose-500 text-rose-500' : 'text-slate-500'
+              }`}
+            />
+            <span>{isWishlisted ? 'Սիրվածներում է' : 'Սիրված'}</span>
+          </motion.button>
+
+          {/* Compare Button */}
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.9 }}
+            onClick={handleToggleCompare}
+            className={`min-h-[44px] px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              isCompared
+                ? 'bg-cyan-50 text-cyan-700 border-cyan-300'
+                : 'bg-slate-50 hover:bg-white text-slate-700 border-slate-200 hover:border-cyan-200'
+            }`}
+          >
+            <ArrowLeftRight className="w-3.5 h-3.5 text-cyan-600" />
+            <span>{isCompared ? 'Համեմատվում է' : 'Համեմատել'}</span>
+          </motion.button>
         </div>
 
         {/* Live Showroom Stock Status Badge */}
@@ -146,7 +220,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 aria-label="Նվազեցնել քանակը"
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer"
+                className="min-h-[48px] min-w-[48px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer"
               >
                 <Minus className="w-4 h-4" />
               </button>
@@ -159,7 +233,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 type="button"
                 onClick={() => setQuantity((q) => Math.min(product.stockQuantity, q + 1))}
                 aria-label="Ավելացնել քանակը"
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer"
+                className="min-h-[48px] min-w-[48px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
               </button>

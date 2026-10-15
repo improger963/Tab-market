@@ -5,6 +5,7 @@ import HeroBanner from '@/components/home/HeroBanner';
 import CategoryGrid from '@/components/home/CategoryGrid';
 import ShowroomTrustSection from '@/components/home/ShowroomTrustSection';
 import ProductCard from '@/components/product/ProductCard';
+import PlumberFaqSection from '@/components/home/PlumberFaqSection';
 import { products } from '@/data/products';
 
 export default function HomePage() {
@@ -99,6 +100,9 @@ export default function HomePage() {
 
       {/* 5. Physical Showroom & Warehouse Feature */}
       <ShowroomTrustSection />
+
+      {/* 6. Professional Plumber Advice & FAQ */}
+      <PlumberFaqSection />
     </div>
   );
 }
