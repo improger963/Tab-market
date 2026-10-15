@@ -11,14 +11,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowRight,
   MapPin,
-  ShieldCheck,
-  Truck,
-  Building2,
   Sparkles,
   ChevronLeft,
   ChevronRight,
   Flame,
-  Layers,
+  Truck,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface HeroSlide {
@@ -38,59 +36,58 @@ interface HeroSlide {
 const SLIDES: HeroSlide[] = [
   {
     id: 1,
-    badge: 'ՃԱՐՏԱՐԱՊԵՏԱԿԱՆ ԼՈԳԱՍԵՆՅԱԿ & ARMEX ՊԱՀԵՍՏ ԵՐԵՎԱՆՈՒՄ',
+    badge: 'ԳԱՐՆԱՆԱՅԻՆ ՎԵՐԱԶԻՆՈՒՄ • ՄԻՆՉԵՎ 40% ԶԵՂՉ',
     badgeIcon: Sparkles,
-    titlePrefix: 'ՍԱՆՏԵԽՆԻԿԱՅԻ ՃԱՐՏԱՐԱՊԵՏՈՒԹՅՈՒՆ',
-    titleHighlight: 'ՄԵԼՔՈՒՄՈՎԻ 40/1',
+    titlePrefix: 'ՇԱՀԱՎԵՏ ԱՌԱՋԱՐԿ․',
+    titleHighlight: 'ԼՈԳԱՍԵՆՅԱԿԻ ՀԱՎԱՔԱԾՈՒՆԵՐ',
     description:
-      'Պրեմիում լոգասենյակի կահավորում, անեզր rimless զուգարանակոնքեր և եվրոպական ստանդարտի սանտեխնիկա՝ անմիջապես պահեստից:',
-    primaryCtaText: 'Դիտել Կատալոգը',
+      'Մինչև 40% զեղչ պրեմիում դասի ցնցուղային համակարգերի, ծորակների և ինստալյացիաների վրա՝ Մելքումովի 40/1 սրահում:',
+    primaryCtaText: 'Դիտել Զեղչերը',
     primaryCtaLink: '/catalog',
     bgImage:
       'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=1600&q=85',
-    stat: '10+ Տարի',
-    statLabel: 'Պաշտոնական Երաշխիք',
+    stat: '-40%',
+    statLabel: 'Spring Special',
   },
   {
     id: 2,
-    badge: 'ԻՏԱԼԱԿԱՆ ՋԵՌՈՒՑՄԱՆ ՀԱՄԱԿԱՐԳԵՐ ԵՎ ԿԱԹՍԱՆԵՐ',
+    badge: 'ԽԵՂԱՑԻ ԿԱՀԱՎՈՐՈՒՄ ԵՎ LED ՀԱՅԵԼԻՆԵՐ',
     badgeIcon: Flame,
-    titlePrefix: 'ԲԱՁՐԱԿԱՐԳ BAXI ԿԱԹՍԱՆԵՐ ԵՎ VALTEC',
-    titleHighlight: 'ՏԱՔ ՀԱՏԱԿ',
+    titlePrefix: 'ԲԱՑԱՌԻԿ ԳԵՐՄԱՆԱԿԱՆ ԵՎ ԻՏԱԼԱԿԱՆ ՈՃ',
+    titleHighlight: 'LED ՀԱՅԵԼԻՆԵՐ ԵՎ ՊԱՀԱՐԱՆՆԵՐ',
     description:
-      '24 կՎտ կոնդենսացիոն կաթսաներ, PEX-A խողովակներ և լատունե կոլեկտորներ՝ անմիջական ցուցադրությամբ և առաքմամբ:',
-    primaryCtaText: 'Ջեռուցման Տեսականի',
+      'Ժամանակակից լոգարանի կահույք սենսորային կառավարմամբ, հակամառախուղային համակարգով և պատրաստի առաքմամբ:',
+    primaryCtaText: 'Բացահայտել Հավաքածուն',
     primaryCtaLink: '/catalog',
     bgImage:
-      'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1600&q=85',
-    stat: '100% Իտալիա',
-    statLabel: 'BAXI & VALTEC',
+      'https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=1600&q=85',
+    stat: '100% Առկա',
+    statLabel: 'Մելքումովի 40/1',
   },
   {
     id: 3,
-    badge: 'ԳԵՍՍԻ ԵՎ ԴՈՌՆԲՐԱԽՏ ՍՏԱՆԴԱՐՏԻ ԾՈՐԱԿՆԵՐ',
-    badgeIcon: Layers,
-    titlePrefix: 'ՄԱՏ ՍԵՎ ԵՎ ՇԱՄՊԱՅՆ ԲՐՈՆԶ ԾՈՐԱԿՆԵՐ',
-    titleHighlight: 'GESSI & GROHE',
+    badge: '🚚 ԱՆՎՃԱՐ ԱՌԱՔՈՒՄ ԵՐԵՎԱՆՈՒՄ ԱՆՄԻՋԱՊԵՍ',
+    badgeIcon: Truck,
+    titlePrefix: 'ԱՆՎՃԱՐ ԱՌԱՔՈՒՄ ԵՐԵՎԱՆՈՒՄ',
+    titleHighlight: 'ԱՆՄԻՋԱՊԵՍ ԳՆՄԱՆ ՕՐԸ',
     description:
-      'Թերմոստատիկ ցնցուղային համակարգեր, նեոպերլ աերատորներ և sedal քարթրիջներ՝ անզուգական ճարտարապետական դիզայնով:',
-    primaryCtaText: 'Բացահայտել Ծորակները',
+      'Գնե՛ք ցանկացած սանտեխնիկա առցանց կամ Մելքումովի 40/1 սրահից, և մենք կառաքենք Երևանի ողջ տարածքում անվճար:',
+    primaryCtaText: 'Անցնել Կատալոգ',
     primaryCtaLink: '/catalog',
     bgImage:
       'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1600&q=85',
-    stat: '750+ Կոդ',
-    statLabel: 'ՀԾ ArmSoft Առկա',
+    stat: '0 ֏',
+    statLabel: 'Անվճար Առաքում',
   },
 ];
 
 export default function HeroBanner() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Auto-slide every 7 seconds
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
-    }, 7000);
+    }, 6000);
     return () => clearInterval(timer);
   }, []);
 
@@ -98,83 +95,88 @@ export default function HeroBanner() {
   const BadgeIcon = slide.badgeIcon;
 
   return (
-    <section className="space-y-6">
-      {/* Architectural Hero Banner */}
-      <div className="relative rounded-3xl overflow-hidden bg-[#111317] text-white min-h-[500px] sm:min-h-[560px] flex items-center p-8 sm:p-14 lg:p-18 border border-black/10 shadow-luxury">
-        {/* Background photo with cross-fade transition */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={slide.id}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 0.4, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.9 }}
-            className="absolute inset-0 bg-cover bg-center pointer-events-none"
-            style={{ backgroundImage: `url(${slide.bgImage})` }}
+    <div className="relative rounded-3xl overflow-hidden bg-[#0F172A] border border-slate-800 shadow-2xl min-h-[480px] sm:min-h-[520px] flex flex-col justify-between">
+      {/* Background Image with AnimatePresence */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={slide.id}
+          initial={{ opacity: 0, scale: 1.03 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.7, ease: 'easeInOut' }}
+          className="absolute inset-0 z-0"
+        >
+          <img
+            src={slide.bgImage}
+            alt={slide.titleHighlight}
+            className="w-full h-full object-cover opacity-45"
+            loading="eager"
           />
-        </AnimatePresence>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A] via-[#0F172A]/80 to-[#0F172A]/40" />
+        </motion.div>
+      </AnimatePresence>
 
-        {/* Atmospheric Vignette Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#111317] via-[#111317]/80 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-radial from-[#C5A880]/15 via-[#111317]/50 to-[#111317] pointer-events-none" />
-
-        {/* Slide Content */}
-        <div className="relative z-10 max-w-3xl space-y-6">
-          {/* Top trust pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-[#C5A880] border border-[#C5A880]/30 text-xs font-mono font-bold tracking-widest backdrop-blur-md uppercase">
-            <BadgeIcon className="w-3.5 h-3.5 text-[#C5A880]" />
-            <span>{slide.badge}</span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light tracking-[0.08em] leading-[1.12] text-white">
-            {slide.titlePrefix}{' '}
-            <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#C5A880] via-[#e2cdb4] to-white">
-              {slide.titleHighlight}
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-[#F7F5F0]/80 text-sm sm:text-base lg:text-lg leading-relaxed max-w-2xl font-light">
-            {slide.description}
-          </p>
-
-          {/* Actions */}
-          <div className="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            <Link
-              href={slide.primaryCtaLink}
-              className="min-h-[50px] inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-[#C5A880] hover:bg-white active:scale-98 text-[#111317] font-bold text-xs uppercase tracking-[0.2em] transition-all shadow-luxury cursor-pointer"
-            >
-              <span>{slide.primaryCtaText}</span>
-              <ArrowRight className="w-4 h-4 text-[#111317]" />
-            </Link>
-
-            <a
-              href="https://maps.google.com/?q=Yerevan+Melkumovi+40/1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="min-h-[50px] inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs tracking-wider uppercase border border-white/15 transition-all cursor-pointer backdrop-blur-md"
-            >
-              <MapPin className="w-4 h-4 text-[#C5A880] shrink-0" />
-              <span>Մելքումովի 40/1 Սրահ</span>
-            </a>
-          </div>
+      {/* Slide Content */}
+      <div className="relative z-10 p-6 sm:p-12 lg:p-16 max-w-3xl space-y-6 my-auto">
+        {/* Top trust pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-mono font-bold tracking-wider backdrop-blur-md uppercase">
+          <BadgeIcon className="w-3.5 h-3.5 text-blue-400" />
+          <span>{slide.badge}</span>
         </div>
 
-        {/* Carousel controls & Stat badge */}
-        <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 z-20 flex items-center gap-4">
-          {/* Quick highlight badge */}
-          <div className="hidden sm:block text-right bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10 shadow-luxury">
-            <span className="text-sm font-black text-[#C5A880] block tabular-nums tracking-wider">
+        {/* Headline */}
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.12] text-white">
+          {slide.titlePrefix}{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-300 to-white block sm:inline">
+            {slide.titleHighlight}
+          </span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-slate-200 text-sm sm:text-base lg:text-lg leading-relaxed max-w-2xl font-normal">
+          {slide.description}
+        </p>
+
+        {/* Actions */}
+        <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+          <Link
+            href={slide.primaryCtaLink}
+            className="min-h-[48px] inline-flex items-center justify-center gap-3 px-8 py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-98 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg cursor-pointer"
+          >
+            <span>{slide.primaryCtaText}</span>
+            <ArrowRight className="w-4 h-4 text-white" />
+          </Link>
+
+          <a
+            href="https://maps.google.com/?q=Yerevan+Melkumovi+40/1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="min-h-[48px] inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 font-bold text-xs tracking-wider uppercase transition-all cursor-pointer shadow-xs"
+          >
+            <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
+            <span>Մելքումովի 40/1 Սրահ</span>
+          </a>
+        </div>
+      </div>
+
+      {/* Carousel controls & Stat badge */}
+      <div className="relative z-20 p-6 sm:p-8 flex items-center justify-between border-t border-slate-800/80 bg-[#0F172A]/80 backdrop-blur-md">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
+          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <span>Պաշտոնական 1-5 տարվա երաշխիք • ապառիկ 0%</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:block text-right">
+            <span className="text-sm font-black text-blue-400 block tabular-nums">
               {slide.stat}
             </span>
-            <span className="text-[9px] text-[#F7F5F0]/60 uppercase tracking-[0.2em] font-bold">
+            <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
               {slide.statLabel}
             </span>
           </div>
 
-          {/* Navigation Arrows */}
-          <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-luxury">
+          <div className="flex items-center gap-1.5 bg-[#1E293B] p-1.5 rounded-2xl border border-slate-700 shadow-lg">
             <button
               type="button"
               onClick={() =>
@@ -194,7 +196,7 @@ export default function HeroBanner() {
                   onClick={() => setCurrentSlide(idx)}
                   aria-label={`Սլայդ ${idx + 1}`}
                   className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                    currentSlide === idx ? 'w-6 bg-[#C5A880]' : 'w-1.5 bg-white/30'
+                    currentSlide === idx ? 'w-6 bg-blue-500' : 'w-1.5 bg-white/30'
                   }`}
                 />
               ))}
@@ -211,61 +213,6 @@ export default function HeroBanner() {
           </div>
         </div>
       </div>
-
-      {/* 4 Core Architectural Pillars Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Pillar 1 */}
-        <div className="bg-white rounded-2xl border border-[#111317]/[0.06] p-6 shadow-xs hover:shadow-luxury transition-all flex items-start gap-4 group">
-          <div className="w-12 h-12 rounded-2xl bg-[#F7F5F0] text-[#C5A880] flex items-center justify-center shrink-0 border border-black/[0.04] group-hover:bg-[#111317] group-hover:text-[#C5A880] transition-colors">
-            <MapPin className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-xs font-extrabold text-[#111317] uppercase tracking-wider">
-              Ֆիզիկական Սրահ
-            </h4>
-            <p className="text-xs text-[#111317]/60 mt-1 font-medium">ք. Երևան, Մելքումովի 40/1</p>
-          </div>
-        </div>
-
-        {/* Pillar 2 */}
-        <div className="bg-white rounded-2xl border border-[#111317]/[0.06] p-6 shadow-xs hover:shadow-luxury transition-all flex items-start gap-4 group">
-          <div className="w-12 h-12 rounded-2xl bg-[#F7F5F0] text-emerald-700 flex items-center justify-center shrink-0 border border-black/[0.04] group-hover:bg-[#111317] group-hover:text-emerald-400 transition-colors">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-xs font-extrabold text-[#111317] uppercase tracking-wider">
-              Մինչև 10 Տարի Երաշխիք
-            </h4>
-            <p className="text-xs text-[#111317]/60 mt-1 font-medium">Պաշտոնական սպասարկում</p>
-          </div>
-        </div>
-
-        {/* Pillar 3 */}
-        <div className="bg-white rounded-2xl border border-[#111317]/[0.06] p-6 shadow-xs hover:shadow-luxury transition-all flex items-start gap-4 group">
-          <div className="w-12 h-12 rounded-2xl bg-[#F7F5F0] text-[#111317] flex items-center justify-center shrink-0 border border-black/[0.04] group-hover:bg-[#111317] group-hover:text-[#C5A880] transition-colors">
-            <Truck className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-xs font-extrabold text-[#111317] uppercase tracking-wider">
-              Արագ Առաքում
-            </h4>
-            <p className="text-xs text-[#111317]/60 mt-1 font-medium">Երևանում և բոլոր մարզերում</p>
-          </div>
-        </div>
-
-        {/* Pillar 4 */}
-        <div className="bg-white rounded-2xl border border-[#111317]/[0.06] p-6 shadow-xs hover:shadow-luxury transition-all flex items-start gap-4 group">
-          <div className="w-12 h-12 rounded-2xl bg-[#F7F5F0] text-[#111317] flex items-center justify-center shrink-0 border border-black/[0.04] group-hover:bg-[#111317] group-hover:text-[#C5A880] transition-colors">
-            <Building2 className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-xs font-extrabold text-[#111317] uppercase tracking-wider">
-              B2B Հաշիվ-Ապրանքագիր
-            </h4>
-            <p className="text-xs text-[#111317]/60 mt-1 font-medium">ՀՎՀՀ-ով հաշիվներ վարպետներին</p>
-          </div>
-        </div>
-      </div>
-    </section>
+    </div>
   );
 }

@@ -108,13 +108,13 @@ export default function FilterSidebar({
   return (
     <div className="space-y-5 text-slate-800">
       {/* Global Header & Overall Reset */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+      <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-900">
+          <span className="text-xs font-black uppercase tracking-wider text-[#0F172A]">
             Ֆիլտրեր
           </span>
           {totalActiveCount > 0 && (
-            <span className="px-2 py-0.5 rounded-full bg-cyan-600 text-white text-[10px] font-black tabular-nums">
+            <span className="px-2 py-0.5 rounded-full bg-[#2563EB] text-white text-[10px] font-black tabular-nums">
               {totalActiveCount}
             </span>
           )}
@@ -123,7 +123,7 @@ export default function FilterSidebar({
           <button
             type="button"
             onClick={onReset}
-            className="text-xs font-semibold text-cyan-700 hover:text-cyan-800 flex items-center gap-1 transition-colors cursor-pointer"
+            className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Մաքրել բոլորը</span>
@@ -132,7 +132,7 @@ export default function FilterSidebar({
       </div>
 
       {/* Showroom Stock Direct Filter Card */}
-      <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 transition-colors">
+      <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 transition-colors">
         <label className="flex items-center justify-between cursor-pointer select-none">
           <div className="pr-2">
             <span className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
@@ -149,13 +149,13 @@ export default function FilterSidebar({
             onChange={(e) =>
               onChange((prev) => ({ ...prev, inStockOnly: e.target.checked }))
             }
-            className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 cursor-pointer"
+            className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 cursor-pointer accent-emerald-600"
           />
         </label>
       </div>
 
       {/* 1. Accordion: Categories */}
-      <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+      <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden bg-white">
         <div
           role="button"
           tabIndex={0}
@@ -166,15 +166,15 @@ export default function FilterSidebar({
               toggleSection('categories');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer select-none"
         >
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#0F172A]">
               Կատեգորիաներ
             </span>
             {categoryActiveCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800 text-[10px] font-black">
+              <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black">
                 {categoryActiveCount}
               </span>
             )}
@@ -187,7 +187,7 @@ export default function FilterSidebar({
                   e.stopPropagation();
                   onChange((prev) => ({ ...prev, category: null }));
                 }}
-                className="text-[11px] text-cyan-700 hover:text-cyan-900 font-bold underline"
+                className="text-[11px] text-blue-600 hover:text-blue-800 font-bold underline"
               >
                 Մաքրել
               </button>
@@ -207,8 +207,8 @@ export default function FilterSidebar({
               onClick={() => onChange((prev) => ({ ...prev, category: null }))}
               className={`w-full min-h-[36px] px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer text-left ${
                 filters.category === null
-                  ? 'bg-slate-950 text-white'
-                  : 'bg-slate-50 hover:bg-slate-100 text-slate-700'
+                  ? 'bg-[#0F172A] text-white shadow-xs'
+                  : 'bg-[#F8FAFC] hover:bg-slate-100 text-slate-700'
               }`}
             >
               <span>Բոլոր բաժինները</span>
@@ -223,14 +223,14 @@ export default function FilterSidebar({
                   onClick={() => onChange((prev) => ({ ...prev, category: cat.slug }))}
                   className={`w-full min-h-[36px] px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer text-left ${
                     isSelected
-                      ? 'bg-cyan-600 text-white shadow-xs'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700'
+                      ? 'bg-[#2563EB] text-white shadow-xs'
+                      : 'bg-[#F8FAFC] hover:bg-slate-100 text-slate-700'
                   }`}
                 >
                   <span className="truncate pr-2">{cat.title}</span>
                   <span
                     className={`text-[10px] px-2 py-0.5 rounded-full font-bold tabular-nums shrink-0 ${
-                      isSelected ? 'bg-cyan-700 text-white' : 'bg-slate-200/80 text-slate-600'
+                      isSelected ? 'bg-blue-800 text-white' : 'bg-slate-200 text-slate-600'
                     }`}
                   >
                     {cat.itemCount}
@@ -243,7 +243,7 @@ export default function FilterSidebar({
       </div>
 
       {/* 2. Accordion: Color & Finish Swatches */}
-      <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+      <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden bg-white">
         <div
           role="button"
           tabIndex={0}
@@ -254,15 +254,15 @@ export default function FilterSidebar({
               toggleSection('colors');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer select-none"
         >
           <div className="flex items-center gap-2">
             <Palette className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#0F172A]">
               Գույն / Ծածկույթ
             </span>
             {colorsActiveCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800 text-[10px] font-black">
+              <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black">
                 {colorsActiveCount}
               </span>
             )}
@@ -275,7 +275,7 @@ export default function FilterSidebar({
                   e.stopPropagation();
                   onChange((prev) => ({ ...prev, colors: [] }));
                 }}
-                className="text-[11px] text-cyan-700 hover:text-cyan-900 font-bold underline"
+                className="text-[11px] text-blue-600 hover:text-blue-800 font-bold underline"
               >
                 Մաքրել
               </button>
@@ -300,13 +300,13 @@ export default function FilterSidebar({
                     onClick={() => toggleArrayItem('colors', swatch.id)}
                     className={`min-h-[42px] px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       isSelected
-                        ? 'border-cyan-600 bg-cyan-50/70 text-cyan-950 ring-2 ring-cyan-500/20 shadow-xs'
-                        : 'border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 text-slate-700'
+                        ? 'border-blue-600 bg-blue-50 text-[#0F172A] ring-2 ring-blue-500/20 shadow-xs'
+                        : 'border-[#E2E8F0] bg-[#F8FAFC] hover:bg-white hover:border-slate-300 text-slate-700'
                     }`}
                   >
                     <span
-                      className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center transition-transform finish-shimmer ${swatch.bgClass} ${
-                        isSelected ? 'scale-110 ring-2 ring-cyan-600' : ''
+                      className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center transition-transform ${swatch.bgClass} ${
+                        isSelected ? 'scale-110 ring-2 ring-blue-600' : ''
                       }`}
                     >
                       {isSelected && (
@@ -322,8 +322,8 @@ export default function FilterSidebar({
         )}
       </div>
 
-      {/* 3. Accordion: Diameters & Sizes (Badge-style selector buttons) */}
-      <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+      {/* 3. Accordion: Diameters & Sizes */}
+      <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden bg-white">
         <div
           role="button"
           tabIndex={0}
@@ -334,15 +334,15 @@ export default function FilterSidebar({
               toggleSection('diameters');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer select-none"
         >
           <div className="flex items-center gap-2">
             <Ruler className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#0F172A]">
               Տրամագիծ և Չափսեր
             </span>
             {diametersActiveCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800 text-[10px] font-black">
+              <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black">
                 {diametersActiveCount}
               </span>
             )}
@@ -355,7 +355,7 @@ export default function FilterSidebar({
                   e.stopPropagation();
                   onChange((prev) => ({ ...prev, diameters: [] }));
                 }}
-                className="text-[11px] text-cyan-700 hover:text-cyan-900 font-bold underline"
+                className="text-[11px] text-blue-600 hover:text-blue-800 font-bold underline"
               >
                 Մաքրել
               </button>
@@ -380,11 +380,11 @@ export default function FilterSidebar({
                     onClick={() => toggleArrayItem('diameters', d.id)}
                     className={`min-h-[38px] px-3.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                       isChecked
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-white'
+                        ? 'bg-[#0F172A] text-white border-[#0F172A] shadow-xs'
+                        : 'bg-[#F8FAFC] text-slate-700 border-[#E2E8F0] hover:border-slate-300 hover:bg-white'
                     }`}
                   >
-                    {isChecked && <Check className="w-3.5 h-3.5 text-cyan-400" />}
+                    {isChecked && <Check className="w-3.5 h-3.5 text-blue-400" />}
                     <span>{d.label}</span>
                   </button>
                 );
@@ -395,7 +395,7 @@ export default function FilterSidebar({
       </div>
 
       {/* 4. Accordion: Brands & Materials */}
-      <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+      <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden bg-white">
         <div
           role="button"
           tabIndex={0}
@@ -406,15 +406,15 @@ export default function FilterSidebar({
               toggleSection('brandsMaterials');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer select-none"
         >
           <div className="flex items-center gap-2">
             <Briefcase className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#0F172A]">
               Նյութեր և Բրենդներ
             </span>
             {brandsMaterialsActiveCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800 text-[10px] font-black">
+              <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black">
                 {brandsMaterialsActiveCount}
               </span>
             )}
@@ -427,7 +427,7 @@ export default function FilterSidebar({
                   e.stopPropagation();
                   onChange((prev) => ({ ...prev, brands: [], materials: [] }));
                 }}
-                className="text-[11px] text-cyan-700 hover:text-cyan-900 font-bold underline"
+                className="text-[11px] text-blue-600 hover:text-blue-800 font-bold underline"
               >
                 Մաքրել
               </button>
@@ -457,8 +457,8 @@ export default function FilterSidebar({
                       onClick={() => toggleArrayItem('brands', brand)}
                       className={`min-h-[34px] px-3 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
                         isChecked
-                          ? 'bg-cyan-600 text-white border-cyan-600 shadow-2xs'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-white'
+                          ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-2xs'
+                          : 'bg-[#F8FAFC] text-slate-700 border-[#E2E8F0] hover:border-slate-300 hover:bg-white'
                       }`}
                     >
                       {isChecked && <Check className="w-3 h-3 text-white" />}
@@ -487,7 +487,7 @@ export default function FilterSidebar({
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => toggleArrayItem('materials', m.id)}
-                          className="w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500 border-slate-300 cursor-pointer"
+                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300 cursor-pointer accent-[#2563EB]"
                         />
                         <span>{m.label}</span>
                       </div>
@@ -501,7 +501,7 @@ export default function FilterSidebar({
       </div>
 
       {/* 5. Accordion: Price Range */}
-      <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+      <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden bg-white">
         <div
           role="button"
           tabIndex={0}
@@ -512,15 +512,15 @@ export default function FilterSidebar({
               toggleSection('price');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer select-none"
         >
           <div className="flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#0F172A]">
               Գնային Միջակայք
             </span>
             {priceActiveCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800 text-[10px] font-black">
+              <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black">
                 1
               </span>
             )}
@@ -537,7 +537,7 @@ export default function FilterSidebar({
                     maxPrice: priceBounds.max,
                   }));
                 }}
-                className="text-[11px] text-cyan-700 hover:text-cyan-900 font-bold underline"
+                className="text-[11px] text-blue-600 hover:text-blue-800 font-bold underline"
               >
                 Մաքրել
               </button>
@@ -563,7 +563,7 @@ export default function FilterSidebar({
                   onChange={(e) =>
                     onChange((prev) => ({ ...prev, minPrice: Number(e.target.value) || 0 }))
                   }
-                  className="w-full text-xs h-10 px-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold focus-cobalt tabular-nums"
+                  className="w-full text-xs h-10 px-2.5 rounded-xl bg-white border border-[#E2E8F0] font-bold focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 tabular-nums"
                 />
               </div>
               <div>
@@ -579,7 +579,7 @@ export default function FilterSidebar({
                       maxPrice: Number(e.target.value) || priceBounds.max,
                     }))
                   }
-                  className="w-full text-xs h-10 px-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold focus-cobalt tabular-nums"
+                  className="w-full text-xs h-10 px-2.5 rounded-xl bg-white border border-[#E2E8F0] font-bold focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 tabular-nums"
                 />
               </div>
             </div>
@@ -593,7 +593,7 @@ export default function FilterSidebar({
               onChange={(e) =>
                 onChange((prev) => ({ ...prev, maxPrice: Number(e.target.value) }))
               }
-              className="w-full accent-cyan-600 cursor-pointer"
+              className="w-full accent-[#2563EB] cursor-pointer"
             />
             <div className="flex justify-between text-[11px] text-slate-400 font-mono">
               <span>{formatAMD(priceBounds.min)}</span>
@@ -605,11 +605,11 @@ export default function FilterSidebar({
 
       {/* Drawer mobile apply button */}
       {isMobileDrawer && onCloseMobileDrawer && (
-        <div className="pt-4 border-t border-slate-200">
+        <div className="pt-4 border-t border-[#E2E8F0]">
           <button
             type="button"
             onClick={onCloseMobileDrawer}
-            className="w-full min-h-[48px] py-3 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold uppercase tracking-wider shadow-md"
+            className="w-full min-h-[48px] py-3 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white text-xs font-bold uppercase tracking-wider shadow-md"
           >
             Կիրառել Ֆիլտրերը
           </button>

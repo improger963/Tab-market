@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ShoppingBag, CheckCircle2, Copy, X, ArrowRight } from 'lucide-react';
-import { useToast, ToastItem } from '@/store/useToast';
+import { ShoppingBag, CheckCircle2, X, ArrowRight } from 'lucide-react';
+import { useToast } from '@/store/useToast';
 import { useCart } from '@/store/useCart';
 import { formatAMD } from '@/lib/utils';
 
@@ -32,7 +32,7 @@ export default function ToastContainer() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -15, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 500, damping: 32 }}
-            className="pointer-events-auto w-full bg-slate-900/95 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-2xl border border-slate-700/80 flex items-center justify-between gap-3"
+            className="pointer-events-auto w-full bg-[#0F172A]/95 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-2xl border border-slate-700/80 flex items-center justify-between gap-3"
           >
             {/* Left Content */}
             <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -46,7 +46,7 @@ export default function ToastContainer() {
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-cyan-400">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-blue-400">
                       <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
                       <span>{toast.title || 'Ավելացվել է զամբյուղ'}</span>
                     </div>
@@ -60,18 +60,18 @@ export default function ToastContainer() {
                 </>
               ) : toast.type === 'copy' ? (
                 <>
-                  <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-500/30">
+                  <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/30">
                     <CheckCircle2 className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs font-bold text-slate-100">{toast.title || 'Պատճենված է'}</div>
-                    <div className="text-[11px] text-cyan-200 truncate">{toast.message}</div>
+                    <div className="text-[11px] text-blue-200 truncate">{toast.message}</div>
                   </div>
                 </>
               ) : (
                 <>
                   <div className="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                    <CheckCircle2 className="w-4 h-4 text-blue-400" />
                   </div>
                   <div className="min-w-0 flex-1">
                     {toast.title && (
@@ -92,9 +92,9 @@ export default function ToastContainer() {
                     openDrawer();
                     removeToast(toast.id);
                   }}
-                  className="min-h-[36px] px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
+                  className="min-h-[36px] px-3 py-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-95 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
                 >
-                  <span>Դիտել Զամբյուղը</span>
+                  <span>Զամբյուղ</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               )}
@@ -103,7 +103,7 @@ export default function ToastContainer() {
                 type="button"
                 onClick={() => removeToast(toast.id)}
                 aria-label="Փակել"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>

@@ -5,23 +5,11 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import {
-  MapPin,
-  Truck,
-  Building,
-  CreditCard,
-  Banknote,
-  FileCheck2,
-  Phone,
-  User,
-  Mail,
-  ShieldCheck,
-  Check,
-} from 'lucide-react';
+import React from 'react';
+import { User, Phone, Mail, MapPin, Truck, CreditCard, Banknote, ShieldCheck } from 'lucide-react';
 
-export type DeliveryType = 'pickup' | 'yerevan' | 'regional';
-export type PaymentType = 'idram' | 'telcell' | 'card' | 'cash';
+export type DeliveryType = 'yerevan' | 'pickup';
+export type PaymentType = 'cash' | 'card' | 'idram';
 
 export interface CheckoutFormData {
   fullName: string;
@@ -30,13 +18,7 @@ export interface CheckoutFormData {
   deliveryMethod: DeliveryType;
   addressStreet: string;
   addressApartment: string;
-  addressFloor: string;
-  marz: string;
-  city: string;
   paymentMethod: PaymentType;
-  isB2B: boolean;
-  companyName: string;
-  companyTIN: string;
   orderNotes: string;
 }
 
@@ -44,38 +26,18 @@ interface CheckoutFormProps {
   data: CheckoutFormData;
   onChange: (updater: (prev: CheckoutFormData) => CheckoutFormData) => void;
   shippingCost: number;
-  hasAttemptedSubmit?: boolean;
 }
 
-const ARMENIAN_MARZES = [
-  'Կոտայք',
-  'Արարատ',
-  'Արմավիր',
-  'Շիրակ',
-  'Լոռի',
-  'Գեղարքունիք',
-  'Սյունիք',
-  'Տավուշ',
-  'Արագածոտն',
-  'Վայոց Ձոր',
-];
-
-export default function CheckoutForm({
-  data,
-  onChange,
-  shippingCost,
-  hasAttemptedSubmit = false,
-}: CheckoutFormProps) {
+export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutFormProps) {
   const updateField = <K extends keyof CheckoutFormData>(field: K, value: CheckoutFormData[K]) => {
     onChange((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Armenian phone auto-formatter: format strictly to +374 (XX) XX-XX-XX
+  // Armenian phone auto-formatter
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '');
-    // Strip leading 374 if entered
     const digits = raw.startsWith('374') ? raw.slice(3) : raw;
-    const trimmed = digits.slice(0, 8); // max 8 local digits (e.g. 95530435)
+    const trimmed = digits.slice(0, 8);
 
     let formatted = trimmed;
     if (trimmed.length > 2 && trimmed.length <= 5) {
@@ -91,20 +53,15 @@ export default function CheckoutForm({
     updateField('phone', formatted);
   };
 
-  const isPhoneInvalid = hasAttemptedSubmit && !data.phone.trim();
-  const isNameInvalid = hasAttemptedSubmit && !data.fullName.trim();
-  const isStreetInvalid =
-    hasAttemptedSubmit && data.deliveryMethod === 'yerevan' && !data.addressStreet.trim();
-
   return (
     <div className="space-y-8">
       {/* SECTION 1: Customer Personal Details */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-5">
+      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-5">
         <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold text-xs">
+          <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-xs">
             1
           </div>
-          <h2 className="text-base font-extrabold uppercase tracking-wider text-slate-900">
+          <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
             Գնորդի Տվյալներ
           </h2>
         </div>
@@ -121,24 +78,10 @@ export default function CheckoutForm({
                 value={data.fullName}
                 onChange={(e) => updateField('fullName', e.target.value)}
                 placeholder="օր.՝ Արմեն Գասպարյան"
-                className={`w-full h-12 pl-10 pr-3 rounded-xl bg-slate-50 border text-xs font-medium transition-all ${
-                  isNameInvalid
-                    ? 'border-rose-500 ring-2 ring-rose-500/20 animate-shake bg-rose-50/30'
-                    : 'border-slate-200 focus:bg-white focus-cobalt'
-                }`}
+                className="w-full h-12 pl-10 pr-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs font-medium focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all"
               />
-              <User
-                className={`w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${
-                  isNameInvalid ? 'text-rose-500' : 'text-slate-400'
-                }`}
-                aria-hidden="true"
-              />
+              <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
-            {isNameInvalid && (
-              <p className="text-[11px] text-rose-600 font-bold mt-1">
-                Խնդրում ենք լրացնել Ձեր անունը և ազգանունը:
-              </p>
-            )}
           </div>
 
           <div>
@@ -146,7 +89,7 @@ export default function CheckoutForm({
               Հեռախոսահամար <span className="text-rose-500">*</span>
             </label>
             <div className="relative flex items-center">
-              <div className="absolute left-3.5 flex items-center gap-1.5 text-xs font-bold text-slate-500 pointer-events-none">
+              <div className="absolute left-3.5 flex items-center gap-1 text-xs font-bold text-slate-500 pointer-events-none">
                 <span>🇦🇲 +374</span>
                 <span className="text-slate-300">|</span>
               </div>
@@ -155,153 +98,108 @@ export default function CheckoutForm({
                 required
                 value={data.phone}
                 onChange={handlePhoneChange}
-                placeholder="95 53-04-35"
-                className={`w-full h-12 pl-22 pr-3 rounded-xl bg-slate-50 border text-xs font-mono font-bold transition-all ${
-                  isPhoneInvalid
-                    ? 'border-rose-500 ring-2 ring-rose-500/20 animate-shake bg-rose-50/30'
-                    : 'border-slate-200 focus:bg-white focus-cobalt'
-                }`}
+                placeholder="(95) 53-04-35"
+                className="w-full h-12 pl-22 pr-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs font-mono font-bold focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all"
               />
             </div>
-            {isPhoneInvalid && (
-              <p className="text-[11px] text-rose-600 font-bold mt-1">
-                Խնդրում ենք մուտքագրել վավեր հեռախոսահամար:
-              </p>
-            )}
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Էլ. Փոստ <span className="text-[10px] font-normal text-slate-400">(ըստ ցանկության)</span>
+              Էլ. Փոստ <span className="text-slate-400 font-normal">(ըստ ցանկության)</span>
             </label>
             <div className="relative">
               <input
                 type="email"
                 value={data.email}
                 onChange={(e) => updateField('email', e.target.value)}
-                placeholder="օր.՝ info@domain.am"
-                className="w-full h-12 pl-10 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus-cobalt transition-all"
+                placeholder="օր.՝ armen@example.am"
+                className="w-full h-12 pl-10 pr-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs font-medium focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all"
               />
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* SECTION 2: Delivery Method */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-5">
+      {/* SECTION 2: Delivery Method (Strictly 2 Options) */}
+      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-5">
         <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold text-xs">
+          <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-xs">
             2
           </div>
-          <h2 className="text-base font-extrabold uppercase tracking-wider text-slate-900">
-            Ստացման / Առաքման Եղանակ
+          <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
+            Ստացման Եղանակ
           </h2>
         </div>
 
-        {/* Radio Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {/* 1. Pickup */}
-          <div
-            onClick={() => updateField('deliveryMethod', 'pickup')}
-            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
-              data.deliveryMethod === 'pickup'
-                ? 'border-cyan-600 bg-cyan-50/50 shadow-xs'
-                : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
-            }`}
-          >
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    data.deliveryMethod === 'pickup' ? 'bg-cyan-600 text-white' : 'bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  <MapPin className="w-4 h-4" aria-hidden="true" />
-                </div>
-                <span className="text-[11px] font-black text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                  ԱՆՎՃԱՐ
-                </span>
-              </div>
-              <h3 className="text-xs font-bold text-slate-900 leading-snug">
-                Ինքնարտահանում Սրահից
-              </h3>
-              <p className="text-[11px] text-slate-500 mt-1 leading-normal">
-                ք. Երևան, Մելքումովի 40/1 (Ամեն օր՝ 10:00 - 20:00)
-              </p>
-            </div>
-          </div>
-
-          {/* 2. Yerevan Delivery */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Option 1: Yerevan Delivery */}
           <div
             onClick={() => updateField('deliveryMethod', 'yerevan')}
-            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+            className={`p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
               data.deliveryMethod === 'yerevan'
-                ? 'border-cyan-600 bg-cyan-50/50 shadow-xs'
-                : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                ? 'border-[#2563EB] bg-blue-50/50 shadow-xs ring-2 ring-blue-500/10'
+                : 'border-[#E2E8F0] hover:border-slate-300 bg-[#F8FAFC]'
             }`}
           >
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-3">
                 <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    data.deliveryMethod === 'yerevan' ? 'bg-cyan-600 text-white' : 'bg-slate-200 text-slate-700'
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                    data.deliveryMethod === 'yerevan' ? 'bg-[#2563EB] text-white' : 'bg-slate-200 text-slate-700'
                   }`}
                 >
-                  <Truck className="w-4 h-4" aria-hidden="true" />
+                  <Truck className="w-5 h-5" />
                 </div>
-                <span className="text-[11px] font-bold text-slate-900 bg-white border border-slate-200 px-2 py-0.5 rounded-full tabular-nums">
-                  {shippingCost === 0 && data.deliveryMethod === 'yerevan' ? 'ԱՆՎՃԱՐ' : '1,500 ֏'}
+                <span className="text-[11px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                  ԱՆՎՃԱՐ (0 ֏)
                 </span>
               </div>
-              <h3 className="text-xs font-bold text-slate-900 leading-snug">
-                Առաքում Երևանում
-              </h3>
-              <p className="text-[11px] text-slate-500 mt-1 leading-normal">
-                24 ժամում մինչև Ձեր դուռը: Անվճար՝ 30,000 ֏-ից սկսած
+              <h3 className="text-sm font-bold text-[#0F172A]">Անվճար Առաքում Երևանի Տարածքում</h3>
+              <p className="text-xs text-slate-500 mt-1 leading-normal">
+                Առաքվում է 24 ժամում՝ անմիջապես Մելքումովի 40/1 պահեստից:
               </p>
             </div>
           </div>
 
-          {/* 3. Regional Delivery */}
+          {/* Option 2: Showroom Pickup */}
           <div
-            onClick={() => updateField('deliveryMethod', 'regional')}
-            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
-              data.deliveryMethod === 'regional'
-                ? 'border-cyan-600 bg-cyan-50/50 shadow-xs'
-                : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+            onClick={() => updateField('deliveryMethod', 'pickup')}
+            className={`p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+              data.deliveryMethod === 'pickup'
+                ? 'border-[#2563EB] bg-blue-50/50 shadow-xs ring-2 ring-blue-500/10'
+                : 'border-[#E2E8F0] hover:border-slate-300 bg-[#F8FAFC]'
             }`}
           >
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-3">
                 <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    data.deliveryMethod === 'regional' ? 'bg-cyan-600 text-white' : 'bg-slate-200 text-slate-700'
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                    data.deliveryMethod === 'pickup' ? 'bg-[#2563EB] text-white' : 'bg-slate-200 text-slate-700'
                   }`}
                 >
-                  <Building className="w-4 h-4" aria-hidden="true" />
+                  <MapPin className="w-5 h-5" />
                 </div>
-                <span className="text-[11px] font-bold text-slate-900 bg-white border border-slate-200 px-2 py-0.5 rounded-full tabular-nums">
-                  3,000 ֏
+                <span className="text-[11px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                  ԱՆՎՃԱՐ (0 ֏)
                 </span>
               </div>
-              <h3 className="text-xs font-bold text-slate-900 leading-snug">
-                Առաքում ՀՀ Մարզեր
-              </h3>
-              <p className="text-[11px] text-slate-500 mt-1 leading-normal">
-                ՀՀ բոլոր քաղաքներ և գյուղեր 2-3 օրում
+              <h3 className="text-sm font-bold text-[#0F172A]">Ինքնաարտահանում Սրահից</h3>
+              <p className="text-xs text-slate-500 mt-1 leading-normal">
+                ք. Երևան, Մելքումովի 40/1 (Բաց է ամեն օր՝ 10:00 - 20:00)
               </p>
             </div>
           </div>
         </div>
 
-        {/* Conditional Address Inputs for Yerevan Delivery with Smooth Accordion Fade */}
+        {/* Conditional Address Inputs for Yerevan Delivery */}
         {data.deliveryMethod === 'yerevan' && (
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 transition-all duration-300 ease-out animate-in fade-in slide-in-from-top-2">
-            <h4 className="text-xs font-bold text-slate-900">Հասցե Երևանում</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-4 animate-in fade-in duration-200">
+            <h4 className="text-xs font-bold text-[#0F172A]">Երևանի Առաքման Հասցե</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
                   Փողոց, Շենք <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -309,22 +207,13 @@ export default function CheckoutForm({
                   required={data.deliveryMethod === 'yerevan'}
                   value={data.addressStreet}
                   onChange={(e) => updateField('addressStreet', e.target.value)}
-                  placeholder="օր.՝ Կոմիտասի պող. 25"
-                  className={`w-full h-12 px-3.5 rounded-xl bg-white border text-xs transition-all ${
-                    isStreetInvalid
-                      ? 'border-rose-500 ring-2 ring-rose-500/20 animate-shake bg-rose-50/30'
-                      : 'border-slate-200 focus-cobalt'
-                  }`}
+                  placeholder="օր.՝ Կոմիտասի պող. 25, շենք 3"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-[#E2E8F0] text-base md:text-xs focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20"
                 />
-                {isStreetInvalid && (
-                  <p className="text-[11px] text-rose-600 font-bold mt-1">
-                    Խնդրում ենք լրացնել առաքման հասցեն (փողոց, շենք):
-                  </p>
-                )}
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
                   Բնակարան / Մուտք / Հարկ
                 </label>
                 <input
@@ -332,61 +221,7 @@ export default function CheckoutForm({
                   value={data.addressApartment}
                   onChange={(e) => updateField('addressApartment', e.target.value)}
                   placeholder="բն. 14, 2-րդ մուտք, 4-րդ հարկ"
-                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Conditional Address Inputs for Regional Delivery */}
-        {data.deliveryMethod === 'regional' && (
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 transition-all duration-300 ease-out animate-in fade-in slide-in-from-top-2">
-            <h4 className="text-xs font-bold text-slate-900">ՀՀ Մարզային Հասցե</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                  Մարզ <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  value={data.marz}
-                  onChange={(e) => updateField('marz', e.target.value)}
-                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold focus-cobalt cursor-pointer"
-                >
-                  <option value="">Ընտրեք մարզը</option>
-                  {ARMENIAN_MARZES.map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                  Քաղաք / Գյուղ <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required={data.deliveryMethod === 'regional'}
-                  value={data.city}
-                  onChange={(e) => updateField('city', e.target.value)}
-                  placeholder="օր.՝ Աբովյան"
-                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                  Փողոց, Շենք, Տուն <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required={data.deliveryMethod === 'regional'}
-                  value={data.addressStreet}
-                  onChange={(e) => updateField('addressStreet', e.target.value)}
-                  placeholder="օր.՝ Հանրապետության 12"
-                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-[#E2E8F0] text-base md:text-xs focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
             </div>
@@ -394,91 +229,78 @@ export default function CheckoutForm({
         )}
       </div>
 
-      {/* SECTION 3: Payment Method */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-5">
+      {/* SECTION 3: Payment Method Selectors */}
+      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-5">
         <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold text-xs">
+          <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-xs">
             3
           </div>
-          <h2 className="text-base font-extrabold uppercase tracking-wider text-slate-900">
+          <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
             Վճարման Եղանակ
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
           {[
-            { id: 'card', title: 'Bank Card', label: 'Բանկային Քարտ', icon: CreditCard },
-            { id: 'cash', title: 'Cash', label: 'Կանխիկ Սրահում / Տեղում', icon: Banknote },
-            { id: 'idram', title: 'Idram', label: 'Idram / Telcell', icon: ShieldCheck },
-            { id: 'telcell', title: 'B2B', label: 'B2B (ՀՎՀՀ փոխանցում)', icon: FileCheck2 },
+            {
+              id: 'cash',
+              title: 'Կանխիկ Վճարում',
+              desc: 'Սրահում կամ առաքիչին ստանալիս',
+              icon: Banknote,
+            },
+            {
+              id: 'card',
+              title: 'Անկանխիկ / Բանկային Քարտ',
+              desc: 'ArCa / Visa / Mastercard առցանց կամ տեղում',
+              icon: CreditCard,
+            },
+            {
+              id: 'idram',
+              title: 'Idram / Rocket Line',
+              desc: 'Անմիջապես հավելվածով կամ Rocket 0% ապառիկով',
+              icon: ShieldCheck,
+            },
           ].map((item) => {
             const Icon = item.icon;
             const isSelected = data.paymentMethod === item.id;
             return (
               <div
                 key={item.id}
-                onClick={() => updateField('paymentMethod', item.id as any)}
-                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                onClick={() => updateField('paymentMethod', item.id as PaymentType)}
+                className={`p-4.5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
-                    ? 'border-cyan-600 bg-cyan-50/50 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                    ? 'border-[#2563EB] bg-blue-50/50 shadow-xs ring-2 ring-blue-500/10'
+                    : 'border-[#E2E8F0] hover:border-slate-300 bg-[#F8FAFC]'
                 }`}
               >
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${
-                    isSelected ? 'bg-cyan-600 text-white' : 'bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" aria-hidden="true" />
+                <div>
+                  <div
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${
+                      isSelected ? 'bg-[#2563EB] text-white' : 'bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xs font-bold text-[#0F172A] leading-snug">{item.title}</h3>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-normal">{item.desc}</p>
                 </div>
-                <h3 className="text-xs font-bold text-slate-900 leading-snug">{item.label}</h3>
               </div>
             );
           })}
         </div>
 
-        {/* B2B Invoicing Checkbox */}
+        {/* Order Notes */}
         <div className="pt-2">
-          <label className="flex items-center gap-3 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={data.isB2B}
-              onChange={(e) => updateField('isB2B', e.target.checked)}
-              className="w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500 border-slate-300 cursor-pointer"
-            />
-            <span className="text-xs font-bold text-slate-800">
-              Ձևակերպել որպես իրավաբանական անձ (B2B հաշիվ-ապրանքագիր և ՀՎՀՀ)
-            </span>
+          <label className="block text-xs font-bold text-slate-700 mb-1">
+            Նշումներ պատվերի վերաբերյալ <span className="text-slate-400 font-normal">(ըստ ցանկության)</span>
           </label>
-
-          {data.isB2B && (
-            <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in">
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                  Կազմակերպության Անվանում <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={data.companyName}
-                  onChange={(e) => updateField('companyName', e.target.value)}
-                  placeholder="օր.՝ «ԱրմենՇին» ՍՊԸ"
-                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                  ՀՎՀՀ (TIN) <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={data.companyTIN}
-                  onChange={(e) => updateField('companyTIN', e.target.value)}
-                  placeholder="օր.՝ 01234567"
-                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold focus-cobalt"
-                />
-              </div>
-            </div>
-          )}
+          <textarea
+            rows={2}
+            value={data.orderNotes}
+            onChange={(e) => updateField('orderNotes', e.target.value)}
+            placeholder="Հարկ, դոմոֆոնի կոդ կամ առաքման հատուկ ժամ..."
+            className="w-full p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 font-medium"
+          />
         </div>
       </div>
     </div>

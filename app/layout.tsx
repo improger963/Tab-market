@@ -51,7 +51,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#020617', // slate-950
+  themeColor: '#0B192C',
 };
 
 export default function RootLayout({
@@ -61,10 +61,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="hy" className={`${inter.variable} ${jakarta.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen bg-slate-50 text-slate-800 antialiased flex flex-col font-sans selection:bg-cyan-500 selection:text-white">
+      <body className="min-h-screen bg-white text-slate-800 antialiased flex flex-col font-sans selection:bg-[#2563EB] selection:text-white overflow-x-hidden w-full max-w-[100vw] pb-[calc(env(safe-area-inset-bottom,16px)+72px)] md:pb-0">
         <TopBar />
         <Header />
-        <main className="flex-1 w-full">{children}</main>
+        <main className="flex-1 w-full bg-white">{children}</main>
         <Footer />
         <MobileNav />
         <CartDrawer />

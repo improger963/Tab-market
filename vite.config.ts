@@ -8,9 +8,9 @@ export default defineConfig(() => {
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
-        'next/link': path.resolve(__dirname, './lib/next-compat/link.tsx'),
-        'next/font/google': path.resolve(__dirname, './lib/next-compat/font.ts'),
+        '@': path.resolve(import.meta.dirname, '.'),
+        'next/link': path.resolve(import.meta.dirname, './lib/next-compat/link.tsx'),
+        'next/font/google': path.resolve(import.meta.dirname, './lib/next-compat/font.ts'),
       },
     },
     server: {

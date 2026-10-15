@@ -58,11 +58,11 @@ export default function PlumberFaqSection() {
   return (
     <section className="space-y-6 pt-4">
       <div className="text-center max-w-2xl mx-auto space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-xs font-extrabold uppercase tracking-widest">
-          <Wrench className="w-3.5 h-3.5 text-cyan-600" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-extrabold uppercase tracking-widest">
+          <Wrench className="w-3.5 h-3.5 text-blue-600" />
           <span>Մասնագիտական Խորհրդատվություն</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">
           Հաճախ Տրվող Հարցեր և Վարպետի Խորհուրդներ
         </h2>
         <p className="text-xs sm:text-sm text-slate-500">
@@ -77,7 +77,7 @@ export default function PlumberFaqSection() {
           return (
             <div
               key={faq.id}
-              className="border border-slate-200/90 rounded-2xl overflow-hidden bg-white shadow-2xs transition-all"
+              className="border border-[#E2E8F0] rounded-2xl overflow-hidden bg-white shadow-xs transition-all"
             >
               <button
                 type="button"
@@ -87,24 +87,24 @@ export default function PlumberFaqSection() {
                 <div className="flex items-center gap-3 min-w-0">
                   <div
                     className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                      isOpen ? 'bg-cyan-600 text-white' : 'bg-slate-100 text-slate-600'
+                      isOpen ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-600'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
                   </div>
-                  <span className="font-bold text-xs sm:text-sm text-slate-900 leading-snug">
+                  <span className="font-bold text-xs sm:text-sm text-[#0F172A] leading-snug">
                     {faq.question}
                   </span>
                 </div>
                 <ChevronDown
                   className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
-                    isOpen ? 'rotate-180 text-cyan-600' : ''
+                    isOpen ? 'rotate-180 text-blue-600' : ''
                   }`}
                 />
               </button>
 
               {isOpen && (
-                <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-[#F8FAFC]">
                   {faq.answer}
                 </div>
               )}

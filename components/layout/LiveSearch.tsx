@@ -7,7 +7,19 @@ import { products } from '@/data/products';
 import { Product } from '@/types';
 import { formatAMD } from '@/lib/utils';
 
-export default function LiveSearch() {
+interface LiveSearchProps {
+  autoFocus?: boolean;
+  onSelect?: () => void;
+  className?: string;
+  isOverlayMode?: boolean;
+}
+
+export default function LiveSearch({
+  autoFocus = false,
+  onSelect,
+  className = '',
+  isOverlayMode = false,
+}: LiveSearchProps) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +28,15 @@ export default function LiveSearch() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Auto focus if requested
+  useEffect(() => {
+    if (autoFocus) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+    }
+  }, [autoFocus]);
 
   // 150ms input debounce
   useEffect(() => {
@@ -94,10 +115,12 @@ export default function LiveSearch() {
         window.dispatchEvent(new PopStateEvent('popstate'));
         window.scrollTo({ top: 0, behavior: 'smooth' });
         setIsOpen(false);
+        onSelect?.();
       }
     } else if (e.key === 'Escape') {
       setIsOpen(false);
       inputRef.current?.blur();
+      onSelect?.();
     }
   };
 
@@ -116,7 +139,7 @@ export default function LiveSearch() {
       <>
         {parts.map((part, i) =>
           part.toLowerCase() === queryStr.toLowerCase() ? (
-            <mark key={i} className="bg-cyan-100 text-cyan-900 font-bold px-0.5 rounded">
+            <mark key={i} className="bg-blue-100 text-blue-900 font-bold px-0.5 rounded">
               {part}
             </mark>
           ) : (
@@ -128,7 +151,7 @@ export default function LiveSearch() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-xl">
+    <div ref={containerRef} className={`relative w-full ${className}`}>
       {/* Search Input Box */}
       <div className="relative flex items-center">
         <input
@@ -146,7 +169,7 @@ export default function LiveSearch() {
           onKeyDown={handleKeyDown}
           placeholder="Որոնել ըստ ՀԾ Կոդի (օր. 31297) կամ մոդելի..."
           aria-label="Որոնել սանտեխնիկա"
-          className="w-full h-11 pl-11 pr-24 rounded-xl bg-slate-100 hover:bg-slate-200/70 focus:bg-white text-slate-900 text-sm border border-slate-200 focus-cobalt focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 transition-all duration-200 placeholder:text-slate-400 font-normal"
+          className="w-full h-11 pl-11 pr-24 rounded-full bg-white hover:bg-slate-50 focus:bg-white text-slate-900 text-base md:text-sm border border-[#E2E8F0] focus:border-[#2563EB] focus:ring-4 focus:ring-blue-500/15 transition-all duration-200 placeholder:text-slate-400 font-normal shadow-2xs"
         />
 
         {/* Left search icon */}
@@ -158,7 +181,7 @@ export default function LiveSearch() {
             <button
               type="button"
               onClick={handleClear}
-              className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+              className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               aria-label="Մաքրել որոնումը"
             >
               <X className="w-4 h-4" />
@@ -169,21 +192,21 @@ export default function LiveSearch() {
             </kbd>
           )}
 
-          <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 bg-slate-900 text-cyan-400 rounded tracking-wider shadow-2xs">
+          <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 bg-[#0F172A] text-white rounded tracking-wider shadow-2xs">
             ՀԾ
           </span>
         </div>
       </div>
 
       {/* Results Dropdown */}
-      {isOpen && debouncedQuery && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-50 shadow-2xl rounded-2xl border border-slate-200 bg-white max-h-[440px] overflow-y-auto divide-y divide-slate-100 animate-in fade-in-50 zoom-in-95 duration-150">
+      {(isOpen || isOverlayMode) && debouncedQuery && (
+        <div className={`absolute top-full left-0 right-0 mt-2 z-50 shadow-2xl rounded-2xl border border-slate-200 bg-white max-h-[60vh] sm:max-h-[440px] overflow-y-auto divide-y divide-slate-100 animate-in fade-in-50 zoom-in-95 duration-150`}>
           {filteredProducts.length === 0 ? (
             <div className="p-8 text-center space-y-2">
               <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
                 <Search className="w-5 h-5" />
               </div>
-              <h4 className="text-sm font-bold text-slate-800">Արդյունք չի գտնվել</h4>
+              <h4 className="text-sm font-bold text-[#0F172A]">Արդյունք չի գտնվել</h4>
               <p className="text-xs text-slate-500 max-w-xs mx-auto">
                 «<span className="font-semibold text-slate-700">{debouncedQuery}</span>» հարցմամբ
                 ՀԾ կոդ կամ ապրանք չկա: Փորձեք <b>31297</b>, <b>18472</b> կամ <b>BAXI</b>:
@@ -193,7 +216,7 @@ export default function LiveSearch() {
             <>
               {/* Dropdown Header */}
               <div className="px-4 py-2.5 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
-                <span className="font-semibold text-slate-700">
+                <span className="font-semibold text-[#0F172A]">
                   ՀԾ համապատասխանող արդյունքներ ({filteredProducts.length})
                 </span>
                 <span className="hidden sm:inline text-[11px] text-slate-400">
@@ -201,54 +224,50 @@ export default function LiveSearch() {
                 </span>
               </div>
 
-              {/* Items List */}
-              <div className="p-1 space-y-0.5">
+              {/* Product List */}
+              <div className="divide-y divide-slate-100">
                 {filteredProducts.map((product, idx) => {
-                  const isSelected = selectedIndex === idx;
+                  const isSelected = idx === selectedIndex;
                   return (
                     <Link
                       key={product.id}
                       href={`/product/${product.slug}`}
-                      onClick={() => setIsOpen(false)}
-                      className={`group flex items-center gap-3 p-2.5 rounded-xl transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-cyan-50/80 text-cyan-950 ring-1 ring-cyan-500/30'
-                          : 'hover:bg-slate-50 text-slate-800'
+                      onClick={() => {
+                        setIsOpen(false);
+                        onSelect?.();
+                      }}
+                      className={`flex items-center gap-3.5 p-3 sm:p-3.5 transition-colors group cursor-pointer ${
+                        isSelected ? 'bg-blue-50/80 text-blue-950' : 'hover:bg-slate-50 text-slate-800'
                       }`}
                     >
-                      {/* Thumbnail */}
-                      <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                      {/* Product Thumbnail */}
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
                         <img
                           src={product.images[0]}
                           alt={product.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          className="w-full h-full object-cover group-hover:scale-106 transition-transform"
                           loading="lazy"
                         />
                       </div>
 
-                      {/* Info */}
+                      {/* Product Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-900 text-cyan-300 font-mono text-[10px] font-bold tracking-wider">
+                          <span className="font-mono text-[11px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">
                             ՀԾ: {highlightMatch(product.code, debouncedQuery)}
                           </span>
-
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                            {product.brand}
-                          </span>
-
                           <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            Առկա է սրահում ({product.stockQuantity})
+                            Առկա է ({product.stockQuantity})
                           </span>
                         </div>
 
-                        <h5 className="text-xs font-semibold truncate group-hover:text-cyan-700 transition-colors">
+                        <h5 className="text-xs font-semibold truncate group-hover:text-blue-600 transition-colors">
                           {highlightMatch(product.title, debouncedQuery)}
                         </h5>
 
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-xs font-bold text-slate-900 tabular-nums">
+                          <span className="text-xs font-bold text-[#0F172A] tabular-nums">
                             {formatAMD(product.price)}
                           </span>
                           {product.oldPrice && (
@@ -259,16 +278,16 @@ export default function LiveSearch() {
                         </div>
                       </div>
 
-                      <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-cyan-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0" />
                     </Link>
                   );
                 })}
               </div>
 
               {/* Dropdown Footer */}
-              <div className="px-4 py-2 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
                 <span className="flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-600" />
+                  <Sparkles className="w-3.5 h-3.5 text-blue-600" />
                   Մելքումովի 40/1 սրահի ուղիղ տվյալներ
                 </span>
                 <span className="font-mono text-[10px] text-slate-400">ArmSoft ERP v8.4</span>

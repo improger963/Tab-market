@@ -63,13 +63,13 @@ export default function OrderSummary({
   };
 
   return (
-    <div className="sticky top-24 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-6">
+    <div className="sticky top-24 bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-        <h2 className="text-base font-extrabold uppercase tracking-wider text-slate-900">
+        <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
           Ձեր Պատվերը
         </h2>
-        <span className="text-xs bg-slate-900 text-cyan-300 font-bold px-2.5 py-0.5 rounded-full tabular-nums">
+        <span className="text-xs bg-[#0F172A] text-white font-bold px-2.5 py-0.5 rounded-full tabular-nums">
           {count} ապրանք
         </span>
       </div>
@@ -81,14 +81,14 @@ export default function OrderSummary({
             <img
               src={item.product.images[0]}
               alt={item.product.title}
-              className="w-14 h-14 rounded-xl object-cover bg-slate-100 border border-slate-200 shrink-0"
+              className="w-14 h-14 rounded-xl object-cover bg-[#F8FAFC] border border-slate-200 shrink-0"
             />
             <div className="flex-1 min-w-0 flex flex-col justify-between">
               <div>
                 <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded">
                   Կոդ: {item.product.code}
                 </span>
-                <h4 className="font-bold text-slate-900 truncate mt-0.5 leading-snug">
+                <h4 className="font-bold text-[#0F172A] truncate mt-0.5 leading-snug">
                   {item.product.title}
                 </h4>
               </div>
@@ -97,7 +97,7 @@ export default function OrderSummary({
                 <span>
                   {formatAMD(item.product.price)} x {item.quantity}
                 </span>
-                <span className="font-extrabold text-slate-900 tabular-nums text-xs">
+                <span className="font-extrabold text-[#0F172A] tabular-nums text-xs">
                   {formatAMD(item.product.price * item.quantity)}
                 </span>
               </div>
@@ -107,7 +107,7 @@ export default function OrderSummary({
       </div>
 
       {/* Interactive Promo Code Form */}
-      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+      <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-2">
         <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 block">
           Պրոմոկոդ կամ Կուպոն
         </span>
@@ -123,12 +123,12 @@ export default function OrderSummary({
                   setCouponError(null);
                 }}
                 placeholder="TAB10, VARPET, FREE"
-                className="w-full h-9 pl-9 pr-3 rounded-xl bg-white border border-slate-200 text-xs font-bold uppercase placeholder:normal-case placeholder:font-normal focus-cobalt"
+                className="w-full h-9 pl-9 pr-3 rounded-xl bg-white border border-[#E2E8F0] text-xs font-bold uppercase placeholder:normal-case placeholder:font-normal focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
             <button
               type="submit"
-              className="px-4 h-9 rounded-xl bg-slate-900 hover:bg-cyan-600 text-white text-xs font-bold transition-all cursor-pointer"
+              className="px-4 h-9 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold transition-all cursor-pointer"
             >
               Կիրառել
             </button>
@@ -163,10 +163,10 @@ export default function OrderSummary({
       </div>
 
       {/* Cost Breakdown */}
-      <div className="border-t border-slate-200 pt-4 space-y-2 text-xs">
+      <div className="border-t border-[#E2E8F0] pt-4 space-y-2 text-xs">
         <div className="flex justify-between text-slate-600">
           <span>Միջանկյալ գումար՝</span>
-          <span className="font-semibold text-slate-900 tabular-nums">
+          <span className="font-semibold text-[#0F172A] tabular-nums">
             {formatAMD(subtotal)}
           </span>
         </div>
@@ -186,25 +186,25 @@ export default function OrderSummary({
                 {appliedCoupon?.freeShipping ? 'ԱՆՎՃԱՐ (FREE)' : 'ԱՆՎՃԱՐ'}
               </span>
             ) : (
-              <span className="text-slate-900">{formatAMD(effectiveShipping)}</span>
+              <span className="text-[#0F172A]">{formatAMD(effectiveShipping)}</span>
             )}
           </span>
         </div>
 
-        <div className="flex justify-between text-sm font-bold text-slate-900 pt-3 border-t border-slate-200 items-baseline">
+        <div className="flex justify-between text-sm font-bold text-[#0F172A] pt-3 border-t border-[#E2E8F0] items-baseline">
           <span>Ընդհանուր գումար՝</span>
-          <span className="text-2xl font-black text-cyan-700 tabular-nums">
+          <span className="text-2xl font-black text-[#0F172A] tabular-nums">
             {formatAMD(finalTotal)}
           </span>
         </div>
       </div>
 
-      {/* Submit Button */}
+      {/* Submit Button: High-contrast Deep Navy (bg-[#0F172A] hover:bg-[#2563EB] text-white font-bold py-4 rounded-xl) */}
       <button
         type="button"
         disabled={isSubmitting || items.length === 0}
         onClick={onSubmit}
-        className="w-full min-h-[52px] py-3.5 px-6 rounded-2xl bg-cyan-600 hover:bg-cyan-700 active:scale-98 disabled:opacity-50 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+        className="w-full min-h-[52px] py-4 px-6 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
       >
         {isSubmitting ? (
           <>
@@ -222,7 +222,7 @@ export default function OrderSummary({
       {/* Trust Badges */}
       <div className="pt-2 border-t border-slate-100 space-y-2 text-[11px] text-slate-500">
         <div className="flex items-center gap-2 text-slate-700">
-          <Warehouse className="w-4 h-4 text-cyan-600 shrink-0" />
+          <Warehouse className="w-4 h-4 text-blue-600 shrink-0" />
           <span>Ապրանքները բրոնյա են արվում Մելքումովի 40/1 պահեստում</span>
         </div>
 

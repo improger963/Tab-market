@@ -60,21 +60,21 @@ export default function QuickOrderModal({
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity animate-in fade-in"
+        className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-xs transition-opacity animate-in fade-in"
       />
 
       {/* Modal Dialog / Mobile Bottom Sheet */}
-      <div className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-10 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 max-h-[92vh] flex flex-col">
+      <div className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#E2E8F0] overflow-hidden z-10 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 max-h-[92vh] flex flex-col">
         {/* Mobile drag handle */}
-        <div className="sm:hidden flex justify-center pt-2.5 pb-1 bg-slate-950">
+        <div className="sm:hidden flex justify-center pt-2.5 pb-1 bg-[#0F172A]">
           <div className="w-12 h-1.5 rounded-full bg-slate-700" />
         </div>
 
         {/* Header */}
-        <div className="p-4 sm:p-5 bg-slate-950 text-white flex items-center justify-between border-b border-slate-800">
+        <div className="p-4 sm:p-5 bg-[#0F172A] text-white flex items-center justify-between border-b border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30">
-              <Zap className="w-4 h-4 fill-cyan-400" />
+            <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
+              <Zap className="w-4 h-4 fill-blue-400" />
             </div>
             <div>
               <h3 className="text-sm font-bold tracking-tight">Արագ Պատվեր 1 Քլիքով</h3>
@@ -86,14 +86,14 @@ export default function QuickOrderModal({
             type="button"
             onClick={onClose}
             aria-label="Փակել"
-            className="min-h-[48px] min-w-[48px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl transition-colors cursor-pointer"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Product Miniature Info */}
-        <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center gap-3">
+        <div className="p-4 bg-[#F8FAFC] border-b border-[#E2E8F0] flex items-center gap-3">
           <img
             src={product.images[0]}
             alt={product.title}
@@ -103,23 +103,23 @@ export default function QuickOrderModal({
             <span className="font-mono text-[10px] font-bold text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200">
               ՀԾ: {product.code}
             </span>
-            <h4 className="text-xs font-bold text-slate-900 truncate mt-1">
+            <h4 className="text-xs font-bold text-[#0F172A] truncate mt-1">
               {product.title}
             </h4>
-            <div className="text-xs font-black text-cyan-700 mt-0.5 tabular-nums">
+            <div className="text-xs font-black text-[#0F172A] mt-0.5 tabular-nums">
               {formatAMD(product.price)}
             </div>
           </div>
         </div>
 
-        {/* Form Body or Success State */}
-        <div className="p-6">
+        {/* Form Body or Success State with Safe Area Padding */}
+        <div className="p-5 sm:p-6 pb-[calc(env(safe-area-inset-bottom,16px)+16px)] sm:pb-6 overflow-y-auto">
           {isSuccess ? (
             <div className="text-center py-6 space-y-3">
               <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h4 className="text-base font-bold text-slate-900">
+              <h4 className="text-base font-bold text-[#0F172A]">
                 Ձեր պատվերն ընդունված է!
               </h4>
               <p className="text-xs text-slate-600 max-w-xs mx-auto leading-relaxed">
@@ -138,7 +138,7 @@ export default function QuickOrderModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Օրինակ՝ Արթուր Գասպարյան"
-                  className="w-full h-12 px-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus-cobalt font-medium"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-[#E2E8F0] text-base md:text-xs focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 font-medium"
                 />
               </div>
 
@@ -157,27 +157,27 @@ export default function QuickOrderModal({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="XX XX-XX-XX"
-                    className="w-full h-12 pl-22 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus-cobalt"
+                    className="w-full h-12 pl-22 pr-3 rounded-xl bg-white border border-[#E2E8F0] text-base md:text-xs font-mono font-bold focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
               </div>
 
               {/* Disclaimer */}
-              <div className="p-3 rounded-xl bg-cyan-50/70 border border-cyan-200/80 text-[11px] text-cyan-900 leading-relaxed">
+              <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-[11px] text-blue-900 leading-relaxed">
                 💡 <b>Արագ սպասարկում:</b> Մեր մասնագետը կզանգահարի ձեզ 15 րոպեի ընթացքում՝ պատվերը հաստատելու և առաքման մանրամասները ճշտելու համար:
               </div>
 
-              {/* Submit Button */}
+              {/* Submit Button: Royal Blue CTA */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full min-h-[50px] py-3.5 rounded-2xl bg-cyan-600 hover:bg-cyan-700 active:scale-98 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+                className="w-full min-h-[50px] py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <span>Գրանցվում է...</span>
                 ) : (
                   <>
-                    <Phone className="w-4 h-4" />
+                    <Phone className="w-4 h-4 text-blue-400" />
                     <span>Հաստատել Պատվերը</span>
                   </>
                 )}

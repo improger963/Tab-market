@@ -94,20 +94,20 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
   };
 
   return (
-    <div id="reviews-section" className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-xs space-y-8 scroll-mt-24">
+    <div id="reviews-section" className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-8 scroll-mt-24">
       {/* Header with Aggregate Rating and Write Review Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-200">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-black uppercase tracking-widest text-cyan-700">
+            <span className="text-xs font-black uppercase tracking-widest text-[#2563EB]">
               Սոցիալական Վստահություն
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
               <ShieldCheck className="w-3 h-3 text-emerald-600" />
               100% Ստուգված Գնորդներ
             </span>
           </div>
-          <h2 className="text-2xl font-black text-slate-950 tracking-tight">
+          <h2 className="text-2xl font-black text-[#0F172A] tracking-tight">
             Հաճախորդների և Վարպետների Կարծիքներ
           </h2>
           <p className="text-xs text-slate-500">
@@ -118,19 +118,19 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="min-h-[44px] px-5 py-2.5 rounded-2xl bg-slate-950 hover:bg-cyan-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs flex items-center gap-2 self-start sm:self-center cursor-pointer active:scale-95"
+          className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs flex items-center gap-2 self-start sm:self-center cursor-pointer active:scale-95"
         >
-          <MessageSquarePlus className="w-4 h-4 text-cyan-400" />
+          <MessageSquarePlus className="w-4 h-4 text-blue-400" />
           <span>Թողնել Կարծիք</span>
         </button>
       </div>
 
       {/* Ratings Summary Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-6 rounded-2xl bg-slate-50 border border-slate-200/80">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-6 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]">
         {/* Score column */}
         <div className="md:col-span-4 text-center sm:text-left space-y-1 sm:border-r border-slate-200 sm:pr-6">
           <div className="flex items-baseline justify-center sm:justify-start gap-2">
-            <span className="text-4xl sm:text-5xl font-black text-slate-950 tabular-nums">
+            <span className="text-4xl sm:text-5xl font-black text-[#0F172A] tabular-nums">
               {averageRating.toFixed(1)}
             </span>
             <span className="text-slate-400 text-lg font-bold">/ 5.0</span>
@@ -163,7 +163,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
               </span>
               <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-cyan-600 rounded-full"
+                  className="h-full bg-[#2563EB] rounded-full"
                   style={{ width: row.pct }}
                 />
               </div>
@@ -180,14 +180,14 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
         {reviews.map((rev) => (
           <div
             key={rev.id}
-            className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3"
+            className="p-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-xs space-y-3"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <span className="font-bold text-sm text-slate-900">{rev.author}</span>
+                <span className="font-bold text-sm text-[#0F172A]">{rev.author}</span>
                 {rev.isVerifiedPlumber && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 text-[10px] font-bold border border-cyan-200">
-                    <Wrench className="w-3 h-3 text-cyan-600" />
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 text-[10px] font-bold border border-blue-200">
+                    <Wrench className="w-3 h-3 text-blue-600" />
                     Վարպետ-Սանտեխնիկ
                   </span>
                 )}
@@ -198,7 +198,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
+              <div className="flex items-center gap-3 text-xs text-slate-400 font-medium">
                 <span>{rev.location}</span>
                 <span>•</span>
                 <span>{rev.date}</span>
@@ -206,17 +206,12 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Star
-                  key={s}
-                  className={`w-3.5 h-3.5 ${
-                    s <= rev.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'
-                  }`}
-                />
+              {[...Array(rev.rating)].map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               ))}
-              <span className="text-xs font-bold text-slate-900 ml-1">{rev.title}</span>
             </div>
 
+            <h4 className="font-bold text-xs sm:text-sm text-[#0F172A]">{rev.title}</h4>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
               {rev.content}
             </p>
@@ -224,18 +219,21 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
         ))}
       </div>
 
-      {/* Write a Review Modal */}
+      {/* Write Review Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 p-6 space-y-5 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="font-black text-base text-slate-950">
-                Թողնել Կարծիք Ապրանքի Մասին
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/70 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
+              <div>
+                <h3 className="font-black text-sm uppercase tracking-wider text-[#0F172A]">
+                  Գնահատել Ապրանքը
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">{product.title}</p>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -243,90 +241,106 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
 
             <form onSubmit={handleSubmitReview} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Գնահատական *</label>
+                <label className="block font-bold text-slate-700 mb-1">Գնահատական</label>
                 <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
+                  {[1, 2, 3, 4, 5].map((s) => (
                     <button
-                      key={star}
+                      key={s}
                       type="button"
-                      onClick={() => setNewRating(star)}
-                      className="p-1 cursor-pointer"
+                      onClick={() => setNewRating(s)}
+                      className="p-1 cursor-pointer focus:outline-hidden"
                     >
                       <Star
-                        className={`w-6 h-6 transition-transform hover:scale-125 ${
-                          star <= newRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'
+                        className={`w-6 h-6 ${
+                          s <= newRating
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-slate-200'
                         }`}
                       />
                     </button>
                   ))}
-                  <span className="font-bold text-slate-800 ml-2">{newRating} / 5 աստղ</span>
+                  <span className="font-bold text-slate-700 ml-2">{newRating} / 5</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Ձեր Անունը <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newAuthor}
+                    onChange={(e) => setNewAuthor(e.target.value)}
+                    placeholder="օր.՝ Կարեն Հովհաննիսյան"
+                    className="w-full h-10 px-3 rounded-xl bg-white border border-[#E2E8F0] focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Քաղաք / Համայնք</label>
+                  <input
+                    type="text"
+                    value={newLocation}
+                    onChange={(e) => setNewLocation(e.target.value)}
+                    placeholder="օր.՝ Երևան, Դավթաշեն"
+                    className="w-full h-10 px-3 rounded-xl bg-white border border-[#E2E8F0] focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 font-medium"
+                  />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Անուն, Ազգանուն *</label>
-                <input
-                  type="text"
-                  required
-                  value={newAuthor}
-                  onChange={(e) => setNewAuthor(e.target.value)}
-                  placeholder="Օրինակ՝ Արմեն Կարապետյան"
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus-cobalt"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Բնակավայր / Շրջան</label>
-                <input
-                  type="text"
-                  value={newLocation}
-                  onChange={(e) => setNewLocation(e.target.value)}
-                  placeholder="Օրինակ՝ Երևան, Դավթաշեն կամ Գյումրի"
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus-cobalt"
-                />
-              </div>
-
-              <label className="flex items-center gap-2 p-3 rounded-xl bg-cyan-50/70 border border-cyan-200 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={isPlumber}
-                  onChange={(e) => setIsPlumber(e.target.checked)}
-                  className="w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500 border-slate-300"
-                />
-                <span className="font-semibold text-cyan-950">
-                  Ես մասնագիտությամբ սանտեխնիկ / շինարար եմ (Certified Plumber badge)
-                </span>
-              </label>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Վերնագիր</label>
+                <label className="block font-bold text-slate-700 mb-1">Կարծիքի Վերնագիր</label>
                 <input
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="Օրինակ՝ Հիանալի որակի լատունե ծորակ"
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus-cobalt"
+                  placeholder="օր.՝ Հիանալի որակ, շատ գոհ եմ"
+                  className="w-full h-10 px-3 rounded-xl bg-white border border-[#E2E8F0] focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 font-medium"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Ձեր Կարծիքը *</label>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Ձեր Կարծիքը <span className="text-rose-500">*</span>
+                </label>
                 <textarea
                   required
                   rows={3}
                   value={newContent}
                   onChange={(e) => setNewContent(e.target.value)}
-                  placeholder="Ինչպե՞ս է աշխատում սանտեխնիկան, ինչպիսի՞ն էր տեղադրումը..."
-                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus-cobalt"
+                  placeholder="Նշեք տեղադրման որակի, նյութի և առաքման մասին..."
+                  className="w-full p-3 rounded-xl bg-white border border-[#E2E8F0] focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 font-medium"
                 />
               </div>
 
-              <button
-                type="submit"
-                className="w-full min-h-[46px] py-3 rounded-xl bg-cyan-600 hover:bg-cyan-700 active:scale-98 text-white font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer"
-              >
-                Հաստատել և Հրապարակել
-              </button>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={isPlumber}
+                  onChange={(e) => setIsPlumber(e.target.checked)}
+                  className="w-4 h-4 rounded text-[#2563EB] focus:ring-blue-500 border-slate-300"
+                />
+                <span className="font-semibold text-slate-700">
+                  Ես պրոֆեսիոնալ վարպետ-սանտեխնիկ եմ (ավելացնել համապատասխան նշում)
+                </span>
+              </label>
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
+                >
+                  Չեղարկել
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white font-bold transition-all shadow-xs cursor-pointer"
+                >
+                  Հրապարակել Կարծիքը
+                </button>
+              </div>
             </form>
           </div>
         </div>

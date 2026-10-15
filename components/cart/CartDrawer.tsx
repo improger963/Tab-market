@@ -1,3 +1,8 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -15,14 +20,18 @@ import {
   Tag,
   CheckCircle2,
   AlertCircle,
+  Truck,
+  Sparkles,
 } from 'lucide-react';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { formatAMD } from '@/lib/utils';
+import { products } from '@/data/products';
 
 export default function CartDrawer() {
   const {
     items,
+    addItem,
     isDrawerOpen,
     closeDrawer,
     removeItem,
@@ -36,7 +45,7 @@ export default function CartDrawer() {
     getFinalTotal,
   } = useCart();
 
-  const { showToast } = useToast();
+  const { showToast, showCartToast } = useToast();
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
 
@@ -78,7 +87,16 @@ export default function CartDrawer() {
   const count = totalCount();
   const subtotal = totalPrice();
   const discountAmount = getDiscountAmount();
-  const finalTotal = getFinalTotal(0); // in Yerevan default base shipping is free
+  const finalTotal = getFinalTotal(0);
+
+  // Free delivery threshold in Yerevan: 50,000 AMD
+  const freeDeliveryThreshold = 50000;
+  const progressPercent = Math.min(100, Math.round((subtotal / freeDeliveryThreshold) * 100));
+  const remainingForFree = Math.max(0, freeDeliveryThreshold - subtotal);
+
+  // Frequently bought together recommendations (suggest items not in cart)
+  const cartProductIds = new Set(items.map((i) => i.product.id));
+  const crossSellProducts = products.filter((p) => !cartProductIds.has(p.id)).slice(0, 3);
 
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +123,7 @@ export default function CartDrawer() {
       <div
         onClick={closeDrawer}
         aria-hidden="true"
-        className={`fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-[#0F172A]/70 backdrop-blur-xs transition-opacity duration-300 ${
           isDrawerOpen ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -113,22 +131,22 @@ export default function CartDrawer() {
       <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:left-auto md:right-0 max-w-full flex md:pl-10 justify-end items-end md:items-stretch">
         <div
           ref={drawerRef}
-          className={`w-full md:w-screen md:max-w-md bg-white shadow-2xl flex flex-col max-h-[92vh] md:max-h-full h-auto md:h-full rounded-t-3xl md:rounded-t-none md:border-l border-slate-200 transform transition-transform duration-300 ease-out ${
+          className={`w-full md:w-screen md:max-w-md bg-white shadow-2xl flex flex-col max-h-[92vh] md:max-h-full h-auto md:h-full rounded-t-3xl md:rounded-t-none md:border-l border-[#E2E8F0] transform transition-transform duration-300 ease-out ${
             isDrawerOpen
               ? 'translate-y-0 md:translate-x-0'
               : 'translate-y-full md:translate-y-0 md:translate-x-full'
           }`}
         >
           {/* Mobile pull handle */}
-          <div className="md:hidden flex justify-center pt-2.5 pb-1 bg-slate-950 rounded-t-3xl">
+          <div className="md:hidden flex justify-center pt-2.5 pb-1 bg-[#0F172A] rounded-t-3xl">
             <div className="w-12 h-1.5 rounded-full bg-slate-700" />
           </div>
 
-          {/* Drawer Header */}
-          <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-950 text-white shrink-0">
+          {/* Drawer Header: Deep Navy */}
+          <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-[#0F172A] text-white shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-cyan-600 flex items-center justify-center">
-                <ShoppingBag className="w-4 h-4 text-white" />
+              <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
+                <ShoppingBag className="w-4 h-4" />
               </div>
               <div>
                 <h3 className="font-bold text-sm tracking-tight">Զամբյուղ</h3>
@@ -143,11 +161,43 @@ export default function CartDrawer() {
               type="button"
               onClick={closeDrawer}
               aria-label="Փակել զամբյուղը"
-              className="min-h-[48px] min-w-[48px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Free Yerevan Delivery Progress Meter */}
+          {items.length > 0 && (
+            <div className="bg-blue-50 border-b border-blue-100 p-3 px-5 text-xs text-blue-950 shrink-0 space-y-1.5">
+              <div className="flex items-center justify-between font-semibold">
+                <span className="flex items-center gap-1.5">
+                  <Truck className="w-4 h-4 text-blue-600" />
+                  {subtotal >= freeDeliveryThreshold ? (
+                    <span className="text-emerald-700 font-bold">Անվճար առաքումը Երևանում ակտիվ է! 🚚</span>
+                  ) : (
+                    <span>Անվճար առաքում Երևանում</span>
+                  )}
+                </span>
+                <span className="font-mono text-[11px]">
+                  {subtotal >= freeDeliveryThreshold ? '100%' : `${progressPercent}%`}
+                </span>
+              </div>
+
+              {subtotal < freeDeliveryThreshold && (
+                <p className="text-[11px] text-slate-600">
+                  Ավելացրեք ևս <b className="text-blue-700">{formatAMD(remainingForFree)}</b> արժողությամբ ապրանք անվճար առաքման համար:
+                </p>
+              )}
+
+              <div className="w-full h-2 rounded-full bg-blue-200/60 overflow-hidden">
+                <div
+                  className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Drawer Scrollable Content Area */}
           <div className="flex-1 overflow-y-auto p-5 space-y-4">
@@ -158,7 +208,7 @@ export default function CartDrawer() {
                   <PackageOpen className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-bold text-sm text-slate-900">
+                  <h4 className="font-bold text-sm text-[#0F172A]">
                     Ձեր զամբյուղը դատարկ է
                   </h4>
                   <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
@@ -168,89 +218,138 @@ export default function CartDrawer() {
                 <button
                   type="button"
                   onClick={closeDrawer}
-                  className="min-h-[44px] px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-cyan-600 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+                  className="min-h-[44px] px-6 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-xs cursor-pointer"
                 >
                   Դիտել Կատալոգը
                 </button>
               </div>
             ) : (
-              /* Items list */
-              items.map((item) => (
-                <div
-                  key={item.product.id}
-                  className="p-3.5 rounded-2xl border border-slate-200 bg-white flex gap-3.5 shadow-2xs relative group hover:border-slate-300 transition-colors"
-                >
-                  {/* Thumbnail */}
-                  <img
-                    src={item.product.images[0]}
-                    alt={item.product.title}
-                    className="w-18 h-18 rounded-xl object-cover bg-slate-100 border border-slate-200 shrink-0"
-                  />
+              <>
+                {/* Items list */}
+                <div className="space-y-3">
+                  {items.map((item) => (
+                    <div
+                      key={item.product.id}
+                      className="p-3.5 rounded-2xl border border-[#E2E8F0] bg-white flex gap-3.5 shadow-2xs relative group hover:border-slate-300 transition-colors"
+                    >
+                      {/* Thumbnail */}
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.product.title}
+                        className="w-18 h-18 rounded-xl object-cover bg-[#F8FAFC] border border-slate-200 shrink-0"
+                      />
 
-                  {/* Body */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-start justify-between gap-1">
-                        <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
-                          Կոդ: {item.product.code}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => removeItem(item.product.id)}
-                          aria-label={`Հեռացնել ${item.product.title}`}
-                          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-rose-600 transition-colors cursor-pointer rounded-lg hover:bg-rose-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      {/* Body */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-start justify-between gap-1">
+                            <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                              Կոդ: {item.product.code}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeItem(item.product.id)}
+                              aria-label={`Հեռացնել ${item.product.title}`}
+                              className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-400 hover:text-rose-600 transition-colors cursor-pointer rounded-lg hover:bg-rose-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
 
-                      <h4 className="font-bold text-xs text-slate-900 line-clamp-2 mt-1 leading-snug">
-                        {item.product.title}
-                      </h4>
-                    </div>
+                          <h4 className="font-bold text-xs text-[#0F172A] line-clamp-2 mt-1 leading-snug">
+                            {item.product.title}
+                          </h4>
+                        </div>
 
-                    {/* Quantity controls and item subtotal */}
-                    <div className="flex items-center justify-between pt-2">
-                      <div className="flex items-center border border-slate-200 rounded-xl bg-slate-50 p-0.5">
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                          aria-label="Նվազեցնել քանակը"
-                          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-600 hover:bg-white rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
+                        {/* Quantity controls and item subtotal */}
+                        <div className="flex items-center justify-between pt-2">
+                          <div className="flex items-center border border-[#E2E8F0] rounded-xl bg-[#F8FAFC] p-0.5">
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                              aria-label="Նվազեցնել քանակը"
+                              className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-600 hover:bg-white rounded-lg transition-colors cursor-pointer"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
 
-                        <span className="w-8 text-center text-xs font-bold text-slate-900 tabular-nums">
-                          {item.quantity}
-                        </span>
+                            <span className="w-8 text-center text-xs font-bold text-[#0F172A] tabular-nums">
+                              {item.quantity}
+                            </span>
 
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                          disabled={item.quantity >= item.product.stockQuantity}
-                          aria-label="Ավելացնել քանակը"
-                          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-30 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                              disabled={item.quantity >= item.product.stockQuantity}
+                              aria-label="Ավելացնել քանակը"
+                              className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-30 rounded-lg transition-colors cursor-pointer"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
 
-                      <div className="text-right">
-                        <div className="text-xs font-black text-slate-900 tabular-nums">
-                          {formatAMD(item.product.price * item.quantity)}
+                          <div className="text-right">
+                            <div className="text-xs font-black text-[#0F172A] tabular-nums">
+                              {formatAMD(item.product.price * item.quantity)}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))
+
+                {/* Frequently Bought Together (Cross-Sell) Section */}
+                {crossSellProducts.length > 0 && (
+                  <div className="pt-4 border-t border-slate-200 space-y-3">
+                    <div className="flex items-center gap-2 text-xs font-black text-[#0F172A] uppercase tracking-wider">
+                      <Sparkles className="w-4 h-4 text-blue-600" />
+                      <span>Հաճախ գնվում է միասին</span>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {crossSellProducts.map((crossSell) => (
+                        <div
+                          key={crossSell.id}
+                          className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 hover:border-blue-300 transition-colors"
+                        >
+                          <img
+                            src={crossSell.images[0]}
+                            alt={crossSell.title}
+                            className="w-11 h-11 rounded-xl object-cover bg-white border border-slate-200 shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-xs font-bold text-[#0F172A] truncate">
+                              {crossSell.title}
+                            </h5>
+                            <div className="text-xs font-extrabold text-blue-600 tabular-nums">
+                              {formatAMD(crossSell.price)}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              addItem(crossSell, 1);
+                              showCartToast(crossSell, 1);
+                            }}
+                            className="px-3 py-2 rounded-xl bg-[#0F172A] hover:bg-blue-600 text-white text-xs font-bold shrink-0 transition-all cursor-pointer shadow-xs flex items-center gap-1"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Ավելացնել</span>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
-          {/* Drawer Footer */}
+          {/* Drawer Footer with Safe Area */}
           {items.length > 0 && (
-            <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50/90 space-y-3.5 shrink-0">
+            <div className="p-4 sm:p-5 pb-[calc(env(safe-area-inset-bottom,16px)+16px)] sm:pb-5 border-t border-[#E2E8F0] bg-slate-50/90 space-y-3.5 shrink-0">
               {/* Interactive Promo Code Form */}
               <div className="space-y-2">
                 {!appliedCoupon ? (
@@ -265,12 +364,12 @@ export default function CartDrawer() {
                           setCouponError(null);
                         }}
                         placeholder="Պրոմոկոդ (TAB10, VARPET, FREE)"
-                        className="w-full h-12 pl-10 pr-3 rounded-xl bg-white border border-slate-200 text-xs font-bold uppercase placeholder:normal-case placeholder:font-normal focus-cobalt"
+                        className="w-full h-11 pl-10 pr-3 rounded-xl bg-white border border-[#E2E8F0] text-base md:text-xs font-bold uppercase placeholder:normal-case placeholder:font-normal focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20"
                       />
                     </div>
                     <button
                       type="submit"
-                      className="px-4 min-h-[48px] rounded-xl bg-slate-900 hover:bg-cyan-600 text-white text-xs font-bold transition-all cursor-pointer"
+                      className="px-4 min-h-[44px] rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold transition-all cursor-pointer"
                     >
                       Կիրառել
                     </button>
@@ -289,7 +388,7 @@ export default function CartDrawer() {
                     <button
                       type="button"
                       onClick={removeCoupon}
-                      className="min-h-[44px] px-2 text-[11px] text-rose-600 hover:underline font-bold ml-2 shrink-0 cursor-pointer flex items-center"
+                      className="min-h-[36px] px-2 text-[11px] text-rose-600 hover:underline font-bold ml-2 shrink-0 cursor-pointer flex items-center"
                     >
                       Հեռացնել
                     </button>
@@ -305,8 +404,8 @@ export default function CartDrawer() {
               </div>
 
               {/* Showroom pickup badge */}
-              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-cyan-50/70 border border-cyan-200 text-cyan-900 text-xs">
-                <ShieldCheck className="w-4 h-4 text-cyan-700 shrink-0" />
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-blue-50/70 border border-blue-200 text-blue-900 text-xs">
+                <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
                 <span className="font-semibold">
                   Անվճար ստացում Մելքումովի 40/1 սրահից
                 </span>
@@ -316,7 +415,7 @@ export default function CartDrawer() {
               <div className="space-y-1.5 text-xs text-slate-600">
                 <div className="flex justify-between">
                   <span>Միջանկյալ գումար՝</span>
-                  <span className="font-semibold text-slate-900 tabular-nums">
+                  <span className="font-semibold text-[#0F172A] tabular-nums">
                     {formatAMD(subtotal)}
                   </span>
                 </div>
@@ -333,27 +432,27 @@ export default function CartDrawer() {
                   <span className="font-semibold text-emerald-700">Անվճար</span>
                 </div>
 
-                <div className="flex justify-between text-sm pt-2 border-t border-slate-200 font-bold text-slate-900">
+                <div className="flex justify-between text-sm pt-2 border-t border-[#E2E8F0] font-bold text-[#0F172A]">
                   <span>Ընդամենը՝</span>
-                  <span className="text-xl font-black text-cyan-700 tabular-nums">
+                  <span className="text-xl font-black text-[#0F172A] tabular-nums">
                     {formatAMD(finalTotal)}
                   </span>
                 </div>
               </div>
 
-              {/* Checkout CTA */}
+              {/* Checkout CTA: Deep Navy / Royal Blue */}
               <Link
                 href="/checkout"
                 onClick={closeDrawer}
-                className="min-h-[52px] w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer"
+                className="min-h-[50px] w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer"
               >
                 <span>Ձևակերպել Պատվերը</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-white" />
               </Link>
 
               <div className="flex items-center justify-between text-[10px] text-slate-400">
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-cyan-600" />
+                  <MapPin className="w-3 h-3 text-blue-600" />
                   Երևան, Մելքումովի 40/1
                 </span>
                 <span>ՀԾ (ArmSoft) Սինք</span>

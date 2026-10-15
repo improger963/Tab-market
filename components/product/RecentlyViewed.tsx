@@ -28,28 +28,28 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
   if (displayItems.length === 0) return null;
 
   return (
-    <section className="space-y-6 pt-10 border-t border-slate-200">
+    <section className="space-y-6 pt-10 border-t border-[#E2E8F0]">
       <div className="flex items-center justify-between">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-cyan-700">
+          <div className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-[#2563EB]">
             <History className="w-3.5 h-3.5" />
             <span>Դուք Վերջերս Դիտել Եք</span>
           </div>
-          <h2 className="text-2xl font-black text-slate-950 tracking-tight mt-0.5">
+          <h2 className="text-2xl font-black text-[#0F172A] tracking-tight mt-0.5">
             Վերջին Դիտված Ապրանքները
           </h2>
         </div>
 
         <Link
           href="/catalog"
-          className="text-xs font-bold text-cyan-700 hover:text-cyan-800 flex items-center gap-1 transition-colors"
+          className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
         >
           <span>Կատալոգ</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
         {displayItems.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

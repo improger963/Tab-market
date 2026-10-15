@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Package, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -17,13 +17,23 @@ import OrderDetailsSummary from '@/components/track/OrderDetailsSummary';
 
 function TrackOrderContent() {
   const searchParams = useSearchParams();
-  const urlOrderId = searchParams.get('id') || searchParams.get('orderId') || '';
-
   const [order, setOrder] = useState<TrackedOrderDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [urlOrderId, setUrlOrderId] = useState<string>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const sp = new URLSearchParams(window.location.search);
+        return sp.get('id') || sp.get('orderId') || '';
+      }
+    } catch {
+      // ignore
+    }
+    return '';
+  });
 
-  const handleSearch = async (orderId: string, phone: string) => {
+  const handleSearch = useCallback(async (orderId: string, phone: string) => {
+    if (!orderId.trim()) return;
     setIsLoading(true);
     setErrorMessage('');
     setOrder(null);
@@ -36,14 +46,24 @@ function TrackOrderContent() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  // Auto-search if `?id=TAB-XXXXX` is provided in query params on mount
+  // Sync search parameters safely if available
   useEffect(() => {
-    if (urlOrderId) {
-      handleSearch(urlOrderId, '');
+    let id = searchParams?.get('id') || searchParams?.get('orderId') || '';
+    if (!id && typeof window !== 'undefined') {
+      try {
+        const sp = new URLSearchParams(window.location.search);
+        id = sp.get('id') || sp.get('orderId') || '';
+      } catch {
+        // ignore
+      }
     }
-  }, [urlOrderId]);
+    if (id) {
+      setUrlOrderId(id);
+      handleSearch(id, '');
+    }
+  }, [searchParams, handleSearch]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
@@ -51,7 +71,7 @@ function TrackOrderContent() {
       <div className="flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-cyan-600 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>Վերադառնալ Գլխավոր Էջ</span>

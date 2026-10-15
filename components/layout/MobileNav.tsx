@@ -7,7 +7,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Home, LayoutGrid, Package, Heart, ShoppingBag, PhoneCall } from 'lucide-react';
+import { Home, LayoutGrid, Package, Heart, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/store/useCart';
 import { useWishlist } from '@/store/useWishlist';
 
@@ -15,61 +15,98 @@ export default function MobileNav() {
   const { openDrawer, totalCount } = useCart();
   const { totalCount: wishlistCount } = useWishlist();
   const [isMounted, setIsMounted] = useState(false);
+  const [currentPath, setCurrentPath] = useState('/');
 
   useEffect(() => {
     setIsMounted(true);
+    if (typeof window !== 'undefined') {
+      setCurrentPath(window.location.pathname || '/');
+      const handleLocationChange = () => {
+        setCurrentPath(window.location.pathname || '/');
+      };
+      window.addEventListener('popstate', handleLocationChange);
+      return () => window.removeEventListener('popstate', handleLocationChange);
+    }
   }, []);
 
   const count = isMounted ? totalCount() : 0;
   const wishCount = isMounted ? wishlistCount() : 0;
 
+  const isHome = currentPath === '/';
+  const isCatalog = currentPath.startsWith('/catalog') || currentPath.startsWith('/category');
+  const isTrack = currentPath.startsWith('/track-order');
+  const isWishlist = currentPath.startsWith('/wishlist');
+
   return (
     <nav
       aria-label="Մոբայլ նավիգացիա"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200/90 px-1 py-1 flex items-center justify-around shadow-2xl safe-area-pb"
+      className="md:hidden fixed bottom-[calc(env(safe-area-inset-bottom,12px)+8px)] left-3 right-3 z-40 max-w-lg mx-auto bg-[#0F172A]/95 backdrop-blur-xl text-white rounded-2xl border border-slate-800 px-2 py-1 flex items-center justify-around shadow-2xl"
     >
       {/* 1. Home */}
       <Link
         href="/"
-        className="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center text-slate-600 hover:text-cyan-600 active:scale-95 transition-all text-[10px] font-semibold gap-0.5 px-2"
+        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
+          isHome ? 'text-[#2563EB]' : 'text-slate-300 hover:text-white'
+        }`}
       >
-        <Home className="w-5 h-5 text-slate-700" />
-        <span>Գլխավոր</span>
+        <div className="relative">
+          <Home className={`w-5 h-5 ${isHome ? 'text-[#2563EB]' : 'text-slate-300'}`} />
+          {isHome && (
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+          )}
+        </div>
+        <span className={isHome ? 'font-bold text-white' : ''}>Գլխավոր</span>
       </Link>
 
       {/* 2. Catalog */}
       <Link
         href="/catalog"
-        className="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center text-slate-600 hover:text-cyan-600 active:scale-95 transition-all text-[10px] font-semibold gap-0.5 px-2"
+        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
+          isCatalog ? 'text-[#2563EB]' : 'text-slate-300 hover:text-white'
+        }`}
       >
-        <LayoutGrid className="w-5 h-5 text-slate-700" />
-        <span>Կատալոգ</span>
+        <div className="relative">
+          <LayoutGrid className={`w-5 h-5 ${isCatalog ? 'text-[#2563EB]' : 'text-slate-300'}`} />
+          {isCatalog && (
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+          )}
+        </div>
+        <span className={isCatalog ? 'font-bold text-white' : ''}>Կատալոգ</span>
       </Link>
 
       {/* 3. Track Order */}
       <Link
         href="/track-order"
-        className="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center text-cyan-700 active:scale-95 transition-all text-[10px] font-bold gap-0.5 px-2"
+        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
+          isTrack ? 'text-[#2563EB]' : 'text-slate-300 hover:text-white'
+        }`}
       >
-        <Package className="w-5 h-5 text-cyan-600" />
-        <span>Ստուգել</span>
+        <div className="relative">
+          <Package className={`w-5 h-5 ${isTrack ? 'text-[#2563EB]' : 'text-slate-300'}`} />
+          {isTrack && (
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+          )}
+        </div>
+        <span className={isTrack ? 'font-bold text-white' : ''}>Ստուգել</span>
       </Link>
 
       {/* 4. Wishlist */}
       <Link
         href="/wishlist"
         aria-label={`Սիրվածներ, ${wishCount} ապրանք`}
-        className="min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center text-slate-600 hover:text-cyan-600 active:scale-95 transition-all text-[10px] font-semibold gap-0.5 px-2 cursor-pointer"
+        className={`min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 cursor-pointer ${
+          isWishlist ? 'text-rose-400' : 'text-slate-300 hover:text-white'
+        }`}
       >
         <div className="relative">
-          <Heart className="w-5 h-5 text-slate-700" />
+          <Heart className={`w-5 h-5 ${isWishlist ? 'fill-rose-500 text-rose-500' : 'text-slate-300'}`} />
           {isMounted && wishCount > 0 && (
             <span className="absolute -top-1.5 -right-2 bg-rose-500 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center tabular-nums leading-none shadow-xs">
               {wishCount > 99 ? '99+' : wishCount}
             </span>
           )}
         </div>
-        <span>Սիրված</span>
+        <span className={isWishlist ? 'font-bold text-white' : ''}>Սիրված</span>
       </Link>
 
       {/* 5. Cart Trigger with live badge */}
@@ -77,29 +114,18 @@ export default function MobileNav() {
         type="button"
         onClick={openDrawer}
         aria-label={`Զամբյուղ, ${count} ապրանք`}
-        className="min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center text-slate-600 hover:text-cyan-600 active:scale-95 transition-all text-[10px] font-semibold gap-0.5 px-2 cursor-pointer"
+        className="min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl cursor-pointer"
       >
         <div className="relative">
-          <ShoppingBag className="w-5 h-5 text-slate-700" />
+          <ShoppingBag className="w-5 h-5 text-slate-300" />
           {isMounted && count > 0 && (
-            <span className="absolute -top-1.5 -right-2 bg-cyan-600 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center tabular-nums leading-none shadow-xs">
+            <span className="absolute -top-1.5 -right-2 bg-[#2563EB] text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center tabular-nums leading-none shadow-xs">
               {count > 99 ? '99+' : count}
             </span>
           )}
         </div>
         <span>Զամբյուղ</span>
       </button>
-
-      {/* 6. Call Showroom */}
-      <a
-        href="tel:095530435"
-        className="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center text-cyan-700 active:scale-95 transition-all text-[10px] font-bold gap-0.5 px-2"
-      >
-        <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center">
-          <PhoneCall className="w-3 h-3 text-cyan-700" />
-        </div>
-        <span>Զանգել</span>
-      </a>
     </nav>
   );
 }

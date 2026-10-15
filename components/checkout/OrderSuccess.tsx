@@ -1,3 +1,8 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -9,7 +14,6 @@ import {
   Phone,
   Clock,
   ArrowRight,
-  FileCheck2,
   Copy,
   Check,
 } from 'lucide-react';
@@ -25,7 +29,6 @@ export default function OrderSuccess({ orderData, orderNumber }: OrderSuccessPro
   const { clearCart } = useCart();
   const [copied, setCopied] = useState(false);
 
-  // Reset cart once the order is placed
   useEffect(() => {
     clearCart();
   }, [clearCart]);
@@ -37,22 +40,19 @@ export default function OrderSuccess({ orderData, orderNumber }: OrderSuccessPro
   };
 
   const getPaymentName = () => {
-    if (orderData.paymentMethod === 'idram') return 'Idram / Rocket';
-    if (orderData.paymentMethod === 'telcell') return 'Telcell Wallet';
+    if (orderData.paymentMethod === 'idram') return 'Idram / Rocket Line (Ապառիկ)';
     if (orderData.paymentMethod === 'card') return 'Բանկային Քարտ (ArCa / Visa / Mastercard)';
-    return 'Կանխիկ վճարում';
+    return 'Կանխիկ Վճարում (Սրահում կամ առաքիչին)';
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-slate-200/90 p-8 sm:p-12 shadow-sm text-center space-y-8 animate-in zoom-in-95 duration-200">
-      {/* Big Emerald Checkmark */}
+    <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-[#E2E8F0] p-8 sm:p-12 shadow-sm text-center space-y-8 animate-in zoom-in-95 duration-200">
       <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner animate-in fade-in zoom-in-50 duration-300">
         <CheckCircle2 className="w-12 h-12" />
       </div>
 
-      {/* Headings */}
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 text-cyan-400 font-mono text-xs font-bold shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F172A] text-blue-400 font-mono text-xs font-bold shadow-2xs">
           <span>ՊԱՏՎԵՐ № {orderNumber}</span>
           <button
             type="button"
@@ -60,11 +60,11 @@ export default function OrderSuccess({ orderData, orderNumber }: OrderSuccessPro
             className="hover:text-white p-0.5 transition-colors cursor-pointer"
             title="Պատճենել համարը"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-cyan-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-blue-400" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">
           Շնորհակալություն, Ձեր պատվերն ընդունված է!
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
@@ -73,77 +73,65 @@ export default function OrderSuccess({ orderData, orderNumber }: OrderSuccessPro
       </div>
 
       {/* Details Card */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200/80 text-left text-xs space-y-3.5">
+      <div className="p-5 sm:p-6 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] text-left text-xs space-y-3.5">
         <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/70">
           <span className="text-slate-500 font-medium">Ստացող՝</span>
-          <span className="font-bold text-slate-900">{orderData.fullName} ({orderData.phone})</span>
+          <span className="font-bold text-[#0F172A]">{orderData.fullName} ({orderData.phone})</span>
         </div>
 
         <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/70">
           <span className="text-slate-500 font-medium">Վճարման եղանակ՝</span>
-          <span className="font-bold text-slate-900">{getPaymentName()}</span>
+          <span className="font-bold text-[#0F172A]">{getPaymentName()}</span>
         </div>
 
         <div className="flex justify-between items-start pb-2.5 border-b border-slate-200/70">
           <span className="text-slate-500 font-medium shrink-0">Ստացման վայր՝</span>
-          <div className="text-right font-bold text-slate-900">
+          <div className="text-right font-bold text-[#0F172A]">
             {orderData.deliveryMethod === 'pickup' && (
-              <span className="flex items-center gap-1.5 justify-end text-cyan-700">
-                <MapPin className="w-3.5 h-3.5" />
+              <span className="flex items-center gap-1.5 justify-end text-blue-700">
+                <MapPin className="w-3.5 h-3.5 text-blue-600" />
                 ք. Երևան, Մելքումովի 40/1 (Խանութ-Սրահ)
               </span>
             )}
             {orderData.deliveryMethod === 'yerevan' && (
-              <span>Երևան, {orderData.addressStreet} {orderData.addressApartment}</span>
-            )}
-            {orderData.deliveryMethod === 'regional' && (
-              <span>ՀՀ {orderData.marz}, ք./գ. {orderData.city}, {orderData.addressStreet}</span>
+              <span className="flex items-center gap-1.5 justify-end text-emerald-700">
+                <Truck className="w-3.5 h-3.5 text-emerald-600" />
+                Անվճար առաքում Երևանում ({orderData.addressStreet})
+              </span>
             )}
           </div>
         </div>
-
-        {orderData.isB2B && (
-          <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/70 text-cyan-900 bg-cyan-50/50 p-2 rounded-xl">
-            <span className="flex items-center gap-1.5 font-bold">
-              <FileCheck2 className="w-3.5 h-3.5 text-cyan-600" />
-              ՀԾ Էլեկտրոնային Հաշիվ՝
-            </span>
-            <span className="font-mono font-black">{orderData.companyName} (ՀՎՀՀ: {orderData.companyTIN})</span>
-          </div>
-        )}
 
         <div className="flex justify-between items-center text-slate-500 text-[11px] pt-1">
           <span className="flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
             Սրահի աշխատանքային ժամեր՝
           </span>
-          <span className="font-semibold text-slate-800">Երկ - Կիրակի՝ 09:00 - 19:00</span>
+          <span className="font-semibold text-slate-800">Երկ - Կիրակի՝ 10:00 - 20:00</span>
         </div>
       </div>
 
-      {/* Confirmation notice */}
-      <div className="p-4 rounded-2xl bg-cyan-50/80 border border-cyan-200/80 text-xs text-cyan-950 flex items-center justify-center gap-2">
-        <Phone className="w-4 h-4 text-cyan-700 shrink-0" />
+      <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-950 flex items-center justify-center gap-2">
+        <Phone className="w-4 h-4 text-blue-600 shrink-0" />
         <span>
           Մեր մենեջերը կկապվի Ձեզ հետ <b>15 րոպեի ընթացքում</b>՝ պատվերը վերջնական հաստատելու համար:
         </span>
       </div>
 
-      {/* Return home & Track Order CTAs */}
       <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
         <Link
           href={`/track-order?id=${orderNumber}`}
-          className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98"
+          className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98"
         >
           <span>Հետևել Պատվերի Ընթացքին</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
 
         <Link
-          href="/"
-          className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+          href="/catalog"
+          className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white border border-[#E2E8F0] hover:bg-slate-50 text-[#0F172A] font-extrabold text-xs uppercase tracking-wider transition-all shadow-xs"
         >
-          <span>Վերադառնալ Գլխավոր Էջ</span>
+          <span>Շարունակել Գնումները</span>
         </Link>
       </div>
     </div>

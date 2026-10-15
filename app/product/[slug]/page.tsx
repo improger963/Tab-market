@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ChevronRight, FileText, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { ChevronRight, FileText, ShieldCheck } from 'lucide-react';
 import { products } from '@/data/products';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductDetailView from '@/components/product/ProductDetailView';
@@ -49,49 +49,57 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .slice(0, 4);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 sm:space-y-12">
       {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500">
-        <Link href="/" className="hover:text-cyan-600 transition-colors">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-500 overflow-x-auto no-scrollbar whitespace-nowrap py-0.5">
+        <Link href="/" className="hover:text-blue-600 transition-colors shrink-0">
           Գլխավոր
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <Link href="/catalog" className="hover:text-cyan-600 transition-colors">
+        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <Link href="/catalog" className="hover:text-blue-600 transition-colors shrink-0">
           Կատալոգ
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
         <Link
-          href={`/catalog/${product.categorySlug}`}
-          className="hover:text-cyan-600 transition-colors"
+          href={`/category/${product.categorySlug}`}
+          className="hover:text-blue-600 transition-colors shrink-0"
         >
           {product.categoryName}
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <span className="text-slate-900 font-bold truncate max-w-xs sm:max-w-md">
+        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <span className="text-[#0F172A] font-bold truncate max-w-xs sm:max-w-md shrink-0">
           {product.title}
         </span>
       </nav>
 
-      {/* Main 2-Column Product Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        {/* Left Column (7 cols): Gallery + Technical Specs */}
-        <div className="lg:col-span-7 space-y-10">
+      {/* Main 2-Column Product Layout on Desktop, Mobile-First Stacked Flow */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-start">
+        {/* Gallery: 1st on mobile, left 7 cols on desktop */}
+        <div className="lg:col-span-7">
           <ProductGallery
             images={product.images}
             blueprintImage={product.blueprintImage}
             title={product.title}
           />
+        </div>
 
+        {/* Buy Box: 2nd on mobile (immediately following gallery), right 5 cols on desktop (sticky top-28 spanning gallery and specs) */}
+        <div className="lg:col-span-5 lg:row-span-2 lg:sticky lg:top-28">
+          <ProductDetailView product={product} />
+        </div>
+
+        {/* Technical Specs & Description: 3rd on mobile, underneath gallery on desktop in left 7 cols */}
+        <div className="lg:col-span-7 space-y-6 sm:space-y-8">
           {/* Description Block */}
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
-            <h2 className="text-base font-extrabold uppercase tracking-wider text-slate-900">
+          <div className="bg-white p-5 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-4">
+            <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
               Ապրանքի Նկարագրություն
             </h2>
-            <p className="text-sm text-slate-600 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
               {product.shortDesc}
             </p>
-            <div className="p-4 rounded-2xl bg-cyan-50/70 border border-cyan-200/80 text-xs text-cyan-950 flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 text-cyan-700 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 text-xs text-blue-950 flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
               <span>
                 Այս մոդելն անցել է գործարանային 10 բար հիդրավլիկ ճնշման փորձարկում և ունի պաշտոնական
                 երաշխիքային կտրոն:
@@ -100,23 +108,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
 
           {/* Technical Specifications Section */}
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-xs space-y-5">
+          <div className="bg-white p-5 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-5">
             <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-cyan-600" />
-              <h2 className="text-base font-extrabold uppercase tracking-wider text-slate-900">
+              <FileText className="w-5 h-5 text-blue-600" />
+              <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
                 Տեխնիկական Բնութագիր (Specifications)
               </h2>
             </div>
 
-            <div className="border border-slate-200 rounded-2xl overflow-hidden">
+            <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden">
               <table className="w-full text-xs text-left">
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-[#E2E8F0]">
                   {Object.entries(product.specs).map(([key, value]) => (
                     <tr key={key} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-3 px-4 font-semibold text-slate-600 bg-slate-50/50 w-2/5">
+                      <td className="py-2.5 sm:py-3 px-3 sm:px-4 font-semibold text-slate-600 bg-slate-50/50 w-2/5">
                         {key}
                       </td>
-                      <td className="py-3 px-4 text-slate-900 font-bold">{value}</td>
+                      <td className="py-2.5 sm:py-3 px-3 sm:px-4 text-[#0F172A] font-bold">{value}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -124,29 +132,24 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           </div>
         </div>
-
-        {/* Right Column (5 cols): Sticky Buy Box */}
-        <div className="lg:col-span-5 sticky top-24">
-          <ProductDetailView product={product} />
-        </div>
       </div>
 
       {/* Customer & Plumber Reviews */}
       <ProductReviews product={product} />
 
-      {/* Related Products Section */}
+      {/* Related Products Section (2-col mobile, 4-col desktop) */}
       {relatedProducts.length > 0 && (
-        <section className="space-y-6 pt-10 border-t border-slate-200">
+        <section className="space-y-6 pt-10 border-t border-[#E2E8F0]">
           <div>
-            <span className="text-xs font-extrabold uppercase tracking-widest text-cyan-700">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563EB]">
               Առաջարկներ
             </span>
-            <h2 className="text-2xl font-black text-slate-950 tracking-tight mt-0.5">
+            <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight mt-0.5">
               Նմանատիպ Ապրանքներ Այս Բաժնում
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {relatedProducts.map((relProduct) => (
               <ProductCard key={relProduct.id} product={relProduct} />
             ))}
