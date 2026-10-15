@@ -1,0 +1,6 @@
+{
+  "name": "tab.am - Ջրամատակարարում և Սանտեխնիկա",
+  "description": "tab.am - Ժամանակակից սանտեխնիկայի և ջրամատակարարման առաջատար խանութ-սրահ Երևանում (Մելքումովի 40/1): ՀԾ (ArmSoft) կոդերով ապրանքացանկ:",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
