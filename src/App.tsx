@@ -15,6 +15,7 @@ import ProductCard from '@/components/product/ProductCard';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductDetailView from '@/components/product/ProductDetailView';
 import CatalogView from '@/components/catalog/CatalogView';
+import BrandPageClient from '@/components/brand/BrandPageClient';
 import HomePage from '@/app/page';
 import CheckoutPage from '@/app/checkout/page';
 import WishlistPage from '@/app/wishlist/page';
@@ -64,6 +65,10 @@ export default function App() {
     if (currentPath.startsWith('/category/')) {
       const categorySlug = currentPath.replace('/category/', '').split('/')[0];
       return { page: 'catalog', categorySlug };
+    }
+    if (currentPath.startsWith('/brand/')) {
+      const slug = currentPath.replace('/brand/', '').split('/')[0];
+      return { page: 'brand', slug };
     }
     if (currentPath === '/catalog') {
       return { page: 'catalog', categorySlug: 'all' };
@@ -283,6 +288,13 @@ export default function App() {
       {route.page === 'track-order' && (
         <main className="flex-1 w-full animate-in fade-in-50 duration-200">
           <TrackOrderPage />
+        </main>
+      )}
+
+      {/* VIEW 8: DEDICATED BRAND LANDING PAGE */}
+      {route.page === 'brand' && route.slug && (
+        <main className="flex-1 w-full animate-in fade-in-50 duration-200">
+          <BrandPageClient slug={route.slug} />
         </main>
       )}
 

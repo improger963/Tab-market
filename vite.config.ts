@@ -11,6 +11,7 @@ export default defineConfig(() => {
         '@': path.resolve(import.meta.dirname, '.'),
         'next/link': path.resolve(import.meta.dirname, './lib/next-compat/link.tsx'),
         'next/font/google': path.resolve(import.meta.dirname, './lib/next-compat/font.ts'),
+        'next/navigation': path.resolve(import.meta.dirname, './lib/next-compat/navigation.ts'),
       },
     },
     server: {
