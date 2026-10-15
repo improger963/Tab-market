@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import {
@@ -38,6 +38,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const [copied, setCopied] = useState(false);
   const [isHeartPopping, setIsHeartPopping] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
 
   const isWishlisted = isInWishlist(product.id);
   const isCompared = isInCompare(product.id);
@@ -65,7 +66,15 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.stopPropagation();
     addItem(product, 1);
     showCartToast(product, 1);
+    // Tactile checkmark confirmation flash on the button
+    setJustAdded(true);
   };
+
+  useEffect(() => {
+    if (!justAdded) return;
+    const timer = setTimeout(() => setJustAdded(false), 1200);
+    return () => clearTimeout(timer);
+  }, [justAdded]);
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -92,6 +101,18 @@ export default function ProductCard({ product }: ProductCardProps) {
   const whatsappUrl = `https://wa.me/37495530435?text=${encodeURIComponent(
     `Բարև ձեզ, ինձ հետաքրքրում է այս ապրանքի գինը և առկայությունը՝ ${product.title} (ՀԾ ԿՈԴ: ${product.code}) Մելքումովի 40/1 սրահում:`
   )}`;
+
+  // Micro-spec pills: Material, Warranty, Connection size (looked up from ERP specs map)
+  const specPills = ['Նյութ', 'Երաշխիք', 'Միացում']
+    .map((key) => {
+      const entry = Object.entries(product.specs).find(
+        ([k]) => k.toLowerCase() === key.toLowerCase()
+      );
+      if (!entry) return null;
+      const value = entry[1].replace(/\s*\(.*?\)\s*/g, '').trim();
+      return { label: value.length > 20 ? `${value.slice(0, 19)}…` : value };
+    })
+    .filter((pill): pill is { label: string } => pill !== null);
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200/90 hover:-translate-y-1.5 hover:shadow-2xl hover:border-blue-400/50 transition-all duration-300 ease-out flex flex-col justify-between group relative overflow-hidden">
@@ -222,6 +243,20 @@ export default function ProductCard({ product }: ProductCardProps) {
               )}
             </button>
           </div>
+
+          {/* Micro-spec pills: Material / Warranty / Connection */}
+          {specPills.length > 0 && (
+            <div className="flex flex-wrap gap-1 pt-0.5">
+              {specPills.map((pill) => (
+                <span
+                  key={pill.label}
+                  className="px-1.5 py-0.5 rounded-md bg-[#F8FAFC] border border-slate-200 text-[9px] sm:text-[10px] font-semibold text-slate-600 truncate max-w-[110px]"
+                >
+                  {pill.label}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Configurable Price Architecture & Rocket Line Badge */}
@@ -244,10 +279,18 @@ export default function ProductCard({ product }: ProductCardProps) {
                   type="button"
                   onClick={handleAddToCart}
                   aria-label={`Ավելացնել ${product.title} զամբյուղ`}
-                  className="min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer shrink-0 btn-tactile shimmer-glint"
+                  className={`min-w-[92px] sm:min-w-[104px] min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-3.5 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer shrink-0 btn-tactile shimmer-glint ${
+                    justAdded ? 'bg-emerald-600 hover:bg-emerald-600 shadow-emerald-500/30' : 'bg-[#0F172A] hover:bg-[#2563EB]'
+                  }`}
                 >
-                  <ShoppingBag className="w-4 h-4 text-blue-400" aria-hidden="true" />
-                  <span className="hidden xs:inline sm:inline">Ավելացնել</span>
+                  {justAdded ? (
+                    <Check className="w-4 h-4 text-white animate-check-pop" aria-hidden="true" />
+                  ) : (
+                    <ShoppingBag className="w-4 h-4 text-blue-400" aria-hidden="true" />
+                  )}
+                  <span className="hidden xs:inline sm:inline">
+                    {justAdded ? 'Ավելացված' : 'Ավելացնել'}
+                  </span>
                 </button>
               </div>
 

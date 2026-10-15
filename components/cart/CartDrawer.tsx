@@ -27,6 +27,53 @@ import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { formatAMD } from '@/lib/utils';
 import { products } from '@/data/products';
+import type { Product } from '@/types';
+
+/* Installation essentials pushed as 1-click cross-sell when a faucet or vanity is in the cart. */
+const INSTALL_ESSENTIALS: Product[] = [
+  {
+    id: -1001,
+    code: '90001',
+    title: 'Ճկուն խողովակներ 45սմ (զույգ)',
+    slug: 'flexible-hoses-45cm-pair',
+    categorySlug: 'accessories',
+    categoryName: 'Լոգարանի Աքսեսուարներ',
+    brand: 'ACCOONA',
+    price: 2500,
+    inStock: true,
+    stockQuantity: 50,
+    images: [
+      'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=400&q=80',
+    ],
+    shortDesc: 'Արագ միացման երկու ճկուն խողովակ՝ 45սմ, ծորակների և սիֆոնների տեղադրման համար:',
+    specs: {
+      'Երկարություն': '45 սմ',
+      'Միացում': '1/2"',
+      'Հավաքածու': '2 հատ (զույգ)',
+    },
+  },
+  {
+    id: -1002,
+    code: '90002',
+    title: 'Լատունե սիֆոն 1 1/4"',
+    slug: 'brass-siphon-1-1-4',
+    categorySlug: 'accessories',
+    categoryName: 'Լոգարանի Աքսեսուարներ',
+    brand: 'ACCOONA',
+    price: 4000,
+    inStock: true,
+    stockQuantity: 40,
+    images: [
+      'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80',
+    ],
+    shortDesc: 'Լատունե ծորած սիֆոն 1 1/4" լվացարանների համար՝ հերմետիկ անվամբ:',
+    specs: {
+      'Տրամերսը': '1 1/4"',
+      'Նյութ': 'Լատուն',
+      'Հավաքածու': 'Անվ + խողովակ',
+    },
+  },
+];
 
 export default function CartDrawer() {
   const {
@@ -48,6 +95,13 @@ export default function CartDrawer() {
   const { showToast, showCartToast } = useToast();
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
+  // Direction of the latest stepper change per item, for smooth spring digit rolls
+  const [qtyRoll, setQtyRoll] = useState<{ id: number; dir: 'up' | 'down' } | null>(null);
+
+  const stepQuantity = (productId: number, nextQty: number, dir: 'up' | 'down') => {
+    updateQuantity(productId, nextQty);
+    setQtyRoll({ id: productId, dir });
+  };
 
   // Prevent SSR hydration mismatch for localStorage persisted Zustand store
   const [isMounted, setIsMounted] = useState(false);
@@ -57,6 +111,11 @@ export default function CartDrawer() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Reset pending digit-roll state whenever the drawer closes
+  useEffect(() => {
+    if (!isDrawerOpen) setQtyRoll(null);
+  }, [isDrawerOpen]);
 
   // Lock body scroll and handle Escape key when drawer is open
   useEffect(() => {
@@ -94,9 +153,18 @@ export default function CartDrawer() {
   const progressPercent = Math.min(100, Math.round((subtotal / freeDeliveryThreshold) * 100));
   const remainingForFree = Math.max(0, freeDeliveryThreshold - subtotal);
 
-  // Frequently bought together recommendations (suggest items not in cart)
+  // Frequently bought together: faucet/vanity in cart → push 1-click installation essentials,
+  // otherwise suggest complementary featured items not already in the cart.
   const cartProductIds = new Set(items.map((i) => i.product.id));
-  const crossSellProducts = products.filter((p) => !cartProductIds.has(p.id)).slice(0, 3);
+  const hasFaucetOrVanity = items.some(
+    (i) => i.product.categorySlug === 'faucets' || i.product.categorySlug === 'cabinets'
+  );
+  const essentialPair = INSTALL_ESSENTIALS.filter((e) => !cartProductIds.has(e.id));
+  const genericCrossSell = products
+    .filter((p) => !cartProductIds.has(p.id) && p.isFeatured)
+    .slice(0, 2);
+  const crossSellProducts =
+    hasFaucetOrVanity && essentialPair.length > 0 ? essentialPair : genericCrossSell;
 
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -209,7 +277,7 @@ export default function CartDrawer() {
                 </div>
                 <div className="space-y-1">
                   <h4 className="font-bold text-sm text-[#0F172A]">
-                    Ձեր զամբյուղը դատարկ է
+                    Ձեր զամբյուղը դեռ դատարկ է
                   </h4>
                   <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
                     Ավելացրեք ապրանքներ tab.am կատալոգից կամ որոնեք ՀԾ արտիկուլներով:
@@ -220,7 +288,7 @@ export default function CartDrawer() {
                   onClick={closeDrawer}
                   className="min-h-[44px] px-6 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer btn-tactile shimmer-glint"
                 >
-                  Դիտել Կատալոգը
+                  Անցնել Կատալոգ
                 </button>
               </div>
             ) : (
@@ -266,20 +334,29 @@ export default function CartDrawer() {
                           <div className="flex items-center border border-[#E2E8F0] rounded-xl bg-[#F8FAFC] p-0.5">
                             <button
                               type="button"
-                              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                              onClick={() => stepQuantity(item.product.id, item.quantity - 1, 'down')}
                               aria-label="Նվազեցնել քանակը"
                               className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-600 hover:bg-white rounded-lg transition-colors cursor-pointer btn-tactile"
                             >
                               <Minus className="w-4 h-4" />
                             </button>
 
-                            <span className="w-8 text-center text-xs font-bold text-[#0F172A] tabular-nums">
+                            <span
+                              key={`${item.product.id}-${item.quantity}-${qtyRoll?.id === item.product.id ? qtyRoll.dir : 'idle'}`}
+                              className={`block w-8 text-center text-xs font-bold text-[#0F172A] tabular-nums ${
+                                qtyRoll?.id === item.product.id
+                                  ? qtyRoll.dir === 'up'
+                                    ? 'animate-qty-roll-up'
+                                    : 'animate-qty-roll-down'
+                                  : ''
+                              }`}
+                            >
                               {item.quantity}
                             </span>
 
                             <button
                               type="button"
-                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                              onClick={() => stepQuantity(item.product.id, item.quantity + 1, 'up')}
                               disabled={item.quantity >= item.product.stockQuantity}
                               aria-label="Ավելացնել քանակը"
                               className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-30 rounded-lg transition-colors cursor-pointer btn-tactile"

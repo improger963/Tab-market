@@ -114,7 +114,8 @@ export default function OrderSuccess({ orderData, orderNumber }: OrderSuccessPro
       <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-950 flex items-center justify-center gap-2">
         <Phone className="w-4 h-4 text-blue-600 shrink-0" />
         <span>
-          Մեր մենեջերը կկապվի Ձեզ հետ <b>15 րոպեի ընթացքում</b>՝ պատվերը վերջնական հաստատելու համար:
+          Մեր մենեջերը <b>կզանգահարի Ձեզ 15 րոպեի ընթացքում</b>՝ պատվերը հաստատելու և
+          առաքման ժամը ճշտելու համար:
         </span>
       </div>
 

@@ -24,7 +24,7 @@ export const products: Product[] = [
       'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=80',
     ],
     blueprintImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
-    shortDesc: 'Գերմանական ճշգրտության բարձրորակ լվացարանի ծորակ՝ Sedal քարթրիջով և փայլուն քրոմապատ ամրակայուն կորպուսով:',
+    shortDesc: 'Ծանր լատունե կորպուսով լվացարանի ծորակ՝ բազմաշերտ քրոմապատ փայլով։ Հագեցած է իսպանական Sedal կերամիկական քարտրիջով և Neoperl աերատորով, որը ջուրը դարձնում է փափուկ ու չի ցայտում։ 5 տարվա պաշտոնական երաշխիք։',
     specs: {
       'ՀԾ Կոդ (ArmSoft)': '11496',
       'Արտադրող': 'GANZER',
@@ -56,7 +56,7 @@ export const products: Product[] = [
       'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1000&q=80',
     ],
     blueprintImage: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
-    shortDesc: 'Ժամանակակից մատ սև էլեկտրոստատիկ ծածկույթով լվացարանի ծորակ՝ Sedal քարթրիջով և հեշտ մոնտաժման հավաքածուով:',
+    shortDesc: 'Էլեկտրոստատիկ ներկված մատ սև մակերես, որի վրա ջրի հետքեր չեն մնում։ Լատունե կորպուս՝ նախատեսված բարձր ճնշման համար։ Հուսալի ու ժամանակակից ընտրություն լոգասենյակի համար։',
     specs: {
       'ՀԾ Կոդ (ArmSoft)': '11463',
       'Արտադրող': 'VIEIR',
@@ -218,7 +218,7 @@ export const products: Product[] = [
       'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=1000&q=80',
     ],
     blueprintImage: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
-    shortDesc: 'Ժամանակակից կախովի լոգարանի պահարան հախճապակե խորը լվացարանով և դանդաղ փակվող (Soft-Close) դարակներով:',
+    shortDesc: 'Խոնավակայուն բարձր խտության MDF-ից պատրաստված կախովի պահարան՝ կերամիկական լվացարանով։ Դարակները հագեցած են Soft-Close (դանդաղ և անաղմուկ փակվող) մեխանիզմներով։',
     specs: {
       'ՀԾ Կոդ (ArmSoft)': '15260',
       'Արտադրող': 'LEDEME',
@@ -251,7 +251,7 @@ export const products: Product[] = [
       'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1000&q=80',
     ],
     blueprintImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
-    shortDesc: 'Բարձրորակ լոգարանի LED հայելի՝ հպումային սենսորային կառավարմամբ, հակամառախուղային տաքացմամբ և կարգավորվող լուսավորությամբ:',
+    shortDesc: 'Հպումային սենսորով LED հայելի՝ հակագոլորշի (Anti-Fog) տաքացման համակարգով։ Լոգանք ընդունելիս չի քրտնում։ Լույսի երանգը կարգավորվում է տաքից սառը։',
     specs: {
       'ՀԾ Կոդ (ArmSoft)': '88941',
       'Արտադրող': 'GERHANS',

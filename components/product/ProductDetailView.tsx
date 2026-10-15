@@ -12,27 +12,21 @@ import {
   Zap,
   Check,
   Copy,
-  MapPin,
-  Truck,
-  ShieldCheck,
-  FileCheck2,
   Plus,
   Minus,
   Heart,
-  ArrowLeftRight,
   Star,
   MessageCircle,
+  PackageCheck,
 } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { useWishlist } from '@/store/useWishlist';
-import { useCompare } from '@/store/useCompare';
 import { useRecentlyViewed } from '@/store/useRecentlyViewed';
 import { formatAMD } from '@/lib/utils';
 import QuickOrderModal from './QuickOrderModal';
 import StickyMobileBuyBar from './StickyMobileBuyBar';
-import ARPreviewModal from './ARPreviewModal';
 
 interface ProductDetailViewProps {
   product: Product;
@@ -42,17 +36,14 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const { addItem, openDrawer } = useCart();
   const { showCartToast, showCopyToast, showToast } = useToast();
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const { isInCompare, toggleCompare } = useCompare();
   const { addProduct } = useRecentlyViewed();
 
   const [quantity, setQuantity] = useState(1);
   const [copiedCode, setCopiedCode] = useState(false);
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false);
-  const [isARModalOpen, setIsARModalOpen] = useState(false);
   const [isHeartPopping, setIsHeartPopping] = useState(false);
 
   const isWishlisted = isInWishlist(product.id);
-  const isCompared = isInCompare(product.id);
 
   useEffect(() => {
     addProduct(product);
@@ -90,14 +81,20 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
     }
   };
 
-  const handleToggleCompare = () => {
-    const res = toggleCompare(product);
-    showToast(res.message, product.title);
-  };
+  // Consolidated 4-chip spec highlights (single source: derived from product.specs)
+  const findSpec = (key: string) =>
+    Object.entries(product.specs).find(([k]) => k.includes(key))?.[1];
 
-  // WhatsApp pre-filled inquiry CTA
+  const specChips = [
+    { emoji: '💧', label: 'Կորպուսը՝', value: findSpec('Նյութ') ?? 'Ծանր Լատուն (CW617N)' },
+    { emoji: '⚙️', label: 'Քարտրիջը՝', value: findSpec('Քարտրիջ') ?? findSpec('Cartridge') ?? 'Sedal 35մմ (Իսպանիա)' },
+    { emoji: '🚚', label: 'Առաքումը՝', value: 'Անվճար Երևանում' },
+    { emoji: '🛡️', label: 'Երաշխիքը՝', value: `${findSpec('Երաշխիք') ?? '5 տարի'} Պաշտոնական` },
+  ];
+
+  // WhatsApp pre-filled inquiry CTA (exact spec copy)
   const whatsappUrl = `https://wa.me/37495530435?text=${encodeURIComponent(
-    `Բարև ձեզ, ինձ հետաքրքրում է ${product.title} (ՀԾ ԿՈԴ: ${product.code}). Խնդրում եմ ասեք՝ առկա՞ է Մելքումովի 40/1 սրահում:`
+    `Բարև ձեզ, ինձ հետաքրքրում է ${product.title}: Խնդրում եմ ասեք՝ առկա՞ է Մելքումովի 40/1 սրահում:`
   )}`;
 
   return (
@@ -120,10 +117,15 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           </div>
         </div>
 
-        {/* Title */}
-        <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight leading-tight">
-          {product.title}
-        </h1>
+        {/* Brand Eyebrow + Title */}
+        <div className="space-y-1">
+          <p className="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">
+            {product.brand}
+          </p>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight leading-tight">
+            {product.title}
+          </h1>
+        </div>
 
         {/* ArmSoft SKU Strip + Wishlist/Compare */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -165,6 +167,25 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               <span>{isWishlisted ? 'Սիրված է' : 'Սիրված'}</span>
             </button>
           </div>
+        </div>
+
+        {/* Live Showroom Stock Indicator */}
+        <div className="flex items-center gap-2 text-xs">
+          {product.inStock ? (
+            <>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-beacon shrink-0" aria-hidden="true" />
+              <span className="font-extrabold text-emerald-700">Առկա է սրահում</span>
+              <span className="font-semibold text-slate-500">
+                Մելքումովի 40/1 · {product.stockQuantity} հատ
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" aria-hidden="true" />
+              <span className="font-extrabold text-rose-600">Սպասման պատվեր</span>
+              <span className="font-semibold text-slate-500">Հարցնել WhatsApp-ով</span>
+            </>
+          )}
         </div>
 
         {/* Pricing Block */}
@@ -253,52 +274,66 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             <MessageCircle className="w-4 h-4 animate-bounce" />
             <span>Հարցնել մասնագետին WhatsApp-ով</span>
           </a>
-
-          {/* AR / 3D Bathroom Preview Button */}
-          <button
-            type="button"
-            onClick={() => setIsARModalOpen(true)}
-            className="w-full min-h-[46px] py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md btn-tactile shimmer-glint"
-          >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 pulse-beacon shrink-0" />
-            <span>AR / 3D Տեղադրում և Սիմուլյացիա</span>
-          </button>
         </div>
 
-        {/* 4 Instant Visual Badge Chips with Hover Elevation & Micro-Animation */}
-        <div className="pt-4 border-t border-[#E2E8F0] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700">
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all group cursor-default">
-            <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
-            <span className="font-semibold">Երաշխիք՝ մինչև 5 տարի</span>
+        {/* Consolidated 4-Chip Specs Highlight Grid (single row, no duplicates) */}
+        <div className="pt-4 border-t border-[#E2E8F0] grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          {specChips.map((chip) => (
+            <div
+              key={chip.label}
+              className="flex items-center gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all group cursor-default"
+            >
+              <span className="text-base leading-none shrink-0 group-hover:scale-110 transition-transform" aria-hidden="true">
+                {chip.emoji}
+              </span>
+              <span className="font-semibold text-slate-700 leading-snug">
+                <b className="text-[#0F172A]">{chip.label}</b> {chip.value}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* "What's in the Box" (Ի՞նչ կա տուփի մեջ) visual checklist */}
+        <div className="pt-4 border-t border-[#E2E8F0] space-y-3">
+          <div className="flex items-center gap-2">
+            <PackageCheck className="w-5 h-5 text-blue-600" />
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#0F172A]">
+              Ի՞նչ կա տուփի մեջ
+            </h2>
           </div>
 
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all group cursor-default">
-            <FileCheck2 className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
-            <span className="font-semibold">Նյութը՝ Պրեմիում Լատուն / Չժանգոտվող պողպատ</span>
-          </div>
-
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all group cursor-default">
-            <Truck className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
-            <span className="font-semibold">Անվճար առաքում Երևանում</span>
-          </div>
-
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all group cursor-default">
-            <MapPin className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
-            <span className="font-semibold">Անվճար ստացում Մելքումովի 40/1 սրահից</span>
-          </div>
+          <ul className="grid grid-cols-1 gap-2">
+            {[
+              product.categorySlug === 'faucets' ? 'Լվացարանի ծորակ' : 'Հիմնական ապրանք',
+              ...(product.categorySlug === 'faucets'
+                ? ['Ճկուն միացման խողովակներ 45սմ (զույգ)']
+                : ['Մոնտաժման / ամրացման հավաքածու']),
+              'Արագ ամրացման մանեկներ և միջադիրներ',
+              'Պաշտոնական երաշխիքային անձնագիր',
+            ].map((boxItem) => (
+              <li
+                key={boxItem}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#F8FAFC] border border-slate-200 text-xs font-semibold text-slate-700"
+              >
+                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <Check className="w-3 h-3" />
+                </span>
+                <span>{boxItem}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
+
+      {/* ============================================================
+          Technical Dossier Tabs (single specs-table source) rendered
+          below-the-fold via <ProductDossierTabs /> in the page layout.
+          ============================================================ */}
 
       <QuickOrderModal
         product={product}
         isOpen={isQuickOrderOpen}
         onClose={() => setIsQuickOrderOpen(false)}
-      />
-
-      <ARPreviewModal
-        product={product}
-        isOpen={isARModalOpen}
-        onClose={() => setIsARModalOpen(false)}
       />
 
       <StickyMobileBuyBar product={product} />

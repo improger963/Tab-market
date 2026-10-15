@@ -421,10 +421,19 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {filteredProducts.map((product) => {
-                      const specSummary = Object.entries(product.specs)
-                        .slice(0, 2)
+                      // Contractor-core specs first: Diameter / Material / Cartridge, padded with Warranty
+                      const specPriority = ['Միացում', 'Նյութ', 'Քարտրիջ', 'Երաշխիք'];
+                      const specEntries = Object.entries(product.specs);
+                      const coreSpecs = specPriority
+                        .map((key) => specEntries.find(([k]) => k.includes(key)))
+                        .filter((e): e is [string, string] => Boolean(e));
+                      const extraSpecs = specEntries.filter(
+                        ([k]) => !specPriority.some((key) => k.includes(key)) && !k.includes('Կոդ')
+                      );
+                      const specSummary = [...coreSpecs, ...extraSpecs]
+                        .slice(0, 3)
                         .map(([k, v]) => `${k}: ${v}`)
-                        .join(', ');
+                        .join(' · ');
                       return (
                         <tr key={product.id} className="hover:bg-slate-50/80 transition-colors">
                           <td className="p-3.5 font-mono font-bold text-blue-600 whitespace-nowrap">

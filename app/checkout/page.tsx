@@ -45,11 +45,12 @@ export default function CheckoutPage() {
 
   const handleSubmit = () => {
     if (!formData.fullName.trim()) {
-      alert('Խնդրում ենք լրացնել Ձեր անունը:');
+      alert('Խնդրում ենք լրացնել Ձեր անունը և ազգանունը:');
       return;
     }
-    if (!formData.phone.trim()) {
-      alert('Խնդրում ենք լրացնել Ձեր հեռախոսահամարը:');
+    const phoneDigits = formData.phone.replace(/\D/g, '');
+    if (phoneDigits.length < 8) {
+      alert('Խնդրում ենք լրացնել հեռախոսահամարը ճիշտ ձևաչափով');
       return;
     }
     if (formData.deliveryMethod === 'yerevan' && !formData.addressStreet.trim()) {

@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { User, Phone, Mail, MapPin, Truck, CreditCard, Banknote, ShieldCheck } from 'lucide-react';
+import { formatAMD } from '@/lib/utils';
 
 export type DeliveryType = 'yerevan' | 'pickup';
 export type PaymentType = 'cash' | 'card' | 'idram';
@@ -158,7 +159,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
               </div>
               <h3 className="text-sm font-bold text-[#0F172A]">Անվճար Առաքում Երևանի Տարածքում</h3>
               <p className="text-xs text-slate-500 mt-1 leading-normal">
-                Առաքվում է 24 ժամում՝ անմիջապես Մելքումովի 40/1 պահեստից:
+                Առաքիչը կզանգահարի մոտենալուց 30 րոպե առաջ:
               </p>
             </div>
           </div>
@@ -187,7 +188,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
               </div>
               <h3 className="text-sm font-bold text-[#0F172A]">Ինքնաարտահանում Սրահից</h3>
               <p className="text-xs text-slate-500 mt-1 leading-normal">
-                ք. Երևան, Մելքումովի 40/1 (Բաց է ամեն օր՝ 10:00 - 20:00)
+                ք. Երևան, Մելքումովի 40/1 (Ամեն օր՝ 10:00 - 20:00):
               </p>
             </div>
           </div>
@@ -196,7 +197,12 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
         {/* Conditional Address Inputs for Yerevan Delivery */}
         {data.deliveryMethod === 'yerevan' && (
           <div className="p-4 sm:p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-4 animate-in fade-in duration-200">
-            <h4 className="text-xs font-bold text-[#0F172A]">Երևանի Առաքման Հասցե</h4>
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold text-[#0F172A]">Երևանի Առաքման Հասցե</h4>
+              <span className="text-[11px] font-black text-emerald-700 tabular-nums">
+                Առաքման արժեք՝ {formatAMD(shippingCost)}
+              </span>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-600 mb-1">
@@ -245,19 +251,19 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
             {
               id: 'cash',
               title: 'Կանխիկ Վճարում',
-              desc: 'Սրահում կամ առաքիչին ստանալիս',
+              desc: 'Սրահում՝ կամ առաքիչին ստանալիս',
               icon: Banknote,
             },
             {
               id: 'card',
-              title: 'Անկանխիկ / Բանկային Քարտ',
-              desc: 'ArCa / Visa / Mastercard առցանց կամ տեղում',
+              title: 'Բանկային Քարտ',
+              desc: 'ArCa / Visa / Mastercard',
               icon: CreditCard,
             },
             {
               id: 'idram',
               title: 'Idram / Rocket Line',
-              desc: 'Անմիջապես հավելվածով կամ Rocket 0% ապառիկով',
+              desc: '0% ապառիկ տեղում',
               icon: ShieldCheck,
             },
           ].map((item) => {

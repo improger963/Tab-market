@@ -14,6 +14,7 @@ import ToastContainer from '@/components/ui/ToastContainer';
 import ProductCard from '@/components/product/ProductCard';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductDetailView from '@/components/product/ProductDetailView';
+import ProductDossierTabs from '@/components/product/ProductDossierTabs';
 import CatalogView from '@/components/catalog/CatalogView';
 import BrandPageClient from '@/components/brand/BrandPageClient';
 import HomePage from '@/app/page';
@@ -29,7 +30,6 @@ import { useCart } from '@/store/useCart';
 import {
   ChevronRight,
   ShieldCheck,
-  FileText,
   X,
   PackageX,
   ArrowRight,
@@ -166,7 +166,7 @@ export default function App() {
               <ProductDetailView product={currentProduct} />
             </div>
 
-            {/* Technical Specs & Description: 3rd on mobile, underneath gallery on desktop in left 7 cols */}
+            {/* Description & Dossier Tabs: 3rd on mobile, underneath gallery on desktop in left 7 cols */}
             <div className="lg:col-span-7 space-y-6 sm:space-y-8">
               <div className="bg-white p-5 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-4">
                 <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
@@ -184,29 +184,8 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="bg-white p-5 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-5">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-600" />
-                  <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
-                    Տեխնիկական Բնութագիր (Specifications)
-                  </h2>
-                </div>
-
-                <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden">
-                  <table className="w-full text-xs text-left">
-                    <tbody className="divide-y divide-[#E2E8F0]">
-                      {Object.entries(currentProduct.specs).map(([key, value]) => (
-                        <tr key={key} className="hover:bg-slate-50 transition-colors">
-                          <td className="py-2.5 sm:py-3 px-3 sm:px-4 font-semibold text-slate-600 bg-slate-50/50 w-2/5">
-                            {key}
-                          </td>
-                          <td className="py-2.5 sm:py-3 px-3 sm:px-4 text-[#0F172A] font-bold">{value}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              {/* Interactive Technical Dossier Tabs — the ONLY full specs table on the page */}
+              <ProductDossierTabs product={currentProduct} />
             </div>
           </div>
 

@@ -32,8 +32,8 @@ export const useToast = create<ToastStore>((set, get) => ({
     const newToast: ToastItem = {
       id,
       type: 'cart',
-      title: 'Ավելացվել է զամբյուղ',
-      message: product.title,
+      title: 'Ավելացվեց Զամբյուղ',
+      message: `${product.title}-ն ավելացվեց զամբյուղ:`,
       product,
       quantity,
       duration: 4000,

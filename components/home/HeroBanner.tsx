@@ -28,6 +28,7 @@ interface HeroSlide {
   description: string;
   primaryCtaText: string;
   primaryCtaLink: string;
+  secondaryCtaText: string;
   bgImage: string;
   stat: string;
   statLabel: string;
@@ -36,48 +37,51 @@ interface HeroSlide {
 const SLIDES: HeroSlide[] = [
   {
     id: 1,
-    badge: 'ԳԱՐՆԱՆԱՅԻՆ ՎԵՐԱԶԻՆՈՒՄ • ՄԻՆՉԵՎ 40% ԶԵՂՉ',
+    badge: 'ԵՎՐՈՊԱԿԱՆ ՍՏԱՆԴԱՐՏ • ՈՒՂԻՂ ՆԵՐՄՈՒԾՈՂԻՑ',
     badgeIcon: Sparkles,
-    titlePrefix: 'ՇԱՀԱՎԵՏ ԱՌԱՋԱՐԿ․',
-    titleHighlight: 'ԼՈԳԱՍԵՆՅԱԿԻ ՀԱՎԱՔԱԾՈՒՆԵՐ',
+    titlePrefix: 'Որակյալ Սանտեխնիկա՝',
+    titleHighlight: 'Մեծածախի Արժեքով',
     description:
-      'Մինչև 40% զեղչ պրեմիում դասի ցնցուղային համակարգերի, ծորակների և ինստալյացիաների վրա՝ Մելքումովի 40/1 սրահում:',
-    primaryCtaText: 'Դիտել Զեղչերը',
+      'Եվրոպական ստանդարտի ծորակներ, ցնցուղային համակարգեր և լոգարանի կահույք՝ անմիջապես ներմուծողից։ Պաշտոնական երաշխիքով և անվճար առաքումով Երևանում։',
+    primaryCtaText: 'Դիտել Ամբողջ Տեսականին',
     primaryCtaLink: '/catalog',
+    secondaryCtaText: 'Մեր Սրահը (Մելքումովի 40/1)',
     bgImage:
       'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=1600&q=85',
-    stat: '-40%',
-    statLabel: 'Spring Special',
+    stat: 'Ուղիղ Ներմուծում',
+    statLabel: 'Առանց Վերավաճառողի',
   },
   {
     id: 2,
-    badge: 'ԽԵՂԱՑԻ ԿԱՀԱՎՈՐՈՒՄ ԵՎ LED ՀԱՅԵԼԻՆԵՐ',
+    badge: 'ՊԱՏՐԱՍՏԻ ԱՌԿԱ ՄԵՐ ՊԱՀԵՍՏՈՒՄ',
     badgeIcon: Flame,
-    titlePrefix: 'ԲԱՑԱՌԻԿ ԳԵՐՄԱՆԱԿԱՆ ԵՎ ԻՏԱԼԱԿԱՆ ՈՃ',
-    titleHighlight: 'LED ՀԱՅԵԼԻՆԵՐ ԵՎ ՊԱՀԱՐԱՆՆԵՐ',
+    titlePrefix: 'Լոգարանի Պահարաններ և',
+    titleHighlight: 'LED Հայելիներ',
     description:
-      'Ժամանակակից լոգարանի կահույք սենսորային կառավարմամբ, հակամառախուղային համակարգով և պատրաստի առաքմամբ:',
-    primaryCtaText: 'Բացահայտել Հավաքածուն',
+      'Խոնավակայուն կահույք, սենսորային տաքացվող հայելիներ և կախովի լվացարաններ՝ պատրաստի առկա մեր պահեստում։',
+    primaryCtaText: 'Ընտրել Պահարաններ',
     primaryCtaLink: '/catalog',
+    secondaryCtaText: 'Մեր Սրահը (Մելքումովի 40/1)',
     bgImage:
       'https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=1600&q=85',
-    stat: '100% Առկա',
+    stat: 'Առկա Է Սրահում',
     statLabel: 'Մելքումովի 40/1',
   },
   {
     id: 3,
-    badge: '🚚 ԱՆՎՃԱՐ ԱՌԱՔՈՒՄ ԵՐԵՎԱՆՈՒՄ ԱՆՄԻՋԱՊԵՍ',
+    badge: '🚚 ԱՆՎՃԱՐ ԱՌԱՔՈՒՄ ԵՐԵՎԱՆՈՒՄ',
     badgeIcon: Truck,
-    titlePrefix: 'ԱՆՎՃԱՐ ԱՌԱՔՈՒՄ ԵՐԵՎԱՆՈՒՄ',
-    titleHighlight: 'ԱՆՄԻՋԱՊԵՍ ԳՆՄԱՆ ՕՐԸ',
+    titlePrefix: 'Անվճար Առաքում Երևանում՝',
+    titleHighlight: 'Գնման Օրը',
     description:
-      'Գնե՛ք ցանկացած սանտեխնիկա առցանց կամ Մելքումովի 40/1 սրահից, և մենք կառաքենք Երևանի ողջ տարածքում անվճար:',
-    primaryCtaText: 'Անցնել Կատալոգ',
+      'Պատվիրեք առցանց կամ մոտեցեք Մելքումովի 40/1 սրահ։ Առաքիչը կզանգահարի մոտենալուց 30 րոպե առաջ։',
+    primaryCtaText: 'Իմանալ Ավելին',
     primaryCtaLink: '/catalog',
+    secondaryCtaText: 'Մեր Սրահը (Մելքումովի 40/1)',
     bgImage:
       'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1600&q=85',
     stat: '0 ֏',
-    statLabel: 'Անվճար Առաքում',
+    statLabel: 'Առաքում Երևանում',
   },
 ];
 
@@ -154,7 +158,7 @@ export default function HeroBanner() {
             className="min-h-[48px] inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 font-bold text-xs tracking-wider uppercase transition-all cursor-pointer shadow-xs"
           >
             <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
-            <span>Մելքումովի 40/1 Սրահ</span>
+            <span>{slide.secondaryCtaText}</span>
           </a>
         </div>
       </div>
