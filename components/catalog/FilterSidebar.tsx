@@ -305,7 +305,7 @@ export default function FilterSidebar({
                     }`}
                   >
                     <span
-                      className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center transition-transform ${swatch.bgClass} ${
+                      className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center transition-transform finish-shimmer ${swatch.bgClass} ${
                         isSelected ? 'scale-110 ring-2 ring-cyan-600' : ''
                       }`}
                     >

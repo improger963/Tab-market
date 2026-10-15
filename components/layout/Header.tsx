@@ -1,11 +1,35 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { ShoppingBag, LayoutGrid, Phone, Heart, ArrowLeftRight } from 'lucide-react';
+import {
+  ShoppingBag,
+  LayoutGrid,
+  Phone,
+  Heart,
+  ArrowLeftRight,
+  Droplets,
+  ShowerHead,
+  Box,
+  CircleDot,
+  Archive,
+  Sparkles,
+  Flame,
+  Grid,
+  Layers,
+  Filter,
+  ChevronDown,
+  Package,
+} from 'lucide-react';
 import { useCart } from '@/store/useCart';
 import { useWishlist } from '@/store/useWishlist';
 import { useCompare } from '@/store/useCompare';
+import { categories } from '@/data/categories';
 import { formatAMD } from '@/lib/utils';
 import LiveSearch from './LiveSearch';
 
@@ -14,9 +38,22 @@ export default function Header() {
   const { totalCount: wishlistCount } = useWishlist();
   const { totalCount: compareCount } = useCompare();
   const [isMounted, setIsMounted] = useState(false);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  // Close megamenu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsMegaMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const count = isMounted ? totalCount() : 0;
@@ -24,11 +61,38 @@ export default function Header() {
   const wishCount = isMounted ? wishlistCount() : 0;
   const compCount = isMounted ? compareCount() : 0;
 
+  const getCategoryIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Droplets':
+        return <Droplets className="w-4 h-4 text-cyan-600 shrink-0" />;
+      case 'ShowerHead':
+        return <ShowerHead className="w-4 h-4 text-cyan-600 shrink-0" />;
+      case 'Box':
+        return <Box className="w-4 h-4 text-cyan-600 shrink-0" />;
+      case 'CircleDot':
+        return <CircleDot className="w-4 h-4 text-cyan-600 shrink-0" />;
+      case 'Archive':
+        return <Archive className="w-4 h-4 text-cyan-600 shrink-0" />;
+      case 'Sparkles':
+        return <Sparkles className="w-4 h-4 text-cyan-600 shrink-0" />;
+      case 'Flame':
+        return <Flame className="w-4 h-4 text-cyan-600 shrink-0" />;
+      case 'Grid':
+        return <Grid className="w-4 h-4 text-cyan-600 shrink-0" />;
+      case 'Layers':
+        return <Layers className="w-4 h-4 text-cyan-600 shrink-0" />;
+      case 'Filter':
+        return <Filter className="w-4 h-4 text-cyan-600 shrink-0" />;
+      default:
+        return <Droplets className="w-4 h-4 text-cyan-600 shrink-0" />;
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-2xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3 sm:gap-6">
-        {/* Brand Logo & Catalog Button */}
-        <div className="flex items-center gap-3 md:gap-5 shrink-0">
+        {/* Brand Logo & Catalog Mega-Menu Dropdown */}
+        <div className="flex items-center gap-3 md:gap-5 shrink-0" ref={menuRef}>
           <Link
             href="/"
             className="flex flex-col group cursor-pointer focus:outline-hidden"
@@ -47,14 +111,73 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Catalog Link Button */}
-          <Link
-            href="/catalog"
-            className="hidden sm:inline-flex items-center gap-2 min-h-[48px] px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-800 text-xs font-bold transition-all border border-slate-200/60 cursor-pointer active:scale-95"
-          >
-            <LayoutGrid className="w-4 h-4 text-cyan-600" />
-            <span>Կատալոգ</span>
-          </Link>
+          {/* Catalog Mega-Menu Button */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
+              className="hidden sm:inline-flex items-center gap-2 min-h-[48px] px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-800 text-xs font-bold transition-all border border-slate-200/60 cursor-pointer active:scale-95"
+            >
+              <LayoutGrid className="w-4 h-4 text-cyan-600" />
+              <span>Կատալոգ</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${
+                  isMegaMenuOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {/* Mega Menu Dropdown */}
+            {isMegaMenuOpen && (
+              <div className="absolute top-full left-0 mt-2 w-[720px] bg-white rounded-3xl shadow-2xl border border-slate-200/80 p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-950 uppercase tracking-wider">
+                      tab.am 10 Կորային Բաժիններ
+                    </h3>
+                    <p className="text-[11px] text-slate-500">
+                      Ընտրեք սանտեխնիկայի և ջրամատակարարման պահանջվող բաժինը
+                    </p>
+                  </div>
+                  <Link
+                    href="/catalog"
+                    onClick={() => setIsMegaMenuOpen(false)}
+                    className="text-xs font-bold text-cyan-600 hover:text-cyan-700"
+                  >
+                    Ամբողջ կատալոգը →
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  {categories.map((cat) => (
+                    <Link
+                      key={cat.id}
+                      href={`/category/${cat.slug}`}
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/70 hover:bg-slate-100 border border-slate-200/60 hover:border-cyan-500/40 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-white shadow-2xs flex items-center justify-center border border-slate-200 group-hover:scale-110 transition-transform">
+                          {getCategoryIcon(cat.icon)}
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-slate-900 group-hover:text-cyan-700 block transition-colors">
+                            {cat.title}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-medium">
+                            {cat.itemCount}+ ապրանք
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 group-hover:text-cyan-600 group-hover:translate-x-0.5 transition-all">
+                        →
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Center: Live Predictive Search */}
@@ -90,6 +213,16 @@ export default function Header() {
                 {wishCount}
               </span>
             )}
+          </Link>
+
+          {/* Track Order Shortcut */}
+          <Link
+            href="/track-order"
+            title="Ստուգել Պատվերի Կարգավիճակը"
+            className="hidden sm:inline-flex items-center gap-1.5 min-h-[48px] px-3.5 py-2.5 rounded-xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-cyan-900 text-xs font-bold transition-all cursor-pointer"
+          >
+            <Package className="w-4 h-4 text-cyan-600" />
+            <span>Ստուգել Պատվերը</span>
           </Link>
 
           {/* Showroom Phone shortcut */}

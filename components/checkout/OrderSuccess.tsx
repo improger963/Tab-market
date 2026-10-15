@@ -129,14 +129,21 @@ export default function OrderSuccess({ orderData, orderNumber }: OrderSuccessPro
         </span>
       </div>
 
-      {/* Return home CTA */}
-      <div className="pt-2">
+      {/* Return home & Track Order CTAs */}
+      <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <Link
+          href={`/track-order?id=${orderNumber}`}
+          className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98"
+        >
+          <span>Հետևել Պատվերի Ընթացքին</span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+
         <Link
           href="/"
-          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-8 py-3 rounded-2xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98"
+          className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
         >
           <span>Վերադառնալ Գլխավոր Էջ</span>
-          <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
     </div>

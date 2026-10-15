@@ -1,3 +1,8 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -17,7 +22,7 @@ import {
   Heart,
   ArrowLeftRight,
   Star,
-  Award,
+  MessageCircle,
 } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/store/useCart';
@@ -85,6 +90,11 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
     showToast(res.message, product.title);
   };
 
+  // WhatsApp inquiry URL
+  const whatsappUrl = `https://wa.me/37495530435?text=${encodeURIComponent(
+    `Բարև ձեզ! Ինձ հետաքրքրում է այս ապրանքը՝ ${product.title} (ՀԾ ԿՈԴ: ${product.code}) Մելքումովի 40/1 սրահում: Կմանրամասնե՞ք:`
+  )}`;
+
   return (
     <div className="space-y-6">
       {/* Sticky Buy Box Card */}
@@ -99,7 +109,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           </Link>
 
           <div className="flex items-center gap-1.5 text-xs font-bold text-amber-500">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
             <span className="text-slate-800">{product.rating || 4.9}</span>
             <a
               href="#reviews-section"
@@ -130,12 +140,12 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           >
             {copiedCode ? (
               <>
-                <Check className="w-3.5 h-3.5 text-cyan-600" />
+                <Check className="w-3.5 h-3.5 text-cyan-600" aria-hidden="true" />
                 <span className="text-cyan-700 font-bold">Պատճենված է!</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5 text-slate-400" />
+                <Copy className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
                 <span>Պատճենել կոդը</span>
               </>
             )}
@@ -156,6 +166,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               className={`w-3.5 h-3.5 ${
                 isWishlisted ? 'fill-rose-500 text-rose-500' : 'text-slate-500'
               }`}
+              aria-hidden="true"
             />
             <span>{isWishlisted ? 'Սիրվածներում է' : 'Սիրված'}</span>
           </motion.button>
@@ -171,7 +182,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 : 'bg-slate-50 hover:bg-white text-slate-700 border-slate-200 hover:border-cyan-200'
             }`}
           >
-            <ArrowLeftRight className="w-3.5 h-3.5 text-cyan-600" />
+            <ArrowLeftRight className="w-3.5 h-3.5 text-cyan-600" aria-hidden="true" />
             <span>{isCompared ? 'Համեմատվում է' : 'Համեմատել'}</span>
           </motion.button>
         </div>
@@ -222,7 +233,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 aria-label="Նվազեցնել քանակը"
                 className="min-h-[48px] min-w-[48px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer"
               >
-                <Minus className="w-4 h-4" />
+                <Minus className="w-4 h-4" aria-hidden="true" />
               </button>
 
               <span className="w-10 text-center text-sm font-extrabold text-slate-900 tabular-nums">
@@ -235,7 +246,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 aria-label="Ավելացնել քանակը"
                 className="min-h-[48px] min-w-[48px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
@@ -246,7 +257,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               onClick={handleAddToCart}
               className="flex-1 min-h-[52px] px-6 py-3.5 rounded-2xl bg-cyan-600 hover:bg-cyan-700 active:scale-98 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-4 h-4" aria-hidden="true" />
               <span>Ավելացնել Զամբյուղ</span>
             </button>
           </div>
@@ -257,29 +268,40 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             onClick={() => setIsQuickOrderOpen(true)}
             className="w-full min-h-[48px] py-3 rounded-2xl bg-slate-950 hover:bg-slate-800 active:scale-98 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs border border-slate-800"
           >
-            <Zap className="w-4 h-4 text-cyan-400 fill-cyan-400" />
+            <Zap className="w-4 h-4 text-cyan-400 fill-cyan-400" aria-hidden="true" />
             <span>Արագ Պատվեր 1 Քլիքով</span>
           </button>
+
+          {/* Luxury WhatsApp Direct Inquiry Button */}
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full min-h-[48px] py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+          >
+            <MessageCircle className="w-4 h-4 fill-white text-emerald-600" aria-hidden="true" />
+            <span>Հարցնել մասնագետին WhatsApp-ով</span>
+          </a>
         </div>
 
         {/* Trust & Delivery Card */}
         <div className="pt-4 border-t border-slate-100 space-y-3 text-xs text-slate-600">
           <div className="flex items-start gap-2.5">
-            <MapPin className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
+            <MapPin className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" aria-hidden="true" />
             <span>
               <b>Անվճար ստացում</b> Մելքումովի 40/1 սրահից (Այսօր, 15 րոպեից)
             </span>
           </div>
 
           <div className="flex items-start gap-2.5">
-            <Truck className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
+            <Truck className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" aria-hidden="true" />
             <span>
               <b>Առաքում Երևանում 24 ժամում</b>, ՀՀ մարզեր՝ 2-3 աշխատանքային օրում
             </span>
           </div>
 
           <div className="flex items-start gap-2.5">
-            <FileCheck2 className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
+            <FileCheck2 className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" aria-hidden="true" />
             <span>
               Պաշտոնական երաշխիք և <b>անկանխիկ B2B հաշիվ-ապրանքագիր (ՀՎՀՀ)</b> շինարարներին
             </span>

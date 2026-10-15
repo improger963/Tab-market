@@ -117,6 +117,14 @@ export default function Footer() {
                 info@tab.am (նախահաշիվների սպասարկում)
               </a>
             </li>
+            <li className="pt-1">
+              <Link
+                href="/track-order"
+                className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1.5"
+              >
+                <span>📦 Ստուգել Պատվերի Կարգավիճակը →</span>
+              </Link>
+            </li>
           </ul>
 
           <div className="pt-2">

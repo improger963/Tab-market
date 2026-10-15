@@ -1,8 +1,13 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Home, LayoutGrid, Heart, ShoppingBag, PhoneCall } from 'lucide-react';
+import { Home, LayoutGrid, Package, Heart, ShoppingBag, PhoneCall } from 'lucide-react';
 import { useCart } from '@/store/useCart';
 import { useWishlist } from '@/store/useWishlist';
 
@@ -41,7 +46,16 @@ export default function MobileNav() {
         <span>Կատալոգ</span>
       </Link>
 
-      {/* 3. Wishlist */}
+      {/* 3. Track Order */}
+      <Link
+        href="/track-order"
+        className="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center text-cyan-700 active:scale-95 transition-all text-[10px] font-bold gap-0.5 px-2"
+      >
+        <Package className="w-5 h-5 text-cyan-600" />
+        <span>Ստուգել</span>
+      </Link>
+
+      {/* 4. Wishlist */}
       <Link
         href="/wishlist"
         aria-label={`Սիրվածներ, ${wishCount} ապրանք`}
@@ -58,7 +72,7 @@ export default function MobileNav() {
         <span>Սիրված</span>
       </Link>
 
-      {/* 4. Cart Trigger with live badge */}
+      {/* 5. Cart Trigger with live badge */}
       <button
         type="button"
         onClick={openDrawer}
@@ -76,7 +90,7 @@ export default function MobileNav() {
         <span>Զամբյուղ</span>
       </button>
 
-      {/* 5. Call Showroom */}
+      {/* 6. Call Showroom */}
       <a
         href="tel:095530435"
         className="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center text-cyan-700 active:scale-95 transition-all text-[10px] font-bold gap-0.5 px-2"

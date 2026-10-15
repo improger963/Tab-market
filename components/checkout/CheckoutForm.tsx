@@ -1,6 +1,11 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   MapPin,
   Truck,
@@ -39,6 +44,7 @@ interface CheckoutFormProps {
   data: CheckoutFormData;
   onChange: (updater: (prev: CheckoutFormData) => CheckoutFormData) => void;
   shippingCost: number;
+  hasAttemptedSubmit?: boolean;
 }
 
 const ARMENIAN_MARZES = [
@@ -54,10 +60,41 @@ const ARMENIAN_MARZES = [
   'Վայոց Ձոր',
 ];
 
-export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutFormProps) {
+export default function CheckoutForm({
+  data,
+  onChange,
+  shippingCost,
+  hasAttemptedSubmit = false,
+}: CheckoutFormProps) {
   const updateField = <K extends keyof CheckoutFormData>(field: K, value: CheckoutFormData[K]) => {
     onChange((prev) => ({ ...prev, [field]: value }));
   };
+
+  // Armenian phone auto-formatter: format strictly to +374 (XX) XX-XX-XX
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    // Strip leading 374 if entered
+    const digits = raw.startsWith('374') ? raw.slice(3) : raw;
+    const trimmed = digits.slice(0, 8); // max 8 local digits (e.g. 95530435)
+
+    let formatted = trimmed;
+    if (trimmed.length > 2 && trimmed.length <= 5) {
+      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2)}`;
+    } else if (trimmed.length > 5 && trimmed.length <= 7) {
+      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2, 5)}-${trimmed.slice(5)}`;
+    } else if (trimmed.length > 7) {
+      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2, 5)}-${trimmed.slice(5, 7)}-${trimmed.slice(7)}`;
+    } else if (trimmed.length > 2) {
+      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2)}`;
+    }
+
+    updateField('phone', formatted);
+  };
+
+  const isPhoneInvalid = hasAttemptedSubmit && !data.phone.trim();
+  const isNameInvalid = hasAttemptedSubmit && !data.fullName.trim();
+  const isStreetInvalid =
+    hasAttemptedSubmit && data.deliveryMethod === 'yerevan' && !data.addressStreet.trim();
 
   return (
     <div className="space-y-8">
@@ -84,10 +121,24 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 value={data.fullName}
                 onChange={(e) => updateField('fullName', e.target.value)}
                 placeholder="օր.՝ Արմեն Գասպարյան"
-                className="w-full h-12 pl-10 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus-cobalt transition-all"
+                className={`w-full h-12 pl-10 pr-3 rounded-xl bg-slate-50 border text-xs font-medium transition-all ${
+                  isNameInvalid
+                    ? 'border-rose-500 ring-2 ring-rose-500/20 animate-shake bg-rose-50/30'
+                    : 'border-slate-200 focus:bg-white focus-cobalt'
+                }`}
               />
-              <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <User
+                className={`w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${
+                  isNameInvalid ? 'text-rose-500' : 'text-slate-400'
+                }`}
+                aria-hidden="true"
+              />
             </div>
+            {isNameInvalid && (
+              <p className="text-[11px] text-rose-600 font-bold mt-1">
+                Խնդրում ենք լրացնել Ձեր անունը և ազգանունը:
+              </p>
+            )}
           </div>
 
           <div>
@@ -103,11 +154,20 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 type="tel"
                 required
                 value={data.phone}
-                onChange={(e) => updateField('phone', e.target.value)}
-                placeholder="XX XX-XX-XX"
-                className="w-full h-12 pl-22 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus-cobalt transition-all"
+                onChange={handlePhoneChange}
+                placeholder="95 53-04-35"
+                className={`w-full h-12 pl-22 pr-3 rounded-xl bg-slate-50 border text-xs font-mono font-bold transition-all ${
+                  isPhoneInvalid
+                    ? 'border-rose-500 ring-2 ring-rose-500/20 animate-shake bg-rose-50/30'
+                    : 'border-slate-200 focus:bg-white focus-cobalt'
+                }`}
               />
             </div>
+            {isPhoneInvalid && (
+              <p className="text-[11px] text-rose-600 font-bold mt-1">
+                Խնդրում ենք մուտքագրել վավեր հեռախոսահամար:
+              </p>
+            )}
           </div>
 
           <div>
@@ -122,7 +182,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 placeholder="օր.՝ info@domain.am"
                 className="w-full h-12 pl-10 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus-cobalt transition-all"
               />
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
             </div>
           </div>
         </div>
@@ -157,7 +217,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                     data.deliveryMethod === 'pickup' ? 'bg-cyan-600 text-white' : 'bg-slate-200 text-slate-700'
                   }`}
                 >
-                  <MapPin className="w-4 h-4" />
+                  <MapPin className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <span className="text-[11px] font-black text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
                   ԱՆՎՃԱՐ
@@ -167,7 +227,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 Ինքնարտահանում Սրահից
               </h3>
               <p className="text-[11px] text-slate-500 mt-1 leading-normal">
-                ք. Երևան, Մելքումովի 40/1 (Ամեն օր՝ 09:00 - 19:00)
+                ք. Երևան, Մելքումովի 40/1 (Ամեն օր՝ 10:00 - 20:00)
               </p>
             </div>
           </div>
@@ -188,7 +248,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                     data.deliveryMethod === 'yerevan' ? 'bg-cyan-600 text-white' : 'bg-slate-200 text-slate-700'
                   }`}
                 >
-                  <Truck className="w-4 h-4" />
+                  <Truck className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <span className="text-[11px] font-bold text-slate-900 bg-white border border-slate-200 px-2 py-0.5 rounded-full tabular-nums">
                   {shippingCost === 0 && data.deliveryMethod === 'yerevan' ? 'ԱՆՎՃԱՐ' : '1,500 ֏'}
@@ -219,7 +279,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                     data.deliveryMethod === 'regional' ? 'bg-cyan-600 text-white' : 'bg-slate-200 text-slate-700'
                   }`}
                 >
-                  <Building className="w-4 h-4" />
+                  <Building className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <span className="text-[11px] font-bold text-slate-900 bg-white border border-slate-200 px-2 py-0.5 rounded-full tabular-nums">
                   3,000 ֏
@@ -235,9 +295,9 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
           </div>
         </div>
 
-        {/* Conditional Address Inputs for Yerevan Delivery */}
+        {/* Conditional Address Inputs for Yerevan Delivery with Smooth Accordion Fade */}
         {data.deliveryMethod === 'yerevan' && (
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 animate-in fade-in">
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 transition-all duration-300 ease-out animate-in fade-in slide-in-from-top-2">
             <h4 className="text-xs font-bold text-slate-900">Հասցե Երևանում</h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="sm:col-span-2">
@@ -250,8 +310,17 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                   value={data.addressStreet}
                   onChange={(e) => updateField('addressStreet', e.target.value)}
                   placeholder="օր.՝ Կոմիտասի պող. 25"
-                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
+                  className={`w-full h-12 px-3.5 rounded-xl bg-white border text-xs transition-all ${
+                    isStreetInvalid
+                      ? 'border-rose-500 ring-2 ring-rose-500/20 animate-shake bg-rose-50/30'
+                      : 'border-slate-200 focus-cobalt'
+                  }`}
                 />
+                {isStreetInvalid && (
+                  <p className="text-[11px] text-rose-600 font-bold mt-1">
+                    Խնդրում ենք լրացնել առաքման հասցեն (փողոց, շենք):
+                  </p>
+                )}
               </div>
 
               <div>
@@ -272,7 +341,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
 
         {/* Conditional Address Inputs for Regional Delivery */}
         {data.deliveryMethod === 'regional' && (
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 animate-in fade-in">
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 transition-all duration-300 ease-out animate-in fade-in slide-in-from-top-2">
             <h4 className="text-xs font-bold text-slate-900">ՀՀ Մարզային Հասցե</h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
@@ -336,159 +405,81 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Idram */}
-          <div
-            onClick={() => updateField('paymentMethod', 'idram')}
-            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
-              data.paymentMethod === 'idram'
-                ? 'border-orange-500 bg-orange-50/30 ring-2 ring-orange-500/10'
-                : 'border-slate-200 hover:border-slate-300 bg-white'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-orange-500/15 text-orange-600 flex items-center justify-center font-black text-xs border border-orange-500/20">
-                idram
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { id: 'card', title: 'Bank Card', label: 'Բանկային Քարտ', icon: CreditCard },
+            { id: 'cash', title: 'Cash', label: 'Կանխիկ Սրահում / Տեղում', icon: Banknote },
+            { id: 'idram', title: 'Idram', label: 'Idram / Telcell', icon: ShieldCheck },
+            { id: 'telcell', title: 'B2B', label: 'B2B (ՀՎՀՀ փոխանցում)', icon: FileCheck2 },
+          ].map((item) => {
+            const Icon = item.icon;
+            const isSelected = data.paymentMethod === item.id;
+            return (
+              <div
+                key={item.id}
+                onClick={() => updateField('paymentMethod', item.id as any)}
+                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                  isSelected
+                    ? 'border-cyan-600 bg-cyan-50/50 shadow-xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                }`}
+              >
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${
+                    isSelected ? 'bg-cyan-600 text-white' : 'bg-slate-200 text-slate-700'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" aria-hidden="true" />
+                </div>
+                <h3 className="text-xs font-bold text-slate-900 leading-snug">{item.label}</h3>
               </div>
-              <div>
-                <h3 className="text-xs font-bold text-slate-900">Idram / Rocket</h3>
-                <p className="text-[11px] text-slate-500">Առցանց վճարում դրամապանակով</p>
-              </div>
-            </div>
-            {data.paymentMethod === 'idram' && <Check className="w-4 h-4 text-orange-600" />}
-          </div>
-
-          {/* Telcell */}
-          <div
-            onClick={() => updateField('paymentMethod', 'telcell')}
-            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
-              data.paymentMethod === 'telcell'
-                ? 'border-orange-600 bg-orange-50/30 ring-2 ring-orange-600/10'
-                : 'border-slate-200 hover:border-slate-300 bg-white'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-orange-600/15 text-orange-700 flex items-center justify-center font-black text-xs border border-orange-600/20">
-                Telcell
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-slate-900">Telcell Wallet</h3>
-                <p className="text-[11px] text-slate-500">QR / Wallet վճարում</p>
-              </div>
-            </div>
-            {data.paymentMethod === 'telcell' && <Check className="w-4 h-4 text-orange-600" />}
-          </div>
-
-          {/* Bank Card */}
-          <div
-            onClick={() => updateField('paymentMethod', 'card')}
-            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
-              data.paymentMethod === 'card'
-                ? 'border-cyan-600 bg-cyan-50/50 ring-2 ring-cyan-500/10'
-                : 'border-slate-200 hover:border-slate-300 bg-white'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center border border-cyan-100">
-                <CreditCard className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-slate-900">Բանկային Քարտ</h3>
-                <p className="text-[11px] text-slate-500">ArCa, Visa, Mastercard</p>
-              </div>
-            </div>
-            {data.paymentMethod === 'card' && <Check className="w-4 h-4 text-cyan-600" />}
-          </div>
-
-          {/* Cash */}
-          <div
-            onClick={() => updateField('paymentMethod', 'cash')}
-            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
-              data.paymentMethod === 'cash'
-                ? 'border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-500/10'
-                : 'border-slate-200 hover:border-slate-300 bg-white'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
-                <Banknote className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-slate-900">Կանխիկ Վճարում</h3>
-                <p className="text-[11px] text-slate-500">Սրահում կամ առաքիչին տեղում</p>
-              </div>
-            </div>
-            {data.paymentMethod === 'cash' && <Check className="w-4 h-4 text-emerald-600" />}
-          </div>
+            );
+          })}
         </div>
-      </div>
 
-      {/* SECTION 4: B2B Electronic Invoice (ArmSoft) */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
-        <label className="flex items-center gap-3 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={data.isB2B}
-            onChange={(e) => updateField('isB2B', e.target.checked)}
-            className="w-5 h-5 rounded text-cyan-600 focus:ring-cyan-500 border-slate-300 cursor-pointer"
-          />
-          <div>
-            <div className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
-              <FileCheck2 className="w-4 h-4 text-cyan-600" />
-              <span>Պահանջվում է անկանխիկ հաշիվ-ապրանքագիր (B2B / ՀԾ)</span>
+        {/* B2B Invoicing Checkbox */}
+        <div className="pt-2">
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={data.isB2B}
+              onChange={(e) => updateField('isB2B', e.target.checked)}
+              className="w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500 border-slate-300 cursor-pointer"
+            />
+            <span className="text-xs font-bold text-slate-800">
+              Ձևակերպել որպես իրավաբանական անձ (B2B հաշիվ-ապրանքագիր և ՀՎՀՀ)
+            </span>
+          </label>
+
+          {data.isB2B && (
+            <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                  Կազմակերպության Անվանում <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={data.companyName}
+                  onChange={(e) => updateField('companyName', e.target.value)}
+                  placeholder="օր.՝ «ԱրմենՇին» ՍՊԸ"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                  ՀՎՀՀ (TIN) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={data.companyTIN}
+                  onChange={(e) => updateField('companyTIN', e.target.value)}
+                  placeholder="օր.՝ 01234567"
+                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold focus-cobalt"
+                />
+              </div>
             </div>
-            <p className="text-[11px] text-slate-500">
-              Շինարարական կազմակերպությունների և Ա/Ձ-ների համար էլեկտրոնային հաշիվ
-            </p>
-          </div>
-        </label>
-
-        {data.isB2B && (
-          <div className="p-4 rounded-2xl bg-cyan-50/60 border border-cyan-200/80 grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in">
-            <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                Կազմակերպության Անվանում կամ Ա/Ձ <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                required={data.isB2B}
-                value={data.companyName}
-                onChange={(e) => updateField('companyName', e.target.value)}
-                placeholder="օր.՝ Շինէքսպերտ ՍՊԸ"
-                className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs focus-cobalt"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                ՀՎՀՀ (8-նիշ TIN) <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                required={data.isB2B}
-                maxLength={8}
-                value={data.companyTIN}
-                onChange={(e) => updateField('companyTIN', e.target.value.replace(/\D/g, ''))}
-                placeholder="օր.՝ 02589412"
-                className="w-full h-12 px-3.5 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold focus-cobalt"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* SECTION 5: Order Notes */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-3">
-        <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-900">
-          Լրացուցիչ Նշումներ կամ Ցուցումներ
-        </label>
-        <textarea
-          rows={3}
-          value={data.orderNotes}
-          onChange={(e) => updateField('orderNotes', e.target.value)}
-          placeholder="օր.՝ 2-րդ մուտք, կոդ 45, կամ զանգահարել նախապես..."
-          className="w-full p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-cyan-500 transition-all placeholder:text-slate-400"
-        />
+          )}
+        </div>
       </div>
     </div>
   );
