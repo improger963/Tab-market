@@ -37,6 +37,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { isInCompare, toggleCompare } = useCompare();
 
   const [copied, setCopied] = useState(false);
+  const [isHeartPopping, setIsHeartPopping] = useState(false);
+
   const isWishlisted = isInWishlist(product.id);
   const isCompared = isInCompare(product.id);
 
@@ -68,6 +70,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsHeartPopping(true);
+    setTimeout(() => setIsHeartPopping(false), 350);
+
     const added = toggleWishlist(product);
     if (added) {
       showToast('Ավելացվեց սիրվածների ցանկում', product.title);
@@ -89,7 +94,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   )}`;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative overflow-hidden active:scale-[0.99]">
+    <div className="bg-white rounded-2xl border border-slate-200/90 hover:-translate-y-1.5 hover:shadow-2xl hover:border-blue-400/50 transition-all duration-300 ease-out flex flex-col justify-between group relative overflow-hidden">
       {/* Top Image Container: Ice-white pedestal */}
       <div className="relative aspect-square bg-[#F8FAFC] overflow-hidden m-1.5 sm:m-2 rounded-xl">
         <Link
@@ -100,7 +105,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <img
             src={product.images[0]}
             alt={product.title}
-            className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500 ease-out"
+            className="w-full h-full object-cover scale-[1.02] group-hover:scale-[1.06] transition-transform duration-500 ease-out"
             loading="lazy"
           />
         </Link>
@@ -110,13 +115,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Left: Badges */}
           <div className="flex flex-col gap-1 items-start">
             {discountPercent ? (
-              <span className="px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg bg-rose-600 text-white font-extrabold text-[10px] sm:text-[11px] tracking-tight shadow-md">
+              <span className="px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg bg-rose-600 text-white font-extrabold text-[10px] sm:text-[11px] tracking-tight shadow-md shimmer-glint">
                 -{discountPercent}%
               </span>
             ) : null}
 
-            <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-sm text-slate-700 text-[9px] sm:text-[10px] font-bold border border-slate-200 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full glass-surface text-slate-800 text-[9px] sm:text-[10px] font-bold shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-beacon shrink-0"></span>
               <span className="hidden xs:inline">Առկա է</span>
             </span>
           </div>
@@ -129,15 +134,15 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={handleToggleWishlist}
               title={isWishlisted ? 'Հեռացնել սիրվածներից' : 'Ավելացնել սիրվածներում'}
               aria-label="Wishlist toggle"
-              className={`w-8 h-8 sm:w-9 sm:h-9 min-h-[36px] min-w-[36px] rounded-full flex items-center justify-center shadow-xs transition-all cursor-pointer ${
+              className={`w-8 h-8 sm:w-9 sm:h-9 min-h-[36px] min-w-[36px] rounded-full flex items-center justify-center shadow-md glass-surface transition-all cursor-pointer ${
                 isWishlisted
-                  ? 'bg-rose-50 text-rose-500 border border-rose-200'
-                  : 'bg-white hover:bg-slate-50 text-slate-500 hover:text-rose-500 border border-slate-200'
-              }`}
+                  ? 'bg-rose-50 text-rose-500 border-rose-200 shadow-rose-200/50'
+                  : 'hover:bg-white text-slate-600 hover:text-rose-500 border-white/80'
+              } ${isHeartPopping ? 'animate-heart-pop' : ''}`}
             >
               <Heart
                 className={`w-3.5 h-3.5 transition-colors ${
-                  isWishlisted ? 'fill-rose-500 text-rose-500' : ''
+                  isWishlisted ? 'fill-rose-500 text-rose-500 drop-shadow-[0_0_6px_rgba(244,63,94,0.6)]' : ''
                 }`}
                 aria-hidden="true"
               />
@@ -149,10 +154,10 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={handleToggleCompare}
               title={isCompared ? 'Հեռացնել համեմատությունից' : 'Համեմատել'}
               aria-label="Compare toggle"
-              className={`w-8 h-8 sm:w-9 sm:h-9 min-h-[36px] min-w-[36px] rounded-full flex items-center justify-center shadow-xs transition-all cursor-pointer ${
+              className={`w-8 h-8 sm:w-9 sm:h-9 min-h-[36px] min-w-[36px] rounded-full flex items-center justify-center shadow-md glass-surface transition-all cursor-pointer ${
                 isCompared
-                  ? 'bg-blue-50 text-blue-600 border border-blue-300'
-                  : 'bg-white hover:bg-slate-50 text-slate-500 hover:text-blue-600 border border-slate-200'
+                  ? 'bg-blue-50 text-blue-600 border-blue-300 shadow-blue-200/50'
+                  : 'hover:bg-white text-slate-600 hover:text-blue-600 border-white/80'
               }`}
             >
               <ArrowLeftRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -163,7 +168,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* CAD Blueprint indicator badge if scheme is available */}
         {product.blueprintImage && (
           <div className="absolute bottom-2 right-2 pointer-events-none">
-            <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-md bg-[#0F172A]/85 backdrop-blur text-blue-300 text-[9px] sm:text-[10px] font-mono font-bold shadow-xs">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0F172A]/90 backdrop-blur-md text-blue-300 text-[9px] sm:text-[10px] font-mono font-bold shadow-xs">
               <Layers className="w-3 h-3 text-blue-400" aria-hidden="true" />
               CAD
             </span>
@@ -202,7 +207,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               type="button"
               onClick={handleCopyCode}
               title="Պատճենել ՀԾ Կոդը"
-              className="hidden sm:inline-flex min-h-[30px] px-1.5 py-0.5 items-center gap-1 text-[10px] font-semibold text-slate-600 hover:text-blue-700 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-md transition-colors cursor-pointer active:scale-95 shrink-0"
+              className="hidden sm:inline-flex min-h-[30px] px-1.5 py-0.5 items-center gap-1 text-[10px] font-semibold text-slate-600 hover:text-blue-700 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-md transition-colors cursor-pointer active:scale-95 shrink-0 btn-tactile"
             >
               {copied ? (
                 <>
@@ -239,7 +244,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   type="button"
                   onClick={handleAddToCart}
                   aria-label={`Ավելացնել ${product.title} զամբյուղ`}
-                  className="min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-95 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                  className="min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer shrink-0 btn-tactile shimmer-glint"
                 >
                   <ShoppingBag className="w-4 h-4 text-blue-400" aria-hidden="true" />
                   <span className="hidden xs:inline sm:inline">Ավելացնել</span>
@@ -247,8 +252,8 @@ export default function ProductCard({ product }: ProductCardProps) {
               </div>
 
               {/* Rocket Line Installment Badge */}
-              <div className="flex items-center gap-1 text-[10px] text-blue-700 bg-blue-50/80 px-2 py-1 rounded-lg border border-blue-200/80 font-semibold tabular-nums">
-                <Zap className="w-3 h-3 text-blue-600 shrink-0 fill-blue-600" />
+              <div className="flex items-center gap-1.5 text-[10px] text-blue-700 bg-blue-50/80 px-2 py-1.5 rounded-lg border border-blue-200/80 font-semibold tabular-nums">
+                <Zap className="w-3 h-3 text-blue-600 shrink-0 fill-blue-600 animate-pulse" />
                 <span>Rocket Line՝ սկսած {formatAMD(monthlyInstallment)}/ամս</span>
               </div>
             </>
@@ -260,9 +265,9 @@ export default function ProductCard({ product }: ProductCardProps) {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full min-h-[40px] py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                className="w-full min-h-[40px] py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer btn-tactile"
               >
-                <MessageCircle className="w-4 h-4" />
+                <MessageCircle className="w-4 h-4 animate-bounce" />
                 <span>Հարցնել գինը WhatsApp-ով</span>
               </a>
             </div>

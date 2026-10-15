@@ -21,7 +21,7 @@ import {
 import { products } from '@/data/products';
 import { categories } from '@/data/categories';
 import ProductCard from '@/components/product/ProductCard';
-import ProductCardSkeleton from '@/components/ui/ProductCardSkeleton';
+import SkeletonCard from '@/components/ui/SkeletonCard';
 import CatalogFilterSkeleton from '@/components/ui/CatalogFilterSkeleton';
 import FilterSidebar, { FilterState } from './FilterSidebar';
 import CategoryNavStrip from './CategoryNavStrip';
@@ -59,13 +59,28 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   const [viewMode, setViewMode] = useState<'gallery' | 'compact'>('gallery');
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { addItem, openDrawer } = useCart();
   const { showCartToast } = useToast();
 
   useEffect(() => {
     setIsMounted(true);
+    const initialTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(initialTimer);
   }, []);
+
+  // Trigger 1-second loading simulation whenever filters or sort changes
+  useEffect(() => {
+    if (!isMounted) return;
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [filters, sortBy, isMounted]);
 
   // Sync if initialCategorySlug changes
   useEffect(() => {
@@ -75,6 +90,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   }, [initialCategorySlug]);
 
   const resetFilters = () => {
+    setIsLoading(true);
     setFilters({
       category: null,
       brands: [],
@@ -85,6 +101,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
       minPrice: priceBounds.min,
       maxPrice: priceBounds.max,
     });
+    setTimeout(() => setIsLoading(false), 1000);
   };
 
   // Find active category title if filtered
@@ -215,7 +232,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
               <button
                 type="button"
                 onClick={() => setIsMobileDrawerOpen(true)}
-                className="lg:hidden min-h-[44px] px-4 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-bold flex items-center gap-2 shadow-sm cursor-pointer"
+                className="lg:hidden min-h-[44px] px-4 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-bold flex items-center gap-2 shadow-sm cursor-pointer btn-tactile"
               >
                 <SlidersHorizontal className="w-4 h-4 text-blue-400" aria-hidden="true" />
                 <span>Ֆիլտրեր</span>
@@ -247,7 +264,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   type="button"
                   onClick={() => setViewMode('gallery')}
                   title="Վիզուալ Ցանց (Gallery)"
-                  className={`p-2 rounded-lg transition-colors cursor-pointer ${
+                  className={`p-2 rounded-lg transition-colors cursor-pointer btn-tactile ${
                     viewMode === 'gallery'
                       ? 'bg-[#0F172A] text-white shadow-xs'
                       : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
@@ -259,7 +276,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   type="button"
                   onClick={() => setViewMode('compact')}
                   title="Կոմպակտ Աղյուսակ վարպետների համար (Compact)"
-                  className={`p-2 rounded-lg transition-colors cursor-pointer ${
+                  className={`p-2 rounded-lg transition-colors cursor-pointer btn-tactile ${
                     viewMode === 'compact'
                       ? 'bg-[#0F172A] text-white shadow-xs'
                       : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
@@ -331,7 +348,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Desktop Sticky Sidebar */}
           <aside className="hidden lg:block lg:col-span-3 sticky top-24 bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-xs max-h-[calc(100vh-7rem)] overflow-y-auto">
-            {!isMounted ? (
+            {!isMounted || isLoading ? (
               <CatalogFilterSkeleton />
             ) : (
               <FilterSidebar
@@ -345,10 +362,10 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
           {/* Product Grid Area */}
           <div className="lg:col-span-9 space-y-6">
-            {!isMounted ? (
+            {isLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <ProductCardSkeleton key={i} />
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <SkeletonCard key={i} />
                 ))}
               </div>
             ) : filteredProducts.length === 0 ? (
@@ -369,7 +386,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   <button
                     type="button"
                     onClick={resetFilters}
-                    className="min-h-[48px] px-8 py-3 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white text-xs font-extrabold uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer inline-flex items-center gap-2"
+                    className="min-h-[48px] px-8 py-3 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white text-xs font-extrabold uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer inline-flex items-center gap-2 btn-tactile"
                   >
                     <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     <span>Մաքրել Բոլոր Ֆիլտրերը</span>
@@ -448,7 +465,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                                 showCartToast(product, 1);
                                 openDrawer();
                               }}
-                              className="px-3.5 py-2 rounded-xl bg-[#0F172A] hover:bg-blue-600 text-white font-bold text-xs shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5"
+                              className="px-3.5 py-2 rounded-xl bg-[#0F172A] hover:bg-blue-600 text-white font-bold text-xs shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5 btn-tactile"
                             >
                               <ShoppingCart className="w-3.5 h-3.5" />
                               <span>Ավելացնել</span>
@@ -508,7 +525,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                 <button
                   type="button"
                   onClick={() => setIsMobileDrawerOpen(false)}
-                  className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100"
+                  className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 btn-tactile"
                   aria-label="Փակել"
                 >
                   <X className="w-5 h-5" />
@@ -518,13 +535,17 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
             {/* Scrollable Facets */}
             <div className="flex-1 overflow-y-auto p-5 overscroll-contain">
-              <FilterSidebar
-                filters={filters}
-                onChange={setFilters}
-                onReset={resetFilters}
-                priceBounds={priceBounds}
-                isMobileDrawer={true}
-              />
+              {!isMounted || isLoading ? (
+                <CatalogFilterSkeleton />
+              ) : (
+                <FilterSidebar
+                  filters={filters}
+                  onChange={setFilters}
+                  onReset={resetFilters}
+                  priceBounds={priceBounds}
+                  isMobileDrawer={true}
+                />
+              )}
             </div>
 
             {/* Sticky Bottom Apply CTA with Safe Area */}
@@ -532,7 +553,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
               <button
                 type="button"
                 onClick={() => setIsMobileDrawerOpen(false)}
-                className="w-full min-h-[48px] py-3 rounded-2xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 text-white text-xs font-bold uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
+                className="w-full min-h-[48px] py-3 rounded-2xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 text-white text-xs font-bold uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer btn-tactile"
               >
                 <span>Կիրառել Ֆիլտրերը {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}</span>
               </button>

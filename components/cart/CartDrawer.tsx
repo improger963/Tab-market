@@ -123,7 +123,7 @@ export default function CartDrawer() {
       <div
         onClick={closeDrawer}
         aria-hidden="true"
-        className={`fixed inset-0 bg-[#0F172A]/70 backdrop-blur-xs transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm transition-opacity duration-300 ${
           isDrawerOpen ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -131,7 +131,7 @@ export default function CartDrawer() {
       <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:left-auto md:right-0 max-w-full flex md:pl-10 justify-end items-end md:items-stretch">
         <div
           ref={drawerRef}
-          className={`w-full md:w-screen md:max-w-md bg-white shadow-2xl flex flex-col max-h-[92vh] md:max-h-full h-auto md:h-full rounded-t-3xl md:rounded-t-none md:border-l border-[#E2E8F0] transform transition-transform duration-300 ease-out ${
+          className={`w-full md:w-screen md:max-w-md bg-white shadow-2xl flex flex-col max-h-[92vh] md:max-h-full h-auto md:h-full rounded-t-3xl md:rounded-t-none md:border-l border-[#E2E8F0] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
             isDrawerOpen
               ? 'translate-y-0 md:translate-x-0'
               : 'translate-y-full md:translate-y-0 md:translate-x-full'
@@ -161,7 +161,7 @@ export default function CartDrawer() {
               type="button"
               onClick={closeDrawer}
               aria-label="Փակել զամբյուղը"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer btn-tactile"
             >
               <X className="w-5 h-5" />
             </button>
@@ -172,7 +172,7 @@ export default function CartDrawer() {
             <div className="bg-blue-50 border-b border-blue-100 p-3 px-5 text-xs text-blue-950 shrink-0 space-y-1.5">
               <div className="flex items-center justify-between font-semibold">
                 <span className="flex items-center gap-1.5">
-                  <Truck className="w-4 h-4 text-blue-600" />
+                  <Truck className="w-4 h-4 text-blue-600 animate-pulse" />
                   {subtotal >= freeDeliveryThreshold ? (
                     <span className="text-emerald-700 font-bold">Անվճար առաքումը Երևանում ակտիվ է! 🚚</span>
                   ) : (
@@ -218,7 +218,7 @@ export default function CartDrawer() {
                 <button
                   type="button"
                   onClick={closeDrawer}
-                  className="min-h-[44px] px-6 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+                  className="min-h-[44px] px-6 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer btn-tactile shimmer-glint"
                 >
                   Դիտել Կատալոգը
                 </button>
@@ -230,7 +230,7 @@ export default function CartDrawer() {
                   {items.map((item) => (
                     <div
                       key={item.product.id}
-                      className="p-3.5 rounded-2xl border border-[#E2E8F0] bg-white flex gap-3.5 shadow-2xs relative group hover:border-slate-300 transition-colors"
+                      className="p-3.5 rounded-2xl border border-[#E2E8F0] bg-white flex gap-3.5 shadow-2xs relative group hover:border-slate-300 transition-all"
                     >
                       {/* Thumbnail */}
                       <img
@@ -250,7 +250,7 @@ export default function CartDrawer() {
                               type="button"
                               onClick={() => removeItem(item.product.id)}
                               aria-label={`Հեռացնել ${item.product.title}`}
-                              className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-400 hover:text-rose-600 transition-colors cursor-pointer rounded-lg hover:bg-rose-50"
+                              className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-400 hover:text-rose-600 transition-colors cursor-pointer rounded-lg hover:bg-rose-50 btn-tactile"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -268,7 +268,7 @@ export default function CartDrawer() {
                               type="button"
                               onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                               aria-label="Նվազեցնել քանակը"
-                              className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-600 hover:bg-white rounded-lg transition-colors cursor-pointer"
+                              className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-600 hover:bg-white rounded-lg transition-colors cursor-pointer btn-tactile"
                             >
                               <Minus className="w-4 h-4" />
                             </button>
@@ -282,7 +282,7 @@ export default function CartDrawer() {
                               onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                               disabled={item.quantity >= item.product.stockQuantity}
                               aria-label="Ավելացնել քանակը"
-                              className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-30 rounded-lg transition-colors cursor-pointer"
+                              className="min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-30 rounded-lg transition-colors cursor-pointer btn-tactile"
                             >
                               <Plus className="w-4 h-4" />
                             </button>
@@ -333,7 +333,7 @@ export default function CartDrawer() {
                               addItem(crossSell, 1);
                               showCartToast(crossSell, 1);
                             }}
-                            className="px-3 py-2 rounded-xl bg-[#0F172A] hover:bg-blue-600 text-white text-xs font-bold shrink-0 transition-all cursor-pointer shadow-xs flex items-center gap-1"
+                            className="px-3 py-2 rounded-xl bg-[#0F172A] hover:bg-blue-600 text-white text-xs font-bold shrink-0 transition-all cursor-pointer shadow-md flex items-center gap-1 btn-tactile"
                           >
                             <Plus className="w-3.5 h-3.5" />
                             <span>Ավելացնել</span>
@@ -369,7 +369,7 @@ export default function CartDrawer() {
                     </div>
                     <button
                       type="submit"
-                      className="px-4 min-h-[44px] rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold transition-all cursor-pointer"
+                      className="px-4 min-h-[44px] rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold transition-all cursor-pointer btn-tactile"
                     >
                       Կիրառել
                     </button>
@@ -388,7 +388,7 @@ export default function CartDrawer() {
                     <button
                       type="button"
                       onClick={removeCoupon}
-                      className="min-h-[36px] px-2 text-[11px] text-rose-600 hover:underline font-bold ml-2 shrink-0 cursor-pointer flex items-center"
+                      className="min-h-[36px] px-2 text-[11px] text-rose-600 hover:underline font-bold ml-2 shrink-0 cursor-pointer flex items-center btn-tactile"
                     >
                       Հեռացնել
                     </button>
@@ -444,7 +444,7 @@ export default function CartDrawer() {
               <Link
                 href="/checkout"
                 onClick={closeDrawer}
-                className="min-h-[50px] w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer"
+                className="min-h-[50px] w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#0F172A] hover:bg-[#2563EB] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-lg cursor-pointer btn-tactile shimmer-glint"
               >
                 <span>Ձևակերպել Պատվերը</span>
                 <ArrowRight className="w-4 h-4 text-white" />

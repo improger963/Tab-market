@@ -42,11 +42,25 @@ export default function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isCartBumping, setIsCartBumping] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const count = isMounted ? totalCount() : 0;
+  const prevCountRef = useRef(count);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Trigger bouncy cart badge when item count increases
+  useEffect(() => {
+    if (count > prevCountRef.current) {
+      setIsCartBumping(true);
+      const timer = setTimeout(() => setIsCartBumping(false), 400);
+      return () => clearTimeout(timer);
+    }
+    prevCountRef.current = count;
+  }, [count]);
 
   // Close megamenu on outside click
   useEffect(() => {
@@ -69,7 +83,6 @@ export default function Header() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isMobileSearchOpen]);
 
-  const count = isMounted ? totalCount() : 0;
   const price = isMounted ? totalPrice() : 0;
   const wishCount = isMounted ? wishlistCount() : 0;
   const compCount = isMounted ? compareCount() : 0;
@@ -102,7 +115,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_4px_20px_rgb(15,23,42,0.03)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[60px] md:h-16 flex items-center justify-between gap-3 sm:gap-6">
         {/* Brand Logo & Catalog Mega-Menu Dropdown */}
         <div className="flex items-center gap-3 md:gap-4 shrink-0" ref={menuRef}>
@@ -115,7 +128,7 @@ export default function Header() {
               <span className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-[#0F172A] group-hover:text-blue-600 transition-colors">
                 TAB<span className="text-blue-600">.AM</span>
               </span>
-              <span className="hidden xl:inline-block text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-[#0F172A] border border-slate-200 uppercase tracking-widest">
+              <span className="hidden xl:inline-block text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-[#0F172A] border border-slate-200 uppercase tracking-widest shimmer-glint">
                 ERP
               </span>
             </div>
@@ -129,7 +142,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
-              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-3.5 py-2 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-3.5 py-2 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white text-xs font-bold transition-all shadow-md cursor-pointer btn-tactile shimmer-glint"
             >
               <LayoutGrid className="w-4 h-4 text-blue-400" />
               <span className="hidden md:inline">Կատալոգ</span>
@@ -142,7 +155,7 @@ export default function Header() {
 
             {/* Mega Menu Dropdown */}
             {isMegaMenuOpen && (
-              <div className="absolute top-full left-0 mt-2 w-[90vw] max-w-[700px] bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute top-full left-0 mt-2 w-[90vw] max-w-[700px] bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200/90 p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
                   <div>
                     <h3 className="text-sm font-black text-[#0F172A] uppercase tracking-wider">
@@ -167,7 +180,7 @@ export default function Header() {
                       key={cat.id}
                       href={`/category/${cat.slug}`}
                       onClick={() => setIsMegaMenuOpen(false)}
-                      className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-slate-100 border border-slate-200 hover:border-blue-300 transition-all group"
+                      className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-slate-100 border border-slate-200 hover:border-blue-300 transition-all group btn-tactile"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center border border-slate-200 group-hover:scale-110 transition-transform">
@@ -205,7 +218,7 @@ export default function Header() {
             type="button"
             onClick={() => setIsMobileSearchOpen(true)}
             aria-label="Որոնել ըստ ՀԾ կոդի"
-            className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 active:scale-95 transition-all cursor-pointer"
+            className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 active:scale-95 transition-all cursor-pointer btn-tactile"
           >
             <Search className="w-5 h-5 text-slate-600" />
           </button>
@@ -214,11 +227,11 @@ export default function Header() {
           <Link
             href="/compare"
             title="Ապրանքների Համեմատում"
-            className="hidden sm:flex min-h-[44px] min-w-[44px] relative items-center justify-center rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-[#0F172A] transition-colors cursor-pointer"
+            className="hidden sm:flex min-h-[44px] min-w-[44px] relative items-center justify-center rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-[#0F172A] transition-colors cursor-pointer btn-tactile"
           >
             <ArrowLeftRight className="w-4 h-4" />
             {compCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-[#2563EB] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none">
+              <span className="absolute -top-1.5 -right-1.5 bg-[#2563EB] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-md">
                 {compCount}
               </span>
             )}
@@ -228,11 +241,11 @@ export default function Header() {
           <Link
             href="/wishlist"
             title="Սիրված Ապրանքներ"
-            className="hidden sm:flex min-h-[44px] min-w-[44px] relative items-center justify-center rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-rose-600 transition-colors cursor-pointer"
+            className="hidden sm:flex min-h-[44px] min-w-[44px] relative items-center justify-center rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-rose-600 transition-colors cursor-pointer btn-tactile"
           >
-            <Heart className="w-4 h-4 text-rose-500" />
+            <Heart className="w-4 h-4 text-rose-500 fill-rose-500/10" />
             {wishCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none">
+              <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-md animate-heart-pop">
                 {wishCount}
               </span>
             )}
@@ -242,7 +255,7 @@ export default function Header() {
           <Link
             href="/track-order"
             title="Ստուգել Պատվերի Կարգավիճակը"
-            className="hidden lg:inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[#0F172A] text-xs font-bold transition-all cursor-pointer"
+            className="hidden lg:inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[#0F172A] text-xs font-bold transition-all cursor-pointer btn-tactile"
           >
             <Package className="w-4 h-4 text-blue-600" />
             <span>Ստուգել Պատվերը</span>
@@ -251,7 +264,7 @@ export default function Header() {
           {/* Showroom Phone shortcut (Desktop) */}
           <a
             href="tel:095530435"
-            className="hidden xl:flex items-center gap-2 min-h-[44px] px-3 py-1.5 rounded-xl text-slate-700 hover:bg-slate-50 text-xs font-semibold transition-colors"
+            className="hidden xl:flex items-center gap-2 min-h-[44px] px-3 py-1.5 rounded-xl text-slate-700 hover:bg-slate-50 text-xs font-semibold transition-colors btn-tactile"
             title="Զանգահարել Մելքումովի 40/1 սրահ"
           >
             <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
@@ -263,17 +276,23 @@ export default function Header() {
             </div>
           </a>
 
-          {/* Cart Trigger Button */}
+          {/* Cart Trigger Button with Bouncy Badge */}
           <button
             type="button"
             onClick={openDrawer}
             aria-label={`Գնումների զամբյուղ, ${count} ապրանք`}
-            className="min-h-[44px] min-w-[44px] relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white font-medium text-xs transition-all shadow-xs active:scale-95 cursor-pointer"
+            className={`min-h-[44px] min-w-[44px] relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white font-medium text-xs transition-all shadow-md cursor-pointer btn-tactile shimmer-glint ${
+              isCartBumping ? 'scale-105' : ''
+            }`}
           >
             <div className="relative">
               <ShoppingBag className="w-4 h-4 text-blue-400" />
               {count > 0 && (
-                <span className="absolute -top-2 -right-2 bg-[#2563EB] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none">
+                <span
+                  className={`absolute -top-2 -right-2 bg-[#2563EB] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-md transition-transform duration-300 ${
+                    isCartBumping ? 'scale-125' : 'scale-100'
+                  }`}
+                >
                   {count > 99 ? '99+' : count}
                 </span>
               )}
@@ -302,7 +321,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => setIsMobileSearchOpen(false)}
-                className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100"
+                className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 btn-tactile"
                 aria-label="Փակել որոնումը"
               >
                 <X className="w-5 h-5" />

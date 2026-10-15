@@ -73,24 +73,24 @@ export default function CategoryStories() {
       {/* Horizontal Scrollable Instagram Stories Bar */}
       <div
         ref={scrollRef}
-        className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1 touch-pan-x overscroll-x-contain"
+        className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth py-3 px-1 touch-pan-x overscroll-x-contain"
       >
         {categories.map((cat) => (
           <Link
             key={cat.id}
             href={`/category/${cat.slug}`}
-            className="flex flex-col items-center gap-2 group shrink-0 cursor-pointer w-20 sm:w-24 text-center"
+            className="flex flex-col items-center gap-2 group shrink-0 cursor-pointer w-20 sm:w-24 text-center btn-tactile"
           >
-            {/* Circular Bubble with Active Royal Blue Glowing Ring */}
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-0.5 bg-gradient-to-tr from-blue-600 via-indigo-500 to-sky-400 group-hover:scale-105 transition-transform shadow-md">
-              <div className="w-full h-full rounded-full bg-white flex items-center justify-center p-2 border-2 border-white group-hover:border-blue-200 transition-colors">
+            {/* Circular Bubble with Active Royal Blue Glowing Ring & Gentle Tilt */}
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-0.5 bg-gradient-to-tr from-blue-600 via-indigo-500 to-sky-400 group-hover:scale-110 group-hover:rotate-[-3deg] transition-all duration-300 shadow-md group-hover:shadow-blue-500/30">
+              <div className="w-full h-full rounded-full bg-white flex items-center justify-center p-2 border-2 border-white group-hover:border-blue-100 transition-colors">
                 <img
                   src={cat.image}
                   alt={cat.title}
                   className="absolute inset-1 rounded-full w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover opacity-85 group-hover:opacity-100 transition-opacity"
                 />
                 <div className="absolute inset-1 rounded-full bg-[#0F172A]/30 group-hover:bg-transparent transition-colors flex items-center justify-center">
-                  <div className="w-8 h-8 rounded-full bg-white/95 backdrop-blur-xs flex items-center justify-center shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-white/95 backdrop-blur-xs flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
                     {getCategoryIcon(cat.icon)}
                   </div>
                 </div>

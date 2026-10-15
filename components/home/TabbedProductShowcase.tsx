@@ -10,9 +10,20 @@ import Link from 'next/link';
 import { Flame, Sparkles, Tag, ArrowRight } from 'lucide-react';
 import { products } from '@/data/products';
 import ProductCard from '@/components/product/ProductCard';
+import SkeletonCard from '@/components/ui/SkeletonCard';
 
 export default function TabbedProductShowcase() {
   const [activeTab, setActiveTab] = useState<'hits' | 'new' | 'discount'>('hits');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleTabChange = (tab: 'hits' | 'new' | 'discount') => {
+    if (tab === activeTab) return;
+    setIsLoading(true);
+    setActiveTab(tab);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 350);
+  };
 
   const getFilteredProducts = () => {
     if (activeTab === 'hits') {
@@ -46,8 +57,8 @@ export default function TabbedProductShowcase() {
         <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#F8FAFC] border border-slate-200 shadow-2xs">
           <button
             type="button"
-            onClick={() => setActiveTab('hits')}
-            className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            onClick={() => handleTabChange('hits')}
+            className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile ${
               activeTab === 'hits'
                 ? 'bg-[#0F172A] text-white shadow-md'
                 : 'text-slate-600 hover:text-[#0F172A]'
@@ -59,8 +70,8 @@ export default function TabbedProductShowcase() {
 
           <button
             type="button"
-            onClick={() => setActiveTab('new')}
-            className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            onClick={() => handleTabChange('new')}
+            className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile ${
               activeTab === 'new'
                 ? 'bg-[#0F172A] text-white shadow-md'
                 : 'text-slate-600 hover:text-[#0F172A]'
@@ -72,8 +83,8 @@ export default function TabbedProductShowcase() {
 
           <button
             type="button"
-            onClick={() => setActiveTab('discount')}
-            className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            onClick={() => handleTabChange('discount')}
+            className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile ${
               activeTab === 'discount'
                 ? 'bg-[#0F172A] text-white shadow-md'
                 : 'text-slate-600 hover:text-[#0F172A]'
@@ -85,17 +96,25 @@ export default function TabbedProductShowcase() {
         </div>
       </div>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-        {currentList.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {/* Product Grid / Skeleton Loaders */}
+      {isLoading ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
+          {currentList.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
 
       <div className="pt-2 text-center">
         <Link
           href="/catalog"
-          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer"
+          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer btn-tactile"
         >
           <span>Դիտել Ամբողջ Տեսականին (ArmSoft ERP Կատալոգ)</span>
           <ArrowRight className="w-4 h-4 text-blue-400" />

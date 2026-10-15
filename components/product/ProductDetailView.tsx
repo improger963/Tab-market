@@ -49,6 +49,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false);
   const [isARModalOpen, setIsARModalOpen] = useState(false);
+  const [isHeartPopping, setIsHeartPopping] = useState(false);
 
   const isWishlisted = isInWishlist(product.id);
   const isCompared = isInCompare(product.id);
@@ -78,6 +79,9 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
   };
 
   const handleToggleWishlist = () => {
+    setIsHeartPopping(true);
+    setTimeout(() => setIsHeartPopping(false), 350);
+
     const added = toggleWishlist(product);
     if (added) {
       showToast('Ավելացվեց սիրվածների ցանկում', product.title);
@@ -93,18 +97,18 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
 
   // WhatsApp pre-filled inquiry CTA
   const whatsappUrl = `https://wa.me/37495530435?text=${encodeURIComponent(
-    `Բարև ձեզ, ինձ հետաքրքրում է ${product.title}: Խնդրում եմ ասեք՝ առկա՞ է Մելքումովի 40/1 սրահում:`
+    `Բարև ձեզ, ինձ հետաքրքրում է ${product.title} (ՀԾ ԿՈԴ: ${product.code}). Խնդրում եմ ասեք՝ առկա՞ է Մելքումովի 40/1 սրահում:`
   )}`;
 
   return (
     <div className="space-y-6">
       {/* Sticky Buy Box Card */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-6">
+      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-sm space-y-6">
         {/* Category & Rating */}
         <div className="flex items-center justify-between gap-2">
           <Link
             href={`/category/${product.categorySlug}`}
-            className="text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-lg transition-colors"
+            className="text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-lg transition-colors btn-tactile"
           >
             {product.categoryName}
           </Link>
@@ -133,7 +137,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               type="button"
               onClick={handleCopyCode}
               title="Պատճենել ՀԾ Կոդը"
-              className="min-h-[40px] px-3 py-2 rounded-xl border border-slate-200 hover:border-blue-300 bg-white hover:bg-blue-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="min-h-[40px] px-3 py-2 rounded-xl border border-slate-200 hover:border-blue-300 bg-white hover:bg-blue-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer btn-tactile"
             >
               {copiedCode ? (
                 <>
@@ -151,13 +155,13 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             <button
               type="button"
               onClick={handleToggleWishlist}
-              className={`min-h-[40px] px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+              className={`min-h-[40px] px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer btn-tactile ${
                 isWishlisted
                   ? 'bg-rose-50 border-rose-200 text-rose-600'
                   : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-              }`}
+              } ${isHeartPopping ? 'animate-heart-pop' : ''}`}
             >
-              <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-rose-500' : ''}`} />
+              <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-rose-500 text-rose-500' : ''}`} />
               <span>{isWishlisted ? 'Սիրված է' : 'Սիրված'}</span>
             </button>
           </div>
@@ -175,7 +179,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               </span>
             )}
             {discountPercent && (
-              <span className="px-2 py-0.5 rounded-lg bg-rose-600 text-white text-xs font-extrabold shadow-2xs">
+              <span className="px-2 py-0.5 rounded-lg bg-rose-600 text-white text-xs font-extrabold shadow-2xs shimmer-glint">
                 -{discountPercent}%
               </span>
             )}
@@ -183,7 +187,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
 
           {/* Rocket Line Installment Badge */}
           <div className="flex items-center gap-2 p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold">
-            <Zap className="w-4 h-4 text-blue-600 shrink-0 fill-blue-600" />
+            <Zap className="w-4 h-4 text-blue-600 shrink-0 fill-blue-600 animate-pulse" />
             <span>
               Հասանելի է <b>Rocket Line</b>-ով (0% տոկոսադրույքով ապառիկ՝ {formatAMD(monthlyInstallment)}/ամս)
             </span>
@@ -198,7 +202,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 aria-label="Նվազեցնել քանակը"
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer btn-tactile"
               >
                 <Minus className="w-4 h-4" />
               </button>
@@ -211,7 +215,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 type="button"
                 onClick={() => setQuantity((q) => Math.min(product.stockQuantity, q + 1))}
                 aria-label="Ավելացնել քանակը"
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-600 hover:bg-white rounded-xl transition-colors cursor-pointer btn-tactile"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -222,7 +226,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               id="main-add-to-cart-btn"
               type="button"
               onClick={handleAddToCart}
-              className="flex-1 min-h-[50px] px-6 py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 text-white font-semibold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 min-h-[50px] px-6 py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white font-semibold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer btn-tactile shimmer-glint"
             >
               <ShoppingBag className="w-4 h-4 text-blue-400" />
               <span>Ավելացնել Զամբյուղ</span>
@@ -233,20 +237,20 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           <button
             type="button"
             onClick={() => setIsQuickOrderOpen(true)}
-            className="w-full min-h-[46px] py-3 rounded-xl bg-white hover:bg-slate-50 active:scale-98 text-[#0F172A] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs border border-[#E2E8F0]"
+            className="w-full min-h-[46px] py-3 rounded-xl bg-white hover:bg-slate-50 text-[#0F172A] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs border border-[#E2E8F0] btn-tactile"
           >
             <Zap className="w-4 h-4 text-blue-600 fill-blue-600" />
             <span>Արագ Պատվեր 1 Քլիքով</span>
           </button>
 
-          {/* WhatsApp Inquiry CTA */}
+          {/* WhatsApp Inquiry CTA with Continuous Green Ambient Pulse Ring on Hover */}
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full min-h-[46px] py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+            className="w-full min-h-[46px] py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md btn-tactile hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]"
           >
-            <MessageCircle className="w-4 h-4" />
+            <MessageCircle className="w-4 h-4 animate-bounce" />
             <span>Հարցնել մասնագետին WhatsApp-ով</span>
           </a>
 
@@ -254,32 +258,32 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           <button
             type="button"
             onClick={() => setIsARModalOpen(true)}
-            className="w-full min-h-[46px] py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-98 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+            className="w-full min-h-[46px] py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md btn-tactile shimmer-glint"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400 pulse-beacon shrink-0" />
             <span>AR / 3D Տեղադրում և Սիմուլյացիա</span>
           </button>
         </div>
 
-        {/* 4 Instant Visual Badge Chips */}
+        {/* 4 Instant Visual Badge Chips with Hover Elevation & Micro-Animation */}
         <div className="pt-4 border-t border-[#E2E8F0] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700">
-          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#F8FAFC] border border-slate-200">
-            <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all group cursor-default">
+            <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
             <span className="font-semibold">Երաշխիք՝ մինչև 5 տարի</span>
           </div>
 
-          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#F8FAFC] border border-slate-200">
-            <FileCheck2 className="w-4 h-4 text-blue-600 shrink-0" />
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all group cursor-default">
+            <FileCheck2 className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
             <span className="font-semibold">Նյութը՝ Պրեմիում Լատուն / Չժանգոտվող պողպատ</span>
           </div>
 
-          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#F8FAFC] border border-slate-200">
-            <Truck className="w-4 h-4 text-blue-600 shrink-0" />
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all group cursor-default">
+            <Truck className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
             <span className="font-semibold">Անվճար առաքում Երևանում</span>
           </div>
 
-          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#F8FAFC] border border-slate-200">
-            <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all group cursor-default">
+            <MapPin className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
             <span className="font-semibold">Անվճար ստացում Մելքումովի 40/1 սրահից</span>
           </div>
         </div>
