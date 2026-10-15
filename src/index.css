@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/* Phase 6: Armenian-capable font stack (Noto Sans Armenian + Inter).
+   Loaded via <link> in index.html; Tailwind v4 theme overrides the default
+   font-sans utility so no component needs to opt in explicitly. */
+@theme {
+  --font-sans: "Inter", "Noto Sans Armenian", ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+}
+
 @layer utilities {
   /* Sanitary Precision Finishes & Ice Chrome Specular Gradients */
   .bg-ice-chrome {
@@ -74,6 +87,133 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
   }
+
+  /* Tactile & Sensory Micro-Interactions */
+  .btn-tactile {
+    transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-tactile:active {
+    transform: scale(0.97);
+  }
+
+  .glass-surface {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 30px rgb(15, 23, 42, 0.05);
+  }
+
+  @keyframes heart-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+  .animate-heart-pop {
+    animation: heart-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes beacon {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+  .pulse-beacon {
+    animation: beacon 2s infinite ease-in-out;
+  }
+
+  @keyframes glint {
+    0% { transform: translateX(-100%) rotate(25deg); }
+    100% { transform: translateX(200%) rotate(25deg); }
+  }
+  .shimmer-glint {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-glint::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-100%) rotate(25deg);
+    pointer-events: none;
+  }
+  .shimmer-glint:hover::before {
+    animation: glint 0.8s ease-out;
+  }
+
+  /* Spring quantity roll (cart steppers): hardware-accelerated transform only */
+  @keyframes qty-roll-up {
+    0% { transform: translateY(45%); opacity: 0.35; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes qty-roll-down {
+    0% { transform: translateY(-45%); opacity: 0.35; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  .animate-qty-roll-up {
+    animation: qty-roll-up 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .animate-qty-roll-down {
+    animation: qty-roll-down 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Checkmark morph pop (add-to-cart confirmation) */
+  @keyframes check-pop {
+    0% { transform: scale(0.4) rotate(-12deg); opacity: 0; }
+    60% { transform: scale(1.15) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .animate-check-pop {
+    animation: check-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Zero-CLS Shimmer Skeleton Engine: fixed 200% gradient track for stable 60fps sweeps */
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: #f1f5f9;
+}
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+/* Skeleton placeholder blocks: reserve exact card geometry so data loads with zero layout shift */
+.skeleton-block {
+  background-color: #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-block::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-size: 200% 100%;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes pulse-subtle {
@@ -87,7 +227,10 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
+  /* Keep anchored content clear of the sticky header during scroll */
+  scroll-padding-top: 96px;
+  /* clip (not hidden) so descendants using position:sticky keep working */
+  overflow-x: clip;
   width: 100%;
   max-width: 100vw;
   position: relative;
@@ -97,11 +240,12 @@ html {
 }
 
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
   max-width: 100vw;
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #ffffff;
   color: #334155;
   selection-background-color: #2563eb;
@@ -133,4 +277,42 @@ input:focus, select:focus, textarea:focus {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/*
+ * Phase 1 — Visible keyboard focus everywhere (single source of truth).
+ * Intentionally UNLAYERED so it wins over `@layer utilities` rules such as
+ * `focus:outline-hidden` on links/buttons, guaranteeing a consistent Royal-Blue
+ * focus ring for keyboard users without editing every component.
+ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/*
+ * Phase 2 — Respect prefers-reduced-motion: disable shimmer, glint, zoom,
+ * slide/roll micro-animations and infinite pulses for motion-sensitive users.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-shimmer::after,
+  .skeleton-block::after,
+  .shimmer-glint::before {
+    animation: none !important;
+  }
+  .pulse-beacon,
+  .animate-pulse-subtle {
+    animation: none !important;
+  }
 }

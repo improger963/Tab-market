@@ -34,7 +34,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             />
             <div className="absolute top-4 left-4 flex flex-col gap-1.5">
               <span className="px-3 py-1 rounded-md bg-[#0F172A] text-white font-mono font-bold text-xs tracking-wider shadow-md">
-                ՀԾ: {product.code}
+                Կոդ: {product.code}
               </span>
               <span className="px-2.5 py-0.5 rounded bg-white/95 text-slate-800 text-[11px] font-bold shadow-xs border border-slate-200">
                 {product.brand}
@@ -92,7 +92,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
             <div className="mt-3 flex items-center gap-3">
               <div className="flex items-center gap-2 p-2 bg-[#F8FAFC] rounded-xl border border-slate-200 text-xs font-mono">
-                <span className="text-slate-500 font-bold">ՀԾ ԿՈԴ:</span>
+                <span className="text-slate-500 font-bold">Կոդ ԿՈԴ:</span>
                 <span className="font-extrabold text-[#0F172A]">{product.code}</span>
               </div>
               <button
@@ -149,7 +149,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
             <a
               href={`https://wa.me/37495530435?text=${encodeURIComponent(
-                `Բարև Ձեզ, հետաքրքրված եմ ՀԾ: ${product.code} (${product.title}) ապրանքով: Առկա՞ է Մելքումովի 40/1 սրահում:`
+                `Բարև Ձեզ, հետաքրքրված եմ Կոդ: ${product.code} (${product.title}) ապրանքով: Առկա՞ է Մելքումովի 40/1 սրահում:`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -196,7 +196,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           <div className="bg-white rounded-2xl max-w-3xl w-full p-4 space-y-4 shadow-2xl border border-slate-200">
             <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
               <span className="font-bold text-sm text-[#0F172A]">
-                CAD Գծագիր: {product.title} (ՀԾ: {product.code})
+                CAD Գծագիր: {product.title} (Կոդ: {product.code})
               </span>
               <button
                 type="button"

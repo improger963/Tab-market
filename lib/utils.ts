@@ -9,11 +9,60 @@ export function cn(...inputs: ClassValue[]): string {
 }
 
 /**
+ * Returns the customer-facing product title. Product records store an internal
+ * title with a trailing "(ԿՈԴ 12345)" code suffix for staff convenience; the
+ * code is shown separately as a "Կոդ" chip, so it is stripped from every
+ * displayed title (cards, cart, checkout, PDP, breadcrumbs, search). The raw
+ * value in the data is left untouched — this is display formatting only.
+ */
+export function displayTitle(title: string): string {
+  return title
+    .replace(/\s*[（(]\s*ԿՈԴ[^）)]*[）)]\s*$/i, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+/**
  * Formats an amount into Armenian Dram (֏ / AMD) with tabular digits,
- * thousand separators, and non-breaking space (\u00A0).
- * e.g., 3500 -> "3,500 ֏"
+ * space thousand separators, and non-breaking space (\u00A0).
+ * Money is always an integer amount; e.g. 2200 -> "2 200 ֏".
  */
 export function formatAMD(price: number): string {
-  if (isNaN(price)) return '0\u00A0֏';
-  return `${new Intl.NumberFormat('en-US').format(Math.round(price))}\u00A0֏`;
+  if (!Number.isFinite(price)) return `0\u00A0֏`;
+  const rounded = Math.round(price);
+  const sign = rounded < 0 ? '-' : '';
+  const grouped = Math.abs(rounded)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0');
+  return `${sign}${grouped}\u00A0֏`;
+}
+
+/**
+ * Progressive auto-formatter for Armenian phone numbers.
+ * Accepts raw input (optionally with +374 country code) and renders the
+ * `+374 (XX) XX-XX-XX` grouping on the 8 local digits, e.g. "95530435"
+ * -> "(95) 53-04-35".
+ */
+export function formatArPhone(raw: string): string {
+  const d = raw.replace(/\D/g, '').replace(/^374/, '').slice(0, 8);
+  if (d.length === 0) return '';
+  let out = `(${d.slice(0, 2)}`;
+  if (d.length <= 2) return out;
+  out += `) ${d.slice(2, 4)}`;
+  if (d.length <= 4) return out;
+  out += `-${d.slice(4, 6)}`;
+  if (d.length <= 6) return out;
+  out += `-${d.slice(6, 8)}`;
+  return out;
+}
+
+/**
+ * Normalizes an Armenian phone value to the canonical `+374 (XX) XX-XX-XX`
+ * form for submission. Returns null when fewer than the required 8 local
+ * digits are present.
+ */
+export function normalizeArPhone(input: string): string | null {
+  const d = input.replace(/\D/g, '').replace(/^374/, '');
+  if (d.length !== 8) return null;
+  return `+374 (${d.slice(0, 2)}) ${d.slice(2, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
 }

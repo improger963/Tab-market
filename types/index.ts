@@ -5,7 +5,7 @@
 
 export interface Product {
   id: number;
-  code: string; // ArmSoft ERP SKU (e.g. "31297") - used by contractors & showroom staff
+  code: string; // SKU code (e.g. "31297")
   title: string; // Full Armenian product title
   slug: string; // SEO friendly URL slug
   categorySlug: string;

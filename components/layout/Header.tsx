@@ -10,7 +10,6 @@ import Link from 'next/link';
 import {
   ShoppingBag,
   LayoutGrid,
-  Phone,
   Heart,
   ArrowLeftRight,
   Droplets,
@@ -128,11 +127,8 @@ export default function Header() {
               <span className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-[#0F172A] group-hover:text-blue-600 transition-colors">
                 TAB<span className="text-blue-600">.AM</span>
               </span>
-              <span className="hidden xl:inline-block text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-[#0F172A] border border-slate-200 uppercase tracking-widest shimmer-glint">
-                ERP
-              </span>
             </div>
-            <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider -mt-1 group-hover:text-slate-700 transition-colors hidden xs:block">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 -mt-1 group-hover:text-slate-700 transition-colors hidden xs:block">
               ՍԱՆՏԵԽՆԻԿԱՅԻ ԽԱՆՈՒԹ-ՍՐԱՀ
             </span>
           </Link>
@@ -158,8 +154,8 @@ export default function Header() {
               <div className="absolute top-full left-0 mt-2 w-[90vw] max-w-[700px] bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200/90 p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
                   <div>
-                    <h3 className="text-sm font-black text-[#0F172A] uppercase tracking-wider">
-                      tab.am 10 Կորային Բաժիններ
+                    <h3 className="text-sm font-bold text-[#0F172A]">
+                      tab.am {categories.length} Կորային Բաժիններ
                     </h3>
                     <p className="text-[11px] text-slate-500">
                       Ընտրեք սանտեխնիկայի և ջրամատակարարման պահանջվող բաժինը
@@ -217,7 +213,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setIsMobileSearchOpen(true)}
-            aria-label="Որոնել ըստ ՀԾ կոդի"
+            aria-label="Որոնել ապրանխ կամ կոդ"
             className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 active:scale-95 transition-all cursor-pointer btn-tactile"
           >
             <Search className="w-5 h-5 text-slate-600" />
@@ -251,30 +247,17 @@ export default function Header() {
             )}
           </Link>
 
-          {/* Track Order Shortcut (Desktop) */}
+          {/* Track Order Shortcut (Desktop) — light text link */}
           <Link
             href="/track-order"
             title="Ստուգել Պատվերի Կարգավիճակը"
-            className="hidden lg:inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[#0F172A] text-xs font-bold transition-all cursor-pointer btn-tactile"
+            className="hidden lg:inline-flex items-center gap-1.5 min-h-[44px] px-2 text-xs font-semibold text-slate-600 hover:text-blue-600 transition-colors"
           >
-            <Package className="w-4 h-4 text-blue-600" />
+            <Package className="w-4 h-4" />
             <span>Ստուգել Պատվերը</span>
           </Link>
 
-          {/* Showroom Phone shortcut (Desktop) */}
-          <a
-            href="tel:095530435"
-            className="hidden xl:flex items-center gap-2 min-h-[44px] px-3 py-1.5 rounded-xl text-slate-700 hover:bg-slate-50 text-xs font-semibold transition-colors btn-tactile"
-            title="Զանգահարել Մելքումովի 40/1 սրահ"
-          >
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
-              <Phone className="w-4 h-4" />
-            </div>
-            <div className="text-left leading-tight">
-              <span className="block text-[10px] text-slate-400 font-medium">Խորհրդատվություն</span>
-              <span className="tabular-nums font-bold text-[#0F172A]">095 53-04-35</span>
-            </div>
-          </a>
+          {/* Showroom phone lives in TopBar; duplicate removed here */}
 
           {/* Cart Trigger Button with Bouncy Badge */}
           <button
@@ -316,7 +299,7 @@ export default function Header() {
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Search className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-bold text-[#0F172A]">Որոնում ըստ ՀԾ Կոդի</span>
+                <span className="text-xs font-bold text-[#0F172A]">Որոնոևմ ապրանխ կամ կոդ</span>
               </div>
               <button
                 type="button"

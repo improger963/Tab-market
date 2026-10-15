@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
-import { formatAMD } from '@/lib/utils';
+import { formatAMD, displayTitle } from '@/lib/utils';
+import ProductImage from '@/components/ui/ProductImage';
 import { DeliveryType } from './CheckoutForm';
 
 interface OrderSummaryProps {
@@ -78,10 +79,10 @@ export default function OrderSummary({
       <div className="divide-y divide-slate-100 max-h-64 overflow-y-auto pr-1">
         {items.map((item) => (
           <div key={item.product.id} className="py-3 flex gap-3 text-xs">
-            <img
+            <ProductImage
               src={item.product.images[0]}
               alt={item.product.title}
-              className="w-14 h-14 rounded-xl object-cover bg-[#F8FAFC] border border-slate-200 shrink-0"
+              className="w-14 h-14 rounded-xl bg-[#F8FAFC] border border-slate-200 shrink-0"
             />
             <div className="flex-1 min-w-0 flex flex-col justify-between">
               <div>
@@ -89,7 +90,7 @@ export default function OrderSummary({
                   Կոդ: {item.product.code}
                 </span>
                 <h4 className="font-bold text-[#0F172A] truncate mt-0.5 leading-snug">
-                  {item.product.title}
+                  {displayTitle(item.product.title)}
                 </h4>
               </div>
 
@@ -108,8 +109,8 @@ export default function OrderSummary({
 
       {/* Interactive Promo Code Form */}
       <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-2">
-        <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 block">
-          Պրոմոկոդ կամ Կուպոն
+        <span className="text-[11px] font-extrabold text-slate-400 block">
+          Զեղչի կոդ
         </span>
         {!appliedCoupon ? (
           <form onSubmit={handleApplyPromo} className="flex gap-2">
@@ -122,7 +123,7 @@ export default function OrderSummary({
                   setCouponInput(e.target.value);
                   setCouponError(null);
                 }}
-                placeholder="TAB10, VARPET, FREE"
+                placeholder="Պրոմոկոդ"
                 className="w-full h-9 pl-9 pr-3 rounded-xl bg-white border border-[#E2E8F0] text-xs font-bold uppercase placeholder:normal-case placeholder:font-normal focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
@@ -183,7 +184,7 @@ export default function OrderSummary({
           <span className="font-bold tabular-nums">
             {effectiveShipping === 0 ? (
               <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-black">
-                {appliedCoupon?.freeShipping ? 'ԱՆՎՃԱՐ (FREE)' : 'ԱՆՎՃԱՐ'}
+                ԱՆՎՃԱՐ
               </span>
             ) : (
               <span className="text-[#0F172A]">{formatAMD(effectiveShipping)}</span>
@@ -204,12 +205,12 @@ export default function OrderSummary({
         type="button"
         disabled={isSubmitting || items.length === 0}
         onClick={onSubmit}
-        className="w-full min-h-[52px] py-4 px-6 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+        className="w-full min-h-[52px] py-4 px-6 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 disabled:opacity-50 text-white font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
       >
         {isSubmitting ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin text-white" />
-            <span>Գրանցվում է ՀԾ համակարգում...</span>
+            <span>Գրանցվում է պատվերը...</span>
           </>
         ) : (
           <>
@@ -223,13 +224,10 @@ export default function OrderSummary({
       <div className="pt-2 border-t border-slate-100 space-y-2 text-[11px] text-slate-500">
         <div className="flex items-center gap-2 text-slate-700">
           <Warehouse className="w-4 h-4 text-blue-600 shrink-0" />
-          <span>Ապրանքները բրոնյա են արվում Մելքումովի 40/1 պահեստում</span>
+          <span>Ապրանքները ամրագրվում են Մելքումովի 40/1 պահեստում</span>
         </div>
 
-        <div className="flex items-center gap-2 text-slate-700">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>100% Պաշտոնական Գործարանային Երաշխիք</span>
-        </div>
+        
       </div>
     </div>
   );

@@ -27,6 +27,7 @@ import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { formatAMD } from '@/lib/utils';
 import { products } from '@/data/products';
+import ProductImage from '@/components/ui/ProductImage';
 import type { Product } from '@/types';
 
 /* Installation essentials pushed as 1-click cross-sell when a faucet or vanity is in the cart. */
@@ -122,7 +123,10 @@ export default function CartDrawer() {
     if (!isMounted) return;
 
     if (isDrawerOpen) {
+      // Compensate for the removed vertical scrollbar so locking scroll causes no layout jump.
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = 'hidden';
+      if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
       closeBtnRef.current?.focus();
 
       const handleKeyDown = (e: KeyboardEvent) => {
@@ -134,10 +138,12 @@ export default function CartDrawer() {
       window.addEventListener('keydown', handleKeyDown);
       return () => {
         document.body.style.overflow = 'unset';
+        document.body.style.paddingRight = '';
         window.removeEventListener('keydown', handleKeyDown);
       };
     } else {
       document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = '';
     }
   }, [isDrawerOpen, closeDrawer, isMounted]);
 
@@ -199,7 +205,7 @@ export default function CartDrawer() {
       <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:left-auto md:right-0 max-w-full flex md:pl-10 justify-end items-end md:items-stretch">
         <div
           ref={drawerRef}
-          className={`w-full md:w-screen md:max-w-md bg-white shadow-2xl flex flex-col max-h-[92vh] md:max-h-full h-auto md:h-full rounded-t-3xl md:rounded-t-none md:border-l border-[#E2E8F0] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`w-full md:w-screen md:max-w-md bg-white shadow-2xl flex flex-col max-h-[92dvh] md:max-h-full h-auto md:h-full rounded-t-3xl md:rounded-t-none md:border-l border-[#E2E8F0] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
             isDrawerOpen
               ? 'translate-y-0 md:translate-x-0'
               : 'translate-y-full md:translate-y-0 md:translate-x-full'
@@ -219,7 +225,7 @@ export default function CartDrawer() {
               <div>
                 <h3 className="font-bold text-sm tracking-tight">Զամբյուղ</h3>
                 <span className="text-[11px] text-slate-400 font-mono">
-                  {count > 0 ? `${count} ապրանք ՀԾ պահեստից` : 'Դատարկ է'}
+                  {count > 0 ? `${count} ապրանք Կոդ պահեստից` : 'Դատարկ է'}
                 </span>
               </div>
             </div>
@@ -280,7 +286,7 @@ export default function CartDrawer() {
                     Ձեր զամբյուղը դեռ դատարկ է
                   </h4>
                   <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
-                    Ավելացրեք ապրանքներ tab.am կատալոգից կամ որոնեք ՀԾ արտիկուլներով:
+                    Ավելացրեք ապրանքներ tab.am կատալոգից կամ որոնեք Որոնել ապրանխ կամ Կոդով:
                   </p>
                 </div>
                 <button
@@ -301,10 +307,10 @@ export default function CartDrawer() {
                       className="p-3.5 rounded-2xl border border-[#E2E8F0] bg-white flex gap-3.5 shadow-2xs relative group hover:border-slate-300 transition-all"
                     >
                       {/* Thumbnail */}
-                      <img
+                      <ProductImage
                         src={item.product.images[0]}
                         alt={item.product.title}
-                        className="w-18 h-18 rounded-xl object-cover bg-[#F8FAFC] border border-slate-200 shrink-0"
+                        className="w-18 h-18 rounded-xl bg-[#F8FAFC] border border-slate-200 shrink-0"
                       />
 
                       {/* Body */}
@@ -390,10 +396,10 @@ export default function CartDrawer() {
                           key={crossSell.id}
                           className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 hover:border-blue-300 transition-colors"
                         >
-                          <img
+                          <ProductImage
                             src={crossSell.images[0]}
                             alt={crossSell.title}
-                            className="w-11 h-11 rounded-xl object-cover bg-white border border-slate-200 shrink-0"
+                            className="w-11 h-11 rounded-xl bg-white border border-slate-200 shrink-0"
                           />
                           <div className="flex-1 min-w-0">
                             <h5 className="text-xs font-bold text-[#0F172A] truncate">
@@ -440,7 +446,7 @@ export default function CartDrawer() {
                           setCouponInput(e.target.value);
                           setCouponError(null);
                         }}
-                        placeholder="Պրոմոկոդ (TAB10, VARPET, FREE)"
+                        placeholder="Պրոմոկոդ"
                         className="w-full h-11 pl-10 pr-3 rounded-xl bg-white border border-[#E2E8F0] text-base md:text-xs font-bold uppercase placeholder:normal-case placeholder:font-normal focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20"
                       />
                     </div>
@@ -532,7 +538,7 @@ export default function CartDrawer() {
                   <MapPin className="w-3 h-3 text-blue-600" />
                   Երևան, Մելքումովի 40/1
                 </span>
-                <span>ՀԾ (ArmSoft) Սինք</span>
+                <span>Տերքնել սրահիք</span>
               </div>
             </div>
           )}

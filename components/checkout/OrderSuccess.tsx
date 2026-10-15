@@ -68,7 +68,7 @@ export default function OrderSuccess({ orderData, orderNumber }: OrderSuccessPro
           Շնորհակալություն, Ձեր պատվերն ընդունված է!
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
-          Ապրանքներն արդեն իսկ ամրագրված են ՀԾ (ArmSoft) պահեստային համակարգում <b>{orderData.fullName}</b> անունով:
+          Ապրանքներն արդեն իսկ ամրագրված են Կոդ () պահեստային համակարգում <b>{orderData.fullName}</b> անունով:
         </p>
       </div>
 

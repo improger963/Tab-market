@@ -116,7 +116,7 @@ export default function TabbedProductShowcase() {
           href="/catalog"
           className="min-h-[48px] inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer btn-tactile"
         >
-          <span>Դիտել Ամբողջ Տեսականին (ArmSoft ERP Կատալոգ)</span>
+          <span>Դիտել Ամբողջ Տեսականին</span>
           <ArrowRight className="w-4 h-4 text-blue-400" />
         </Link>
       </div>

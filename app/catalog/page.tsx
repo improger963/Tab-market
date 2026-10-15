@@ -5,7 +5,7 @@ import CatalogView from '@/components/catalog/CatalogView';
 export const metadata: Metadata = {
   title: 'Սանտեխնիկայի Կատալոգ | tab.am Երևան, Մելքումովի 40/1',
   description:
-    'tab.am - Ջրամատակարարման, ջեռուցման և սանտեխնիկայի ամբողջ տեսականին Երևանում: ՀԾ (ArmSoft) կոդերով ճշգրիտ որոնում և առկայություն:',
+    'tab.am - Ջրամատակարարման, ջեռուցման և սանտեխնիկայի ամբողջ տեսականին Երևանում: կոդերով ճշգրիտ որոնում և առկայություն:',
 };
 
 export default function CatalogPage() {

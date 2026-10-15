@@ -24,7 +24,9 @@ import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { useWishlist } from '@/store/useWishlist';
 import { useCompare } from '@/store/useCompare';
-import { formatAMD } from '@/lib/utils';
+import { formatAMD, displayTitle } from '@/lib/utils';
+import { resolveImageUrl } from '@/lib/config';
+import ProductImage from '@/components/ui/ProductImage';
 
 interface ProductCardProps {
   product: Product;
@@ -99,10 +101,10 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   // WhatsApp inquiry URL for hidden price / custom order
   const whatsappUrl = `https://wa.me/37495530435?text=${encodeURIComponent(
-    `Բարև ձեզ, ինձ հետաքրքրում է այս ապրանքի գինը և առկայությունը՝ ${product.title} (ՀԾ ԿՈԴ: ${product.code}) Մելքումովի 40/1 սրահում:`
+    `Բարև ձեզ, ինձ հետաքրքրում է այս ապրանքի գինը և առկայությունը՝ ${product.title} (կոդ ԿՈԴ: ${product.code}) Մելքումովի 40/1 սրահում:`
   )}`;
 
-  // Micro-spec pills: Material, Warranty, Connection size (looked up from ERP specs map)
+  // Micro-spec pills: Material, Warranty, Connection size (from product.specs)
   const specPills = ['Նյութ', 'Երաշխիք', 'Միացում']
     .map((key) => {
       const entry = Object.entries(product.specs).find(
@@ -123,11 +125,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           className="block w-full h-full cursor-pointer focus:outline-hidden"
           aria-label={product.title}
         >
-          <img
+          <ProductImage
             src={product.images[0]}
             alt={product.title}
-            className="w-full h-full object-cover scale-[1.02] group-hover:scale-[1.06] transition-transform duration-500 ease-out"
-            loading="lazy"
+            className="w-full h-full"
+            imgClassName="scale-[1.02] group-hover:scale-[1.06] transition-transform duration-500 ease-out"
           />
         </Link>
 
@@ -186,8 +188,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        {/* CAD Blueprint indicator badge if scheme is available */}
-        {product.blueprintImage && (
+        {/* CAD Blueprint indicator badge if a real scheme image is available */}
+        {resolveImageUrl(product.blueprintImage) && (
           <div className="absolute bottom-2 right-2 pointer-events-none">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0F172A]/90 backdrop-blur-md text-blue-300 text-[9px] sm:text-[10px] font-mono font-bold shadow-xs">
               <Layers className="w-3 h-3 text-blue-400" aria-hidden="true" />
@@ -201,23 +203,25 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-2.5 sm:p-4 pt-0 sm:pt-1 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
         <div className="space-y-1">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-[10px] sm:text-[11px] font-extrabold text-slate-400 uppercase tracking-widest truncate">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 truncate">
               {product.brand}
             </span>
-            <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-amber-500 shrink-0">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-400" aria-hidden="true" />
-              <span className="text-slate-800">{product.rating || 4.9}</span>
-            </div>
+            {product.rating ? (
+              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-amber-500 shrink-0">
+                <Star className="w-3 h-3 fill-amber-400 text-amber-400" aria-hidden="true" />
+                <span className="text-slate-800 tabular-nums">{product.rating}</span>
+              </div>
+            ) : null}
           </div>
 
           <Link
             href={`/product/${product.slug}`}
             className="font-semibold sm:font-bold text-[#0F172A] text-xs sm:text-sm leading-snug hover:text-blue-600 transition-colors line-clamp-2 min-h-[2.4rem] sm:min-h-[2.5rem] block cursor-pointer"
           >
-            {product.title}
+            {displayTitle(product.title)}
           </Link>
 
-          {/* ArmSoft SKU Badge */}
+          {/* SKU chip */}
           <div className="pt-0.5 flex items-center justify-between gap-1.5">
             <div className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-slate-200 text-slate-800 font-mono text-[10px] font-medium shadow-2xs truncate">
               <span className="text-slate-400 text-[9px]">ԿՈԴ:</span>
@@ -227,7 +231,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <button
               type="button"
               onClick={handleCopyCode}
-              title="Պատճենել ՀԾ Կոդը"
+              title="Պատճենել Կոդ"
               className="hidden sm:inline-flex min-h-[30px] px-1.5 py-0.5 items-center gap-1 text-[10px] font-semibold text-slate-600 hover:text-blue-700 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-md transition-colors cursor-pointer active:scale-95 shrink-0 btn-tactile"
             >
               {copied ? (

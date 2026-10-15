@@ -5,10 +5,12 @@
 
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronRight, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '@/store/useCart';
+import { generateOrderId } from '@/services/api';
+import { normalizeArPhone } from '@/lib/utils';
 import CheckoutForm, { CheckoutFormData } from '@/components/checkout/CheckoutForm';
 import OrderSummary from '@/components/checkout/OrderSummary';
 import OrderSuccess from '@/components/checkout/OrderSuccess';
@@ -35,6 +37,8 @@ export default function CheckoutPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccessNumber, setOrderSuccessNumber] = useState<string | null>(null);
+  // Idempotency token: guards against double-submit (including same-tick re-entry).
+  const submitTokenRef = useRef<string | null>(null);
 
   const subtotal = useMemo(() => {
     return isMounted ? totalPrice() : 0;
@@ -44,13 +48,15 @@ export default function CheckoutPage() {
   const shippingCost = 0;
 
   const handleSubmit = () => {
+    if (isSubmitting || submitTokenRef.current) return; // prevent double-submit
+
     if (!formData.fullName.trim()) {
       alert('Խնդրում ենք լրացնել Ձեր անունը և ազգանունը:');
       return;
     }
-    const phoneDigits = formData.phone.replace(/\D/g, '');
-    if (phoneDigits.length < 8) {
-      alert('Խնդրում ենք լրացնել հեռախոսահամարը ճիշտ ձևաչափով');
+    const normalizedPhone = normalizeArPhone(formData.phone);
+    if (!normalizedPhone) {
+      alert('Խնդրում ենք լրացնել հեռախոսահամարը ճիշտ ձևաչափով՝ +374 (XX) XX-XX-XX:');
       return;
     }
     if (formData.deliveryMethod === 'yerevan' && !formData.addressStreet.trim()) {
@@ -58,10 +64,13 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Order number is owned by the API layer, generated once per submission.
+    const orderId = generateOrderId();
+    submitTokenRef.current = orderId;
+
     setIsSubmitting(true);
     setTimeout(() => {
-      const generatedOrder = `TAB-${Math.floor(10000 + Math.random() * 90000)}`;
-      setOrderSuccessNumber(generatedOrder);
+      setOrderSuccessNumber(orderId);
       setIsSubmitting(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 900);
@@ -86,7 +95,7 @@ export default function CheckoutPage() {
             Ձեր զամբյուղը դատարկ է
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
-            Պատվեր ձևակերպելու համար ավելացրեք ապրանքներ tab.am կատալոգից կամ օգտագործեք ՀԾ կոդով որոնումը:
+            Պատվեր ձևակերպելու համար ավելացրեք ապրանքներ tab.am կատալոգից կամ օգտագործեք Կոդ Կոդով որոնումը:
           </p>
         </div>
         <Link
@@ -120,7 +129,7 @@ export default function CheckoutPage() {
           Պատվերի Ձևակերպում
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Ապրանքները բրոնյա են արվում ՀԾ համակարգում Մելքումովի 40/1 պահեստից (Անվճար առաքում Երևանում):
+          Ապրանքները բրոնյա են արվում Կոդ համակարգում Մելքումովի 40/1 պահեստից (Անվճար առաքում Երևանում):
         </p>
       </div>
 

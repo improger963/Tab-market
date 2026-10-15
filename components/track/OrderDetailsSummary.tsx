@@ -9,6 +9,7 @@ import React from 'react';
 import { MapPin, Phone, MessageCircle, Truck, Package, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { TrackedOrderDetails } from '@/types/api';
 import { formatAMD } from '@/lib/utils';
+import ProductImage from '@/components/ui/ProductImage';
 
 interface OrderDetailsSummaryProps {
   order: TrackedOrderDetails;
@@ -136,10 +137,10 @@ export default function OrderDetailsSummary({ order }: OrderDetailsSummaryProps)
               className="p-3 rounded-2xl border border-[#E2E8F0] bg-white flex items-center justify-between gap-4"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <img
+                <ProductImage
                   src={item.image}
                   alt={item.title}
-                  className="w-14 h-14 rounded-xl object-cover bg-[#F8FAFC] border border-slate-200 shrink-0"
+                  className="w-14 h-14 rounded-xl bg-[#F8FAFC] border border-slate-200 shrink-0"
                 />
                 <div className="min-w-0">
                   <span className="font-mono text-[10px] font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">

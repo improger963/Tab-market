@@ -28,6 +28,7 @@ import CategoryNavStrip from './CategoryNavStrip';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { formatAMD } from '@/lib/utils';
+import ProductImage from '@/components/ui/ProductImage';
 
 interface CatalogViewProps {
   initialCategorySlug?: string;
@@ -248,7 +249,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                 <span className="text-xs font-semibold text-slate-600 hidden sm:inline">Դասավորել՝</span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
+                  onChange={(e) => setSortBy(e.target.value as 'popular' | 'price-asc' | 'price-desc')}
                   aria-label="Դասավորել ըստ"
                   className="bg-transparent text-xs font-bold text-[#0F172A] focus:outline-hidden cursor-pointer"
                 >
@@ -347,7 +348,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
         {/* Main Grid & Desktop Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Desktop Sticky Sidebar */}
-          <aside className="hidden lg:block lg:col-span-3 sticky top-24 bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-xs max-h-[calc(100vh-7rem)] overflow-y-auto">
+          <aside className="hidden lg:block lg:col-span-3 sticky top-24 bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-xs max-h-[calc(100dvh-7rem)] overflow-y-auto">
             {!isMounted || isLoading ? (
               <CatalogFilterSkeleton />
             ) : (
@@ -441,10 +442,10 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                           </td>
                           <td className="p-3.5">
                             <div className="flex items-center gap-3">
-                              <img
+                              <ProductImage
                                 src={product.images[0]}
                                 alt={product.title}
-                                className="w-10 h-10 rounded-lg object-cover bg-slate-100 border border-slate-200 shrink-0"
+                                className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 shrink-0"
                               />
                               <Link
                                 href={`/product/${product.slug}`}

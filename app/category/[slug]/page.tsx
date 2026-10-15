@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
   return {
     title: `${category.title} | tab.am Սանտեխնիկայի Խանութ-Սրահ Երևանում`,
-    description: `tab.am - ${category.title}: Պահեստում առկա է ${category.itemCount} տեսականի Մելքումովի 40/1 սրահում: Գործարանային երաշխիք և ՀԾ սինք:`,
+    description: `tab.am - ${category.title}: Պահեստում առկա է ${category.itemCount} տեսականի Մելքումովի 40/1 սրահում: Գործարանային երաշխիք և սինք:`,
   };
 }
 

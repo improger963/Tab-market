@@ -6,6 +6,37 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, Product } from '../types';
+import { products } from '../data/products';
+
+// Persisted schema version. Bump when the stored shape changes and add a
+// matching branch in `migrate` below.
+const CART_SCHEMA_VERSION = 1;
+
+/**
+ * Re-validates persisted cart lines against the live catalog on rehydration:
+ *  - drops items that no longer exist in the catalog,
+ *  - refreshes price/availability truth from the catalog,
+ *  - clamps quantity to the current min/max (1..stock).
+ */
+function revalidateCartItems(items: CartItem[]): CartItem[] {
+  return items.reduce<CartItem[]>((acc, item) => {
+    const fresh = products.find((p) => p.id === item.product.id);
+    if (!fresh) return acc; // product removed from catalog
+    const merged: Product = {
+      ...item.product,
+      price: fresh.price,
+      oldPrice: fresh.oldPrice,
+      inStock: fresh.inStock,
+      stockQuantity: fresh.stockQuantity,
+      title: fresh.title,
+      images: fresh.images,
+    };
+    const maxQty = fresh.stockQuantity > 0 ? fresh.stockQuantity : item.quantity;
+    const quantity = Math.max(1, Math.min(item.quantity, maxQty));
+    acc.push({ product: merged, quantity });
+    return acc;
+  }, []);
+}
 
 export interface CouponData {
   code: string;
@@ -126,7 +157,7 @@ export const useCart = create<CartState>()(
             description: '10% զեղչ պատվերի ամբողջ արժեքից',
           };
           set({ appliedCoupon: coupon });
-          return { success: true, message: '«TAB10» կիրառված է: 10% զեղչ ամբողջ զամբյուղի համար!' };
+          return { success: true, message: 'կիրառված է: 10% զեղչ ամբողջ զամբյուղի համար!' };
         }
 
         if (code === 'VARPET') {
@@ -137,7 +168,7 @@ export const useCart = create<CartState>()(
             description: '15% հատուկ վարպետական զեղչ',
           };
           set({ appliedCoupon: coupon });
-          return { success: true, message: '«VARPET» կիրառված է: 15% մասնագիտական զեղչ!' };
+          return { success: true, message: 'կիրառված է: 15% մասնագիտական զեղչ!' };
         }
 
         if (code === 'FREE') {
@@ -148,10 +179,10 @@ export const useCart = create<CartState>()(
             description: 'Անվճար առաքում ամբողջ ՀՀ տարածքում',
           };
           set({ appliedCoupon: coupon });
-          return { success: true, message: '«FREE» կիրառված է: Անվճար առաքում ՀՀ բոլոր մարզեր!' };
+          return { success: true, message: 'կիրառված է: Անվճար առաքում ՀՀ բոլոր մարզեր!' };
         }
 
-        return { success: false, message: 'Անվավեր պրոմոկոդ: Փորձեք TAB10, VARPET կամ FREE' };
+        return { success: false, message: 'Անվավեր պրոմոկոդ: Փորձեք Պրոմոկոդ' };
       },
 
       removeCoupon: () => {
@@ -189,7 +220,21 @@ export const useCart = create<CartState>()(
     {
       name: 'tab-cart-storage',
       storage: createJSONStorage(() => localStorage),
+      version: CART_SCHEMA_VERSION,
       partialize: (state) => ({ items: state.items, appliedCoupon: state.appliedCoupon }),
+      migrate: (persistedState, version) => {
+        const state = (persistedState ?? {}) as Partial<CartState>;
+        if (version < CART_SCHEMA_VERSION) {
+          state.items = Array.isArray(state.items) ? state.items : [];
+          state.appliedCoupon = state.appliedCoupon ?? null;
+        }
+        return state as CartState;
+      },
+      onRehydrateStorage: () => (state) => {
+        if (state && Array.isArray(state.items) && state.items.length > 0) {
+          useCart.setState({ items: revalidateCartItems(state.items) });
+        }
+      },
     }
   )
 );

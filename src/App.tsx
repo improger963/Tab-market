@@ -26,10 +26,11 @@ import ProductReviews from '@/components/product/ProductReviews';
 import RecentlyViewed from '@/components/product/RecentlyViewed';
 import { Product } from '@/types';
 import { products } from '@/data/products';
+import { resolveImageUrl } from '@/lib/config';
+import { displayTitle } from '@/lib/utils';
 import { useCart } from '@/store/useCart';
 import {
   ChevronRight,
-  ShieldCheck,
   X,
   PackageX,
   ArrowRight,
@@ -103,7 +104,7 @@ export default function App() {
   }, [route]);
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans selection:bg-[#2563EB] selection:text-white overflow-x-hidden w-full max-w-[100vw] pb-[calc(env(safe-area-inset-bottom,16px)+72px)] md:pb-0">
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans selection:bg-[#2563EB] selection:text-white overflow-x-clip w-full max-w-[100vw] pb-[calc(env(safe-area-inset-bottom,16px)+72px)] md:pb-0">
       {/* 1. Global Shell: TopBar */}
       <TopBar />
 
@@ -147,7 +148,7 @@ export default function App() {
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
             <span className="text-[#0F172A] font-bold truncate max-w-xs sm:max-w-md">
-              {currentProduct.title}
+              {displayTitle(currentProduct.title)}
             </span>
           </nav>
 
@@ -175,13 +176,6 @@ export default function App() {
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
                   {currentProduct.shortDesc}
                 </p>
-                <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 text-xs text-blue-950 flex items-start gap-2.5">
-                  <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span>
-                    Այս մոդելն անցել է գործարանային 10 բար հիդրավլիկ ճնշման փորձարկում և ունի պաշտոնական
-                    երաշխիքային կտրոն:
-                  </span>
-                </div>
               </div>
 
               {/* Interactive Technical Dossier Tabs — the ONLY full specs table on the page */}
@@ -280,13 +274,13 @@ export default function App() {
       {/* CAD Blueprint Zoom Modal */}
       {activeCadProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/70 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90dvh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
             <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between sticky top-0 bg-white z-10">
               <div>
                 <h4 className="font-bold text-sm text-[#0F172A]">{activeCadProduct.title}</h4>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="font-mono text-blue-600 text-xs font-bold">
-                    ՀԾ: {activeCadProduct.code}
+                    Կոդ: {activeCadProduct.code}
                   </span>
                   <span className="text-slate-400">•</span>
                   <span className="text-xs text-slate-500">CAD Տեխնիկական Սխեմա (մմ)</span>
@@ -302,14 +296,18 @@ export default function App() {
             </div>
 
             <div className="p-6 bg-[#0F172A] flex flex-col items-center justify-center min-h-[340px]">
-              <img
-                src={
-                  activeCadProduct.blueprintImage ||
-                  'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80'
-                }
-                alt="CAD Scheme"
-                className="max-h-[380px] w-auto object-contain"
-              />
+              {resolveImageUrl(activeCadProduct.blueprintImage) ? (
+                <img
+                  src={resolveImageUrl(activeCadProduct.blueprintImage)!}
+                  alt="CAD Scheme"
+                  className="max-h-[380px] w-auto object-contain"
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-3 text-slate-500">
+                  <PackageX className="w-12 h-12" aria-hidden="true" />
+                  <span className="text-xs font-semibold">CAD գծագիրը ներառված չէ</span>
+                </div>
+              )}
             </div>
 
             <div className="p-4 border-t border-[#E2E8F0] bg-slate-50 flex items-center justify-between">

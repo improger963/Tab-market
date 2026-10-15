@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
   // Price range
   filtered = filtered.filter((p) => p.price >= minPrice && p.price <= maxPrice);
 
-  // Search query (matches title or ArmSoft code)
+  // Search query (matches title or  code)
   if (search && search.trim() !== '') {
     const q = search.toLowerCase().trim();
     filtered = filtered.filter(

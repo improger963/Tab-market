@@ -41,8 +41,10 @@ function TrackOrderContent() {
     try {
       const data = await trackOrder(orderId, phone);
       setOrder(data);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Պատվերը նշված համարով չի գտնվել:');
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Պատվերը նշված համարով չի գտնվել:';
+      setErrorMessage(message);
     } finally {
       setIsLoading(false);
     }

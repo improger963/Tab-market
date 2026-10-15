@@ -54,7 +54,7 @@ export const useToast = create<ToastStore>((set, get) => ({
       id,
       type: 'copy',
       title: 'Պատճենված է',
-      message: `ՀԾ Կոդ ${code}-ը պատճենվեց`,
+      message: `կոդ ${code}-ը պատճենվեց`,
       duration: 3000,
     };
 

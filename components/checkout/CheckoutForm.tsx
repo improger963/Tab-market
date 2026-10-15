@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { User, Phone, Mail, MapPin, Truck, CreditCard, Banknote, ShieldCheck } from 'lucide-react';
-import { formatAMD } from '@/lib/utils';
+import { formatAMD, formatArPhone } from '@/lib/utils';
 
 export type DeliveryType = 'yerevan' | 'pickup';
 export type PaymentType = 'cash' | 'card' | 'idram';
@@ -34,24 +34,24 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
     onChange((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Armenian phone auto-formatter
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, '');
-    const digits = raw.startsWith('374') ? raw.slice(3) : raw;
-    const trimmed = digits.slice(0, 8);
+  // Exhaustive payment options — keyed off the typed PaymentType union.
+  const PAYMENT_OPTIONS: Array<{ id: PaymentType; title: string; desc: string; icon: React.ComponentType<{ className?: string }> }> = [
+    { id: 'cash', title: 'Կանխիկ Վճարում', desc: 'Սրահում՝ կամ առաքիչին ստանալիս', icon: Banknote },
+    { id: 'card', title: 'Բանկային Քարտ', desc: 'ArCa / Visa / Mastercard', icon: CreditCard },
+    { id: 'idram', title: 'Idram / Rocket Line', desc: '0% ապառիկ տեղում', icon: ShieldCheck },
+  ];
 
-    let formatted = trimmed;
-    if (trimmed.length > 2 && trimmed.length <= 5) {
-      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2)}`;
-    } else if (trimmed.length > 5 && trimmed.length <= 7) {
-      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2, 5)}-${trimmed.slice(5)}`;
-    } else if (trimmed.length > 7) {
-      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2, 5)}-${trimmed.slice(5, 7)}-${trimmed.slice(7)}`;
-    } else if (trimmed.length > 2) {
-      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2)}`;
+  // Shared keyboard activation for radio-style option cards.
+  const activateOnKey = (fn: () => void) => (e: React.KeyboardEvent) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      fn();
     }
+  };
 
-    updateField('phone', formatted);
+  // Armenian phone auto-formatter — canonical +374 (XX) XX-XX-XX grouping
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateField('phone', formatArPhone(e.target.value));
   };
 
   return (
@@ -134,10 +134,14 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" role="radiogroup" aria-label="Ստացման եղանակ">
           {/* Option 1: Yerevan Delivery */}
           <div
+            role="radio"
+            aria-checked={data.deliveryMethod === 'yerevan'}
+            tabIndex={data.deliveryMethod === 'yerevan' ? 0 : -1}
             onClick={() => updateField('deliveryMethod', 'yerevan')}
+            onKeyDown={activateOnKey(() => updateField('deliveryMethod', 'yerevan'))}
             className={`p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
               data.deliveryMethod === 'yerevan'
                 ? 'border-[#2563EB] bg-blue-50/50 shadow-xs ring-2 ring-blue-500/10'
@@ -166,7 +170,11 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
 
           {/* Option 2: Showroom Pickup */}
           <div
+            role="radio"
+            aria-checked={data.deliveryMethod === 'pickup'}
+            tabIndex={data.deliveryMethod === 'pickup' ? 0 : -1}
             onClick={() => updateField('deliveryMethod', 'pickup')}
+            onKeyDown={activateOnKey(() => updateField('deliveryMethod', 'pickup'))}
             className={`p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
               data.deliveryMethod === 'pickup'
                 ? 'border-[#2563EB] bg-blue-50/50 shadow-xs ring-2 ring-blue-500/10'
@@ -246,33 +254,18 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-          {[
-            {
-              id: 'cash',
-              title: 'Կանխիկ Վճարում',
-              desc: 'Սրահում՝ կամ առաքիչին ստանալիս',
-              icon: Banknote,
-            },
-            {
-              id: 'card',
-              title: 'Բանկային Քարտ',
-              desc: 'ArCa / Visa / Mastercard',
-              icon: CreditCard,
-            },
-            {
-              id: 'idram',
-              title: 'Idram / Rocket Line',
-              desc: '0% ապառիկ տեղում',
-              icon: ShieldCheck,
-            },
-          ].map((item) => {
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5" role="radiogroup" aria-label="Վճարման եղանակ">
+          {PAYMENT_OPTIONS.map((item) => {
             const Icon = item.icon;
             const isSelected = data.paymentMethod === item.id;
             return (
               <div
                 key={item.id}
-                onClick={() => updateField('paymentMethod', item.id as PaymentType)}
+                role="radio"
+                aria-checked={isSelected}
+                tabIndex={isSelected ? 0 : -1}
+                onClick={() => updateField('paymentMethod', item.id)}
+                onKeyDown={activateOnKey(() => updateField('paymentMethod', item.id))}
                 className={`p-4.5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
                     ? 'border-[#2563EB] bg-blue-50/50 shadow-xs ring-2 ring-blue-500/10'

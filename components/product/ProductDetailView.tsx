@@ -24,7 +24,7 @@ import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { useWishlist } from '@/store/useWishlist';
 import { useRecentlyViewed } from '@/store/useRecentlyViewed';
-import { formatAMD } from '@/lib/utils';
+import { formatAMD, displayTitle } from '@/lib/utils';
 import QuickOrderModal from './QuickOrderModal';
 import StickyMobileBuyBar from './StickyMobileBuyBar';
 
@@ -53,8 +53,6 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
     product.oldPrice && product.oldPrice > product.price
       ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
       : null;
-
-  const monthlyInstallment = product.price ? Math.round(product.price / 6) : 0;
 
   const handleCopyCode = () => {
     navigator.clipboard?.writeText(product.code);
@@ -85,12 +83,17 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const findSpec = (key: string) =>
     Object.entries(product.specs).find(([k]) => k.includes(key))?.[1];
 
+  const materialSpec = findSpec('Նյութ');
+  const cartridgeSpec = findSpec('Քարտրիջ') ?? findSpec('Cartridge');
+  const warrantySpec = findSpec('Երաշխիք');
+
+  // Render chips ONLY when the per-product spec field exists — no invented fallbacks.
   const specChips = [
-    { emoji: '💧', label: 'Կորպուսը՝', value: findSpec('Նյութ') ?? 'Ծանր Լատուն (CW617N)' },
-    { emoji: '⚙️', label: 'Քարտրիջը՝', value: findSpec('Քարտրիջ') ?? findSpec('Cartridge') ?? 'Sedal 35մմ (Իսպանիա)' },
+    materialSpec && { emoji: '💧', label: 'Կորպուսը՝', value: materialSpec },
+    cartridgeSpec && { emoji: '⚙️', label: 'Քարտրիջը՝', value: cartridgeSpec },
     { emoji: '🚚', label: 'Առաքումը՝', value: 'Անվճար Երևանում' },
-    { emoji: '🛡️', label: 'Երաշխիքը՝', value: `${findSpec('Երաշխիք') ?? '5 տարի'} Պաշտոնական` },
-  ];
+    warrantySpec && { emoji: '🛡️', label: 'Երաշխիքը՝', value: `${warrantySpec} Պաշտոնական` },
+  ].filter((c): c is { emoji: string; label: string; value: string } => Boolean(c));
 
   // WhatsApp pre-filled inquiry CTA (exact spec copy)
   const whatsappUrl = `https://wa.me/37495530435?text=${encodeURIComponent(
@@ -112,8 +115,8 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
 
           <div className="flex items-center gap-1.5 text-xs font-bold text-amber-500">
             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
-            <span className="text-[#0F172A]">{product.rating || 4.9}</span>
-            <span className="text-slate-400 text-[11px]">({product.reviewsCount || 16} կարծիք)</span>
+            <span className="text-[#0F172A] tabular-nums">{product.rating}</span>
+            <span className="text-slate-400 text-[11px]">({product.reviewsCount} կարծիք)</span>
           </div>
         </div>
 
@@ -123,14 +126,14 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             {product.brand}
           </p>
           <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight leading-tight">
-            {product.title}
+            {displayTitle(product.title)}
           </h1>
         </div>
 
-        {/* ArmSoft SKU Strip + Wishlist/Compare */}
+        {/*  SKU Strip + Wishlist/Compare */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0F172A] text-white font-mono text-xs font-bold shadow-2xs">
-            <span className="text-blue-400">ՀԾ ԿՈԴ:</span>
+            <span className="text-blue-400">կոդ ԿՈԴ:</span>
             <span>{product.code}</span>
           </div>
 
@@ -138,7 +141,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             <button
               type="button"
               onClick={handleCopyCode}
-              title="Պատճենել ՀԾ Կոդը"
+              title="Պատճենել Կոդ Կոդը"
               className="min-h-[40px] px-3 py-2 rounded-xl border border-slate-200 hover:border-blue-300 bg-white hover:bg-blue-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer btn-tactile"
             >
               {copiedCode ? (
@@ -204,14 +207,6 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 -{discountPercent}%
               </span>
             )}
-          </div>
-
-          {/* Rocket Line Installment Badge */}
-          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold">
-            <Zap className="w-4 h-4 text-blue-600 shrink-0 fill-blue-600 animate-pulse" />
-            <span>
-              Հասանելի է <b>Rocket Line</b>-ով (0% տոկոսադրույքով ապառիկ՝ {formatAMD(monthlyInstallment)}/ամս)
-            </span>
           </div>
         </div>
 

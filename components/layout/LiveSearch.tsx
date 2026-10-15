@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useTransition, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useTransition, useMemo, useId } from 'react';
 import Link from 'next/link';
 import { Search, X, CheckCircle2, ChevronRight, CornerDownLeft, Sparkles } from 'lucide-react';
 import { products } from '@/data/products';
 import { Product } from '@/types';
 import { formatAMD } from '@/lib/utils';
+import ProductImage from '@/components/ui/ProductImage';
 
 interface LiveSearchProps {
   autoFocus?: boolean;
@@ -142,7 +143,7 @@ function scoreMatch(p: Product, rawQuery: string, variants: string[]): number {
   const brand = p.brand.toLowerCase();
   const title = p.title.toLowerCase();
 
-  // Exact ArmSoft SKU wins instantly
+  // Exact SKU wins instantly
   if (code === q) return 100;
   if (code.startsWith(q)) return 90;
   // Exact translit brand match
@@ -170,6 +171,8 @@ export default function LiveSearch({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isPending, startTransition] = useTransition();
+
+  const listboxId = useId();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -326,8 +329,16 @@ export default function LiveSearch({
             if (query.trim()) setIsOpen(true);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Որոնել՝ ԾԾ կոդ, անուն կամ translit (օր. 31297, corak, ganzer)..."
+          placeholder="Որոնել՝ ԾԾ Կոդ, անուն կամ translit (օր. 31297, corak, ganzer)..."
           aria-label="Որոնել սանտեխնիկա"
+          role="combobox"
+          aria-expanded={isOpen && debouncedQuery.length > 0}
+          aria-controls={listboxId}
+          aria-autocomplete="list"
+          aria-haspopup="listbox"
+          aria-activedescendant={
+            isOpen && selectedIndex >= 0 ? `${listboxId}-opt-${selectedIndex}` : undefined
+          }
           className="w-full h-11 pl-11 pr-24 rounded-full bg-white hover:bg-slate-50 focus:bg-white text-slate-900 text-base md:text-sm border border-[#E2E8F0] focus:border-[#2563EB] focus:ring-4 focus:ring-blue-500/15 transition-all duration-200 placeholder:text-slate-400 font-normal shadow-2xs"
         />
 
@@ -352,7 +363,7 @@ export default function LiveSearch({
           )}
 
           <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 bg-[#0F172A] text-white rounded tracking-wider shadow-2xs">
-            ՀԾ
+            Կոդ
           </span>
         </div>
       </div>
@@ -368,7 +379,7 @@ export default function LiveSearch({
               <h4 className="text-sm font-bold text-[#0F172A]">Արդյունք չի գտնվել</h4>
               <p className="text-xs text-slate-500 max-w-xs mx-auto">
                 «<span className="font-semibold text-slate-700">{debouncedQuery}</span>» հարցմամբ
-                ՀԾ կոդ կամ ապրանք չկա: Փորձեք <b>31297</b>, <b>corak</b> կամ <b>ganzer</b>:
+                Կոդ Կոդ կամ ապրանք չկա: Փորձեք <b>31297</b>, <b>corak</b> կամ <b>ganzer</b>:
               </p>
             </div>
           ) : (
@@ -376,7 +387,7 @@ export default function LiveSearch({
               {/* Dropdown Header */}
               <div className="px-4 py-2.5 bg-slate-50/80 backdrop-blur-xs flex items-center justify-between text-xs text-slate-500 sticky top-0 z-10">
                 <span className="font-semibold text-[#0F172A]">
-                  ՀԾ համապատասխանող արդյունքներ ({filteredProducts.length})
+                  համապատասխանող արդյունքներ ({filteredProducts.length})
                 </span>
                 <span className="hidden sm:inline text-[11px] text-slate-400 flex items-center gap-1">
                   <CornerDownLeft className="w-3 h-3" /> Enter · ↑↓ նավիգացիա
@@ -384,12 +395,15 @@ export default function LiveSearch({
               </div>
 
               {/* Product List */}
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100" role="listbox" id={listboxId}>
                 {filteredProducts.map((product, idx) => {
                   const isSelected = idx === selectedIndex;
                   return (
                     <Link
                       key={product.id}
+                      id={`${listboxId}-opt-${idx}`}
+                      role="option"
+                      aria-selected={isSelected}
                       ref={(el: HTMLAnchorElement | null) => {
                         resultRefs.current[idx] = el;
                       }}
@@ -404,11 +418,11 @@ export default function LiveSearch({
                     >
                       {/* Product Thumbnail */}
                       <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
-                        <img
+                        <ProductImage
                           src={product.images[0]}
                           alt={product.title}
-                          className="w-full h-full object-cover group-hover:scale-106 transition-transform"
-                          loading="lazy"
+                          className="w-full h-full"
+                          imgClassName="group-hover:scale-106 transition-transform"
                         />
                       </div>
 
@@ -458,7 +472,7 @@ export default function LiveSearch({
                   <Sparkles className="w-3.5 h-3.5 text-blue-600" />
                   Translit ուղղում ակտիվ է · Մելքումովի 40/1 ուղիղ տվյալներ
                 </span>
-                <span className="font-mono text-[10px] text-slate-400">ArmSoft ERP v8.4</span>
+                
               </div>
             </>
           )}

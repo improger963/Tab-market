@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         data: {
           valid: true,
           discountPercent: 10,
-          message: 'Կիրառվեց 10% զեղչ (TAB10)',
+          message: 'Կիրառվեց 10% զեղչ',
         },
       } as ApiResponse<{ valid: boolean; discountPercent: number; message: string }>);
     } else if (coupon === 'VARPET') {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         data: {
           valid: true,
           discountPercent: 15,
-          message: 'Կիրառվեց վարպետի 15% զեղչ (VARPET)',
+          message: 'Կիրառվեց վարպետի 15% զեղչ',
         },
       } as ApiResponse<{ valid: boolean; discountPercent: number; message: string }>);
     } else if (coupon === 'FREE') {

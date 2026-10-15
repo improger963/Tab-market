@@ -15,6 +15,15 @@ import { Product, Category } from '@/types';
 
 const API_BASE = typeof window !== 'undefined' ? '/api/v1' : 'http://localhost:3000/api/v1';
 
+/**
+ * Generates a new order id in the canonical `TAB-xxxxx` format.
+ * Order-number ownership lives in the API layer, never in a component, so the
+ * Laravel backend can adopt the exact same contract.
+ */
+export function generateOrderId(): string {
+  return `TAB-${Math.floor(10000 + Math.random() * 90000)}`;
+}
+
 export async function fetchProducts(params?: ProductFilterParams): Promise<PaginatedResponse<Product>> {
   const query = new URLSearchParams();
   if (params) {

@@ -6,7 +6,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Camera, Layers, Maximize2, ShieldCheck, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Camera, Layers, Maximize2, ShieldCheck, X, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
+import { resolveImageUrl } from '@/lib/config';
+import ProductImage from '@/components/ui/ProductImage';
 
 interface ProductGalleryProps {
   images: string[];
@@ -26,7 +28,8 @@ export default function ProductGallery({
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
-  const currentImage = images[selectedImageIndex] || images[0];
+  const currentImage = resolveImageUrl(images[selectedImageIndex] || images[0]);
+  const resolvedBlueprint = resolveImageUrl(blueprintImage);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -71,7 +74,7 @@ export default function ProductGallery({
           <span>Լուսանկարներ</span>
         </button>
 
-        {blueprintImage && (
+        {resolvedBlueprint && (
           <button
             type="button"
             onClick={() => setActiveTab('blueprint')}
@@ -98,21 +101,28 @@ export default function ProductGallery({
       >
         {activeTab === 'photo' ? (
           <div className="w-full h-full relative overflow-hidden bg-[#F8FAFC] flex items-center justify-center select-none">
-            <img
-              src={currentImage}
-              alt={title}
-              className={`w-full h-full object-cover transition-transform duration-200 ease-out ${
-                isZoomed ? 'scale-175' : 'scale-100 group-hover:scale-104'
-              }`}
-              style={
-                isZoomed
-                  ? {
-                      transformOrigin: `${mousePos.x}% ${mousePos.y}%`,
-                    }
-                  : undefined
-              }
-              loading="eager"
-            />
+            {currentImage ? (
+              <img
+                src={currentImage}
+                alt={title}
+                className={`w-full h-full object-cover transition-transform duration-200 ease-out ${
+                  isZoomed ? 'scale-175' : 'scale-100 group-hover:scale-104'
+                }`}
+                style={
+                  isZoomed
+                    ? {
+                        transformOrigin: `${mousePos.x}% ${mousePos.y}%`,
+                      }
+                    : undefined
+                }
+                loading="eager"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-slate-50 text-slate-300">
+                <ImageIcon className="w-16 h-16" aria-hidden="true" />
+                <span className="sr-only">{title}</span>
+              </div>
+            )}
 
             {/* Desktop zoom tip */}
             <div className="hidden sm:block absolute bottom-3 right-3 bg-[#0F172A]/70 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg pointer-events-none border border-slate-700">
@@ -150,7 +160,7 @@ export default function ProductGallery({
         ) : (
           <div className="w-full h-full bg-[#0F172A] p-4 sm:p-6 flex flex-col items-center justify-center relative group/blueprint">
             <img
-              src={blueprintImage}
+              src={resolvedBlueprint!}
               alt={`${title} - CAD Blueprint`}
               className="max-h-[85%] max-w-[85%] object-contain cursor-pointer"
               onClick={() => setIsBlueprintModalOpen(true)}
@@ -210,7 +220,7 @@ export default function ProductGallery({
                       : 'border-[#E2E8F0] hover:border-slate-300'
                   }`}
                 >
-                  <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                  <ProductImage src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full" />
                 </button>
               );
             })}
@@ -219,9 +229,9 @@ export default function ProductGallery({
       )}
 
       {/* Blueprint Zoom Modal */}
-      {isBlueprintModalOpen && blueprintImage && (
+      {isBlueprintModalOpen && resolvedBlueprint && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#0F172A]/80 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
             <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between sticky top-0 bg-white z-10">
               <h4 className="font-bold text-sm text-[#0F172A] truncate mr-2">{title} - CAD Գծագիր</h4>
               <button
@@ -233,7 +243,7 @@ export default function ProductGallery({
               </button>
             </div>
             <div className="p-4 sm:p-6 bg-[#0F172A] flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
-              <img src={blueprintImage} alt="CAD Scheme Full" className="max-h-[500px] w-auto object-contain" />
+              <img src={resolvedBlueprint} alt="CAD Scheme Full" className="max-h-[500px] w-auto object-contain" />
             </div>
           </div>
         </div>

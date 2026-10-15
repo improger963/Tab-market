@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import { categories } from '@/data/categories';
+import { products } from '@/data/products';
 import { formatAMD } from '@/lib/utils';
 
 export interface FilterState {
@@ -35,7 +36,9 @@ interface FilterSidebarProps {
   onCloseMobileDrawer?: () => void;
 }
 
-const AVAILABLE_BRANDS = ['GANZER', 'BRAVAT', 'LEDEME', 'VIEIR', 'VALTEC', 'BAXI', 'CERSANIT'];
+// Brand facets are derived from the live catalog so the list never advertises
+// brands (or filters) that have zero products.
+const AVAILABLE_BRANDS = Array.from(new Set(products.map((p) => p.brand))).sort();
 
 const COLOR_SWATCHES = [
   { id: 'chrome', label: 'Քրոմ', bgClass: 'bg-metallic-chrome', textClass: 'text-slate-800' },

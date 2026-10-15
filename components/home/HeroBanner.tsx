@@ -22,7 +22,7 @@ import {
 interface HeroSlide {
   id: number;
   badge: string;
-  badgeIcon: any;
+  badgeIcon: React.ComponentType<{ className?: string }>;
   titlePrefix: string;
   titleHighlight: string;
   description: string;

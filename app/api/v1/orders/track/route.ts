@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
         },
         {
           id: 'step-2',
-          title: 'Ամրագրված է ՀԾ (ArmSoft) Պահեստում',
+          title: 'Ամրագրված է Պահեստում',
           description: 'Ապրանքները անցել են ստուգում և ամրագրվել Մելքումովի 40/1 սրահում',
           timestamp: 'Այսօր, 14:25',
           isCompleted: true,
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
         },
         {
           id: 'step-2',
-          title: 'Մշակված է ՀԾ (ArmSoft) Բազայում',
+          title: 'Մշակված է Բազայում',
           description: 'Պահեստից փաթեթավորվել է',
           timestamp: 'Երեկ, 11:30',
           isCompleted: true,
@@ -185,7 +185,7 @@ export async function GET(req: NextRequest) {
         {
           id: 'step-2',
           title: 'Մշակվում է Մելքումովի 40/1 Սրահում',
-          description: 'ArmSoft համակարգը ստուգում է պահեստային մնացորդները',
+          description: ' համակարգը ստուգում է պահեստային մնացորդները',
           timestamp: 'Ընթացքում',
           isCompleted: true,
           isCurrent: true,

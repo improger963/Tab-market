@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, Phone, Zap, ShieldCheck } from 'lucide-react';
 import { Product } from '@/types';
 import { formatAMD } from '@/lib/utils';
+import ProductImage from '@/components/ui/ProductImage';
 
 interface QuickOrderModalProps {
   product: Product;
@@ -94,14 +95,14 @@ export default function QuickOrderModal({
 
         {/* Product Miniature Info */}
         <div className="p-4 bg-[#F8FAFC] border-b border-[#E2E8F0] flex items-center gap-3">
-          <img
+          <ProductImage
             src={product.images[0]}
             alt={product.title}
-            className="w-16 h-16 rounded-xl object-cover bg-white border border-slate-200 shrink-0"
+            className="w-16 h-16 rounded-xl bg-white border border-slate-200 shrink-0"
           />
           <div className="min-w-0 flex-1">
             <span className="font-mono text-[10px] font-bold text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200">
-              ՀԾ: {product.code}
+              Կոդ: {product.code}
             </span>
             <h4 className="text-xs font-bold text-[#0F172A] truncate mt-1">
               {product.title}

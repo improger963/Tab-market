@@ -6,13 +6,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Phone, Package, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Search, Phone, Package, ArrowRight, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
+import { formatArPhone } from '@/lib/utils';
 
 interface TrackOrderFormProps {
   onSearch: (orderId: string, phone: string) => void;
   isLoading: boolean;
   initialOrderId?: string;
 }
+
+const ORDER_ID_PATTERN = /^TAB-\d{5}$/;
 
 export default function TrackOrderForm({
   onSearch,
@@ -21,6 +24,7 @@ export default function TrackOrderForm({
 }: TrackOrderFormProps) {
   const [orderId, setOrderId] = useState(initialOrderId);
   const [phone, setPhone] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (initialOrderId) {
@@ -28,34 +32,29 @@ export default function TrackOrderForm({
     }
   }, [initialOrderId]);
 
-  // Armenian phone auto-formatter
+  // Armenian phone auto-formatter — canonical +374 (XX) XX-XX-XX grouping
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, '');
-    const digits = raw.startsWith('374') ? raw.slice(3) : raw;
-    const trimmed = digits.slice(0, 8);
-
-    let formatted = trimmed;
-    if (trimmed.length > 2 && trimmed.length <= 5) {
-      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2)}`;
-    } else if (trimmed.length > 5 && trimmed.length <= 7) {
-      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2, 5)}-${trimmed.slice(5)}`;
-    } else if (trimmed.length > 7) {
-      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2, 5)}-${trimmed.slice(5, 7)}-${trimmed.slice(7)}`;
-    } else if (trimmed.length > 2) {
-      formatted = `(${trimmed.slice(0, 2)}) ${trimmed.slice(2)}`;
-    }
-
-    setPhone(formatted);
+    setPhone(formatArPhone(e.target.value));
   };
 
   const handleOrderIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOrderId(e.target.value.toUpperCase());
+    if (error) setError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!orderId.trim()) return;
-    onSearch(orderId.trim(), phone.trim());
+    const value = orderId.trim().toUpperCase();
+    if (!value) {
+      setError('Մուտքագրեք պատվերի համարը (օր.՝ TAB-84920):');
+      return;
+    }
+    if (!ORDER_ID_PATTERN.test(value)) {
+      setError('Պատվերի համարը պետք է ունենա TAB-XXXXX ձևաչափը (5 թիվ):');
+      return;
+    }
+    setError(null);
+    onSearch(value, phone.trim());
   };
 
   const loadDemoOrder = (demoId: string, demoPhone: string) => {
@@ -69,7 +68,7 @@ export default function TrackOrderForm({
       <div className="space-y-2 text-center sm:text-left">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" aria-hidden="true" />
-          <span>ArmSoft ERP Ինտեգրված Համակարգ</span>
+          <span> Ինտեգրված Համակարգ</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">
           Ստուգել Պատվերի Կարգավիճակը
@@ -115,10 +114,22 @@ export default function TrackOrderForm({
                 value={orderId}
                 onChange={handleOrderIdChange}
                 placeholder="օր.՝ TAB-84920"
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? 'order-id-error' : undefined}
                 className="w-full h-12 pl-10 pr-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs font-mono font-bold uppercase focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all"
               />
               <Package className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
             </div>
+            {error && (
+              <p
+                id="order-id-error"
+                role="alert"
+                className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-rose-600"
+              >
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                <span>{error}</span>
+              </p>
+            )}
           </div>
 
           <div>

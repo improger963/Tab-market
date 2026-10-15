@@ -36,7 +36,7 @@ export default function SkeletonCard() {
             <div className="w-2/3 h-4 skeleton-block rounded" />
           </div>
 
-          {/* ArmSoft SKU Badge placeholder */}
+          {/* SKU chip placeholder */}
           <div className="w-24 h-5 skeleton-block rounded-md mt-1" />
         </div>
 

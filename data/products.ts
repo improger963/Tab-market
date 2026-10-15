@@ -26,7 +26,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Ծանր լատունե կորպուսով լվացարանի ծորակ՝ բազմաշերտ քրոմապատ փայլով։ Հագեցած է իսպանական Sedal կերամիկական քարտրիջով և Neoperl աերատորով, որը ջուրը դարձնում է փափուկ ու չի ցայտում։ 5 տարվա պաշտոնական երաշխիք։',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '11496',
+      'code': '11496',
       'Արտադրող': 'GANZER',
       'Տեսակ': 'Լվացարանի անշարժ',
       'Նյութ': 'Լատուն (Brass CW617N)',
@@ -58,7 +58,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Էլեկտրոստատիկ ներկված մատ սև մակերես, որի վրա ջրի հետքեր չեն մնում։ Լատունե կորպուս՝ նախատեսված բարձր ճնշման համար։ Հուսալի ու ժամանակակից ընտրություն լոգասենյակի համար։',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '11463',
+      'code': '11463',
       'Արտադրող': 'VIEIR',
       'Տեսակ': 'Լվացարանի ծորակ',
       'Նյութ': 'Լատուն',
@@ -91,7 +91,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Բազմաֆունկցիոնալ ցնցուղի ձեռքի գլխիկ՝ 3 ջրցանի ռեժիմներով և հակակրաքարային սիլիկոնե վարդակներով:',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '31296',
+      'code': '31296',
       'Արտադրող': 'VIEIR',
       'Ռեժիմներ': '3 ռեժիմ (Rain, Massage, Mixed)',
       'Նյութ': 'Հարվածակայուն ABS + Սիլիկոնային ծայրեր',
@@ -122,7 +122,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Բարձր ամրության կրկնակի պտտվող հակախճճվող ցնցուղի խողովակ՝ 175 սմ երկարությամբ և պողպատե պատյանով:',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '31195',
+      'code': '31195',
       'Արտադրող': 'GANZER',
       'Երկարություն': '175 սմ',
       'Տեսակ': 'Ճկվող, հակապտտվող (Anti-Twist)',
@@ -155,7 +155,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Բարձրակարգ սանիտարական ճենապակյա սեղանադիր լվացարան՝ հակաբակտերիալ փայլուն սպիտակ գլազուրով:',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '55120',
+      'code': '55120',
       'Արտադրող': 'HANSEN',
       'Տեսակ': 'Սեղանադիր լվացարան-թաս',
       'Նյութ': 'Սանիտարական ճենապակի',
@@ -188,7 +188,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Արհեստական գրանիտից պատրաստված խոհանոցի և լոգարանի խորը լվացարան՝ հարվածակայուն և հեշտ մաքրվող մակերեսով:',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '44102',
+      'code': '44102',
       'Արտադրող': 'HANSEN',
       'Չափսեր': '78 x 50 սմ',
       'Նյութ': 'Գրանիտե կոմպոզիտ',
@@ -220,7 +220,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Խոնավակայուն բարձր խտության MDF-ից պատրաստված կախովի պահարան՝ կերամիկական լվացարանով։ Դարակները հագեցած են Soft-Close (դանդաղ և անաղմուկ փակվող) մեխանիզմներով։',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '15260',
+      'code': '15260',
       'Արտադրող': 'LEDEME',
       'Լայնություն': '80 սմ',
       'Տեղադրում': 'Պատից կախովի (Hanging)',
@@ -253,7 +253,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Հպումային սենսորով LED հայելի՝ հակագոլորշի (Anti-Fog) տաքացման համակարգով։ Լոգանք ընդունելիս չի քրտնում։ Լույսի երանգը կարգավորվում է տաքից սառը։',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '88941',
+      'code': '88941',
       'Արտադրող': 'GERHANS',
       'Չափսեր': '80 x 70 սմ',
       'Ֆունկցիաներ': 'Հպումային սենսոր, Տաքացում / Anti-Fog, Լույսի կարգավորում (Warm/Cold)',
@@ -285,7 +285,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Չժանգոտվող պողպատից (SUS304) ջրային սրբիչաչորանոց՝ նորաոճ մատ սև երանգով և բարձր ջերմատվությամբ:',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '22019',
+      'code': '22019',
       'Արտադրող': 'VIEIR',
       'Նյութ': 'Չժանգոտվող պողպատ (SUS304)',
       'Տեսակ': 'Ջրային',
@@ -319,7 +319,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Պատին ամրացվող չժանգոտվող պողպատից սրբիչի կախիչ՝ փայլուն քրոմ ծածկույթով:',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '11225',
+      'code': '11225',
       'Արտադրող': 'VIEIR',
       'Նյութ': 'Չժանգոտվող պողպատ SUS304',
       'Գույն': 'Քրոմ',
@@ -351,7 +351,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
     shortDesc: 'Անեզր (Rimless) կախովի զուգարանակոնք՝ թաքնված ինստալյացիոն համակարգով և դանդաղ փակվող նստատեղով:',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '77091',
+      'code': '77091',
       'Արտադրող': 'HANSEN',
       'Տեսակ': 'Կախովի անեզր (Rimless)',
       'Նյութ': 'Սանիտարական ճենապակի',
@@ -383,7 +383,7 @@ export const products: Product[] = [
     blueprintImage: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
     shortDesc: '5-աստիճան հակադարձ օսմոսի խմելու ջրի մաքրման համակարգ՝ առանձին ծորակով և պահեստային բաքով:',
     specs: {
-      'ՀԾ Կոդ (ArmSoft)': '66014',
+      'code': '66014',
       'Արտադրող': 'ACCOONA',
       'Տեսակ': 'Հակադարձ օսմոս (RO)',
       'Աստիճաններ': '5 ֆիլտրացիոն մակարդակ',

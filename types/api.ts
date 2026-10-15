@@ -5,6 +5,22 @@
 
 import { Product, Category } from '@/types';
 
+/**
+ * Canonical order lifecycle statuses (single source of truth).
+ * The mock server and (future) Laravel API return these exact string values.
+ */
+export const ORDER_STATUS = {
+  RECEIVED: 'received',
+  PROCESSING: 'processing',
+  READY_FOR_PICKUP: 'ready_for_pickup',
+  IN_TRANSIT: 'in_transit',
+  DELIVERED: 'delivered',
+} as const;
+
+export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
+
+export type DeliveryMethod = 'showroom_pickup' | 'yerevan_delivery' | 'regional_delivery';
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -44,7 +60,7 @@ export interface CreateOrderPayload {
     email?: string;
   };
   delivery: {
-    method: 'showroom_pickup' | 'yerevan_delivery' | 'regional_delivery';
+    method: DeliveryMethod;
     address?: {
       marz?: string;
       city?: string;
@@ -66,15 +82,17 @@ export interface CreateOrderPayload {
   couponCode?: string;
   items: Array<{
     productId: number;
-    productCode: string; // ArmSoft SKU
+    productCode: string; // SKU
     quantity: number;
     unitPrice: number;
   }>;
 }
 
+export type OrderCreationStatus = 'pending' | 'confirmed' | 'reserved_in_armsoft';
+
 export interface OrderConfirmation {
   orderId: string; // e.g. "TAB-84920"
-  status: 'pending' | 'confirmed' | 'reserved_in_armsoft';
+  status: OrderCreationStatus;
   subtotal: number;
   discount: number;
   shippingCost: number;
@@ -96,15 +114,15 @@ export interface TrackedOrderDetails {
   createdAt: string;
   customerName: string;
   phone: string;
-  deliveryMethod: 'showroom_pickup' | 'yerevan_delivery' | 'regional_delivery';
+  deliveryMethod: DeliveryMethod;
   deliveryAddress?: string;
   paymentMethod: string;
   paymentStatus: 'paid' | 'pending';
-  currentStatus: 'received' | 'processing' | 'ready_for_pickup' | 'in_transit' | 'delivered';
+  currentStatus: OrderStatus;
   timeline: OrderTrackingStep[];
   items: Array<{
     id: number;
-    code: string; // ArmSoft SKU
+    code: string; // SKU
     title: string;
     image: string;
     quantity: number;

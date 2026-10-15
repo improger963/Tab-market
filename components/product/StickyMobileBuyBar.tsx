@@ -6,6 +6,7 @@ import { Product } from '@/types';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { formatAMD } from '@/lib/utils';
+import ProductImage from '@/components/ui/ProductImage';
 
 interface StickyMobileBuyBarProps {
   product: Product;
@@ -70,10 +71,10 @@ export default function StickyMobileBuyBar({
         {/* Left: Mini product thumbnail, title, and formatted AMD price */}
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#F8FAFC] border border-slate-200 shrink-0">
-            <img
+            <ProductImage
               src={product.images[0]}
               alt={product.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full"
             />
           </div>
           <div className="min-w-0">
@@ -85,7 +86,7 @@ export default function StickyMobileBuyBar({
                 {formatAMD(product.price)}
               </span>
               <span className="text-[10px] text-slate-400 font-mono truncate">
-                ՀԾ: {product.code}
+                Կոդ: {product.code}
               </span>
             </div>
           </div>

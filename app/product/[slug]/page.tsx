@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     title: `${product.title} (ԿՈԴ: ${product.code}) | TAB.AM`,
     description: `${product.title} - ${product.shortDesc} Առկա է Մելքումովի 40/1 սրահում (${product.stockQuantity} հատ): Գործարանային երաշխիք:`,
     openGraph: {
-      title: `${product.title} (ՀԾ: ${product.code}) | tab.am`,
+      title: `${product.title} (Կոդ: ${product.code}) | tab.am`,
       description: product.shortDesc,
       images: [{ url: product.images[0] }],
     },

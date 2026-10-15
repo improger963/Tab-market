@@ -7,7 +7,6 @@ import React from 'react';
 import HeroBanner from '@/components/home/HeroBanner';
 import CategoryStories from '@/components/home/CategoryStories';
 import TabbedProductShowcase from '@/components/home/TabbedProductShowcase';
-import BespokeConfiguratorWidget from '@/components/home/BespokeConfiguratorWidget';
 import BrandsCarousel from '@/components/home/BrandsCarousel';
 import ShowroomTrustSection from '@/components/home/ShowroomTrustSection';
 import PlumberFaqSection from '@/components/home/PlumberFaqSection';
@@ -23,9 +22,6 @@ export default function HomePage() {
 
       {/* Step 4: Tabbed Product Showcase */}
       <TabbedProductShowcase />
-
-      {/* Interactive Bespoke Bathroom Configurator */}
-      <BespokeConfiguratorWidget />
 
       {/* Step 5: Interactive Brands Marquee / Carousel */}
       <BrandsCarousel />

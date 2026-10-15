@@ -29,7 +29,7 @@ export default function Footer() {
           </Link>
 
           <p className="text-slate-300 leading-relaxed text-xs">
-            Գնե՛ք հատով՝ մեծածախի արժեքով: Գործում է առաքում՝ անմիջապես գնման օրը: Պաշտոնական ներկրող (LEDEME, VIEIR, HANSEN, GANZER, GERHANS, ACCOONA, LEMARK) և ArmSoft (ՀԾ) ինտեգրված կենտրոնացված պահեստ:
+            Գնե՛ք հատով՝ մեծածախի արժեքով: Գործում է առաքում՝ անմիջապես գնման օրը: Պաշտոնական ներկրող (LEDEME, VIEIR, HANSEN, GANZER, GERHANS, ACCOONA, LEMARK) և  (կոդ) ինտեգրված կենտրոնացված պահեստ:
           </p>
 
           <div className="space-y-2 pt-1 text-slate-200">
@@ -106,7 +106,7 @@ export default function Footer() {
             <li className="flex items-start gap-2">
               <FileCheck2 className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
               <span>
-                ՀԾ էլեկտրոնային հաշիվ-ապրանքագրեր շինարարական կազմակերպություններին (ՀՎՀՀ / TIN)
+                Կոդ էլեկտրոնային հաշիվ-ապրանքագրեր շինարարական կազմակերպություններին (ՀՎՀՀ / TIN)
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -181,7 +181,7 @@ export default function Footer() {
             © {currentYear} tab.am — Բոլոր իրավունքները պաշտպանված են: Մելքումովի 40/1 | 095 53-04-35
           </div>
           <div className="flex items-center gap-4">
-            <span>ՀԾ (ArmSoft) Sync Ready</span>
+            <span>կոդ () </span>
             <span className="text-slate-700">•</span>
             <span>Բաց է 10:00 - 20:00</span>
           </div>
