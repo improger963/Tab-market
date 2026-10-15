@@ -157,7 +157,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={handleToggleWishlist}
               title={isWishlisted ? 'Հեռացնել սիրվածներից' : 'Ավելացնել սիրվածներում'}
               aria-label="Wishlist toggle"
-              className={`w-8 h-8 sm:w-9 sm:h-9 min-h-[36px] min-w-[36px] rounded-full flex items-center justify-center shadow-md glass-surface transition-all cursor-pointer ${
+              className={`w-9 h-9 sm:w-10 sm:h-10 min-h-[44px] min-w-[44px] rounded-full flex items-center justify-center shadow-md glass-surface transition-all cursor-pointer ${
                 isWishlisted
                   ? 'bg-rose-50 text-rose-500 border-rose-200 shadow-rose-200/50'
                   : 'hover:bg-white text-slate-600 hover:text-rose-500 border-white/80'
@@ -177,7 +177,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={handleToggleCompare}
               title={isCompared ? 'Հեռացնել համեմատությունից' : 'Համեմատել'}
               aria-label="Compare toggle"
-              className={`w-8 h-8 sm:w-9 sm:h-9 min-h-[36px] min-w-[36px] rounded-full flex items-center justify-center shadow-md glass-surface transition-all cursor-pointer ${
+              className={`w-9 h-9 sm:w-10 sm:h-10 min-h-[44px] min-w-[44px] rounded-full flex items-center justify-center shadow-md glass-surface transition-all cursor-pointer ${
                 isCompared
                   ? 'bg-blue-50 text-blue-600 border-blue-300 shadow-blue-200/50'
                   : 'hover:bg-white text-slate-600 hover:text-blue-600 border-white/80'
@@ -267,7 +267,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="pt-2 sm:pt-3 border-t border-slate-100 space-y-2">
           {product.price && product.price > 0 ? (
             <>
-              <div className="flex items-center justify-between gap-1">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <div className="text-sm sm:text-lg font-bold sm:font-extrabold text-[#0F172A] tabular-nums tracking-tight truncate">
                     {formatAMD(product.price)}
@@ -283,7 +283,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   type="button"
                   onClick={handleAddToCart}
                   aria-label={`Ավելացնել ${product.title} զամբյուղ`}
-                  className={`min-w-[92px] sm:min-w-[104px] min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-3.5 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer shrink-0 btn-tactile shimmer-glint ${
+                  className={`w-full sm:w-auto min-h-[44px] sm:min-w-[104px] px-2.5 sm:px-3.5 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer shrink-0 btn-tactile shimmer-glint ${
                     justAdded ? 'bg-emerald-600 hover:bg-emerald-600 shadow-emerald-500/30' : 'bg-[#0F172A] hover:bg-[#2563EB]'
                   }`}
                 >
@@ -292,7 +292,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   ) : (
                     <ShoppingBag className="w-4 h-4 text-blue-400" aria-hidden="true" />
                   )}
-                  <span className="hidden xs:inline sm:inline">
+                  <span className="whitespace-nowrap">
                     {justAdded ? 'Ավելացված' : 'Ավելացնել'}
                   </span>
                 </button>

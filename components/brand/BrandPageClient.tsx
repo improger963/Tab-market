@@ -68,7 +68,7 @@ export default function BrandPageClient({ slug }: BrandPageClientProps) {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-10">
+    <div className="container-lux py-8 space-y-10">
       {/* Breadcrumbs */}
       <nav
         aria-label="Breadcrumb"

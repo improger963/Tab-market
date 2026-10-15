@@ -104,7 +104,7 @@ export default function App() {
   }, [route]);
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans selection:bg-[#2563EB] selection:text-white overflow-x-clip w-full max-w-[100vw] pb-[calc(env(safe-area-inset-bottom,16px)+72px)] md:pb-0">
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans selection:bg-[#2563EB] selection:text-white overflow-x-clip w-full pb-shell">
       {/* 1. Global Shell: TopBar */}
       <TopBar />
 
@@ -120,7 +120,7 @@ export default function App() {
 
       {/* VIEW 2: CATALOG PAGE */}
       {route.page === 'catalog' && (
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 animate-in fade-in-50 duration-200">
+        <main className="flex-1 container-lux py-8 animate-in fade-in-50 duration-200">
           <CatalogView
             initialCategorySlug={route.categorySlug === 'all' ? undefined : route.categorySlug}
           />
@@ -129,7 +129,7 @@ export default function App() {
 
       {/* VIEW 3: PRODUCT DETAIL PAGE */}
       {route.page === 'product' && currentProduct && (
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 space-y-12 animate-in fade-in-50 duration-200">
+        <main className="flex-1 container-lux py-8 space-y-12 animate-in fade-in-50 duration-200">
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500">
             <Link href="/" className="hover:text-blue-600 transition-colors">
@@ -163,7 +163,7 @@ export default function App() {
             </div>
 
             {/* Buy Box: 2nd on mobile (immediately following gallery), right 5 cols on desktop (sticky top-28 spanning gallery and specs) */}
-            <div className="lg:col-span-5 lg:row-span-2 lg:sticky lg:top-28">
+            <div className="lg:col-span-5 lg:row-span-2 lg:sticky lg:top-[calc(var(--topbar-h)+var(--header-h)+1rem)]">
               <ProductDetailView product={currentProduct} />
             </div>
 
@@ -273,7 +273,7 @@ export default function App() {
 
       {/* CAD Blueprint Zoom Modal */}
       {activeCadProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/70 backdrop-blur-xs">
+        <div className="fixed inset-0 z-overlay flex items-center justify-center p-4 bg-[#0F172A]/70 backdrop-blur-xs">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90dvh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
             <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between sticky top-0 bg-white z-10">
               <div>

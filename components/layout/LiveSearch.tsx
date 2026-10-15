@@ -319,6 +319,8 @@ export default function LiveSearch({
         <input
           ref={inputRef}
           type="text"
+          inputMode="search"
+          enterKeyHint="search"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -370,7 +372,7 @@ export default function LiveSearch({
 
       {/* Instant Spotlight Dropdown with backdrop-blur chrome */}
       {(isOpen || isOverlayMode) && debouncedQuery && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-50 shadow-2xl rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-md max-h-[60vh] sm:max-h-[440px] overflow-y-auto overscroll-contain divide-y divide-slate-100 animate-in fade-in-50 slide-in-from-top-1 duration-150">
+        <div className="absolute top-full left-0 right-0 mt-2 z-50 shadow-2xl rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-md max-h-[60dvh] sm:max-h-[440px] overflow-y-auto overscroll-contain divide-y divide-slate-100 animate-in fade-in-50 slide-in-from-top-1 duration-150">
           {filteredProducts.length === 0 ? (
             <div className="p-8 text-center space-y-2">
               <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">

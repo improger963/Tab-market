@@ -50,7 +50,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .slice(0, 4);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 sm:space-y-12">
+    <div className="container-lux py-6 sm:py-8 space-y-8 sm:space-y-12">
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-500 overflow-x-auto no-scrollbar whitespace-nowrap py-0.5">
         <Link href="/" className="hover:text-blue-600 transition-colors shrink-0">

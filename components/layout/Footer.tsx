@@ -14,9 +14,9 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0B192C] text-slate-300 text-xs border-t border-slate-800 pb-[calc(env(safe-area-inset-bottom,16px)+80px)] md:pb-8">
+    <footer className="bg-[#0B192C] text-slate-300 text-xs border-t border-slate-800 pb-8">
       {/* Upper Main Footer Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+      <div className="container-lux py-12 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
         {/* Column 1: Brand & Physical Showroom */}
         <div className="space-y-4">
           <Link href="/" className="inline-block">
@@ -176,7 +176,7 @@ export default function Footer() {
 
       {/* Bottom Legal / Copyright Strip */}
       <div className="border-t border-slate-800 bg-[#070F1E]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
+        <div className="container-lux py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
           <div>
             © {currentYear} tab.am — Բոլոր իրավունքները պաշտպանված են: Մելքումովի 40/1 | 095 53-04-35
           </div>

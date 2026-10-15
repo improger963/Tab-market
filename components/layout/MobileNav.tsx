@@ -12,7 +12,7 @@ import { useCart } from '@/store/useCart';
 import { useWishlist } from '@/store/useWishlist';
 
 export default function MobileNav() {
-  const { openDrawer, totalCount } = useCart();
+  const { openDrawer, totalCount, isDrawerOpen } = useCart();
   const { totalCount: wishlistCount } = useWishlist();
   const [isMounted, setIsMounted] = useState(false);
   const [currentPath, setCurrentPath] = useState('/');
@@ -37,15 +37,21 @@ export default function MobileNav() {
   const isTrack = currentPath.startsWith('/track-order');
   const isWishlist = currentPath.startsWith('/wishlist');
 
+  // Stacking rule: never two fixed bottom bars at once. On the PDP the sticky buy
+  // bar replaces the dock; on checkout and while the cart sheet is open the dock hides.
+  const isProduct = currentPath.startsWith('/product/');
+  const isCheckout = currentPath.startsWith('/checkout');
+  if (isMounted && (isProduct || isCheckout || isDrawerOpen)) return null;
+
   return (
     <nav
       aria-label="Մոբայլ նավիգացիա"
-      className="md:hidden fixed bottom-[calc(env(safe-area-inset-bottom,12px)+8px)] left-3 right-3 z-40 max-w-lg mx-auto bg-[#0F172A]/95 backdrop-blur-xl text-white rounded-2xl border border-slate-800 px-2 py-1 flex items-center justify-around shadow-2xl"
+      className="md:hidden fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-dock max-w-lg mx-auto bg-[#0F172A]/95 backdrop-blur-xl text-white rounded-2xl border border-slate-800 px-2 py-1 flex items-center justify-around shadow-2xl"
     >
       {/* 1. Home */}
       <Link
         href="/"
-        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
+        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
           isHome ? 'text-[#2563EB]' : 'text-slate-300 hover:text-white'
         }`}
       >
@@ -61,7 +67,7 @@ export default function MobileNav() {
       {/* 2. Catalog */}
       <Link
         href="/catalog"
-        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
+        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
           isCatalog ? 'text-[#2563EB]' : 'text-slate-300 hover:text-white'
         }`}
       >
@@ -77,7 +83,7 @@ export default function MobileNav() {
       {/* 3. Track Order */}
       <Link
         href="/track-order"
-        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
+        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
           isTrack ? 'text-[#2563EB]' : 'text-slate-300 hover:text-white'
         }`}
       >
@@ -94,7 +100,7 @@ export default function MobileNav() {
       <Link
         href="/wishlist"
         aria-label={`Սիրվածներ, ${wishCount} ապրանք`}
-        className={`min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 cursor-pointer ${
+        className={`min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 cursor-pointer ${
           isWishlist ? 'text-rose-400' : 'text-slate-300 hover:text-white'
         }`}
       >
@@ -114,7 +120,7 @@ export default function MobileNav() {
         type="button"
         onClick={openDrawer}
         aria-label={`Զամբյուղ, ${count} ապրանք`}
-        className="min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all text-[10px] font-semibold gap-0.5 px-2 rounded-xl cursor-pointer"
+        className="min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl cursor-pointer"
       >
         <div className="relative">
           <ShoppingBag className="w-5 h-5 text-slate-300" />

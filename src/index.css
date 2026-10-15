@@ -6,6 +6,34 @@
 @theme {
   --font-sans: "Inter", "Noto Sans Armenian", ui-sans-serif, system-ui,
     -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Single z-index scale: header < dock < buy bar < overlay < sheet/drawer < toast */
+  --z-index-header: 20;
+  --z-index-dock: 30;
+  --z-index-buybar: 40;
+  --z-index-overlay: 50;
+  --z-index-sheet: 60;
+  --z-index-toast: 70;
+}
+
+/*
+ * Fixed UI heights + shared layout tokens (single source of truth).
+ * These reserve space so the sticky header, dock and buy bar never cause CLS,
+ * and let `scroll-padding-top` / `main` clearance be computed, not hardcoded.
+ */
+:root {
+  --topbar-h: 44px;
+  --header-h: 60px;
+  --dock-h: 58px;
+  --buybar-h: 70px;
+  /* Bottom clearance reserve = tallest fixed bottom bar (buy bar) + inset */
+  --bottom-bar-h: 70px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 64px;
+  }
 }
 
 html,
@@ -227,35 +255,96 @@ body {
 
 html {
   scroll-behavior: smooth;
-  /* Keep anchored content clear of the sticky header during scroll */
-  scroll-padding-top: 96px;
-  /* clip (not hidden) so descendants using position:sticky keep working */
-  overflow-x: clip;
-  width: 100%;
-  max-width: 100vw;
-  position: relative;
+  /* Anchored content clears the fixed top bar + sticky header (computed, not hardcoded) */
+  scroll-padding-top: calc(var(--topbar-h) + var(--header-h) + 1rem);
+  /* Never disable zoom on text: keep font sizing predictable across iOS/Android */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/*
+ * NOTE: html/body intentionally have NO `overflow-x`, `position: relative` or
+ * `max-width: 100vw`. Those hacks mask real horizontal overflow AND break
+ * `position: sticky` (hidden/relative ancestors) while `100vw` wrongly includes
+ * the scrollbar width. The single safety-net clip lives on the root app wrapper
+ * (`src/App.tsx`) instead, and every offender is fixed at its root cause.
+ */
 body {
-  overflow-x: clip;
-  width: 100%;
-  max-width: 100vw;
-  position: relative;
   min-height: 100vh;
   min-height: 100dvh;
   background-color: #ffffff;
   color: #334155;
   selection-background-color: #2563eb;
   selection-color: #ffffff;
+  overscroll-behavior-y: none;
+}
+
+/*
+ * Mobile bottom clearance so the fixed dock never covers trailing content
+ * (applied on the shell wrapper via `pb-shell` utility, see components).
+ */
+
+/*
+ * One container token everywhere (replaces conflicting max-w-7xl / max-w-[1440px]).
+ * Text blocks are capped to a comfortable reading measure.
+ */
+.container-lux {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+@media (min-width: 640px) {
+  .container-lux {
+    padding-inline: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .container-lux {
+    padding-inline: 2rem;
+  }
+}
+.prose-measure {
+  max-width: 75ch;
+}
+
+/* Dock clearance for the shell wrapper: never cover the footer on mobile */
+.pb-shell {
+  padding-bottom: calc(var(--bottom-bar-h) + env(safe-area-inset-bottom) + 1rem);
+}
+@media (min-width: 768px) {
+  .pb-shell {
+    padding-bottom: 0;
+  }
+}
+
+/* Touch ergonomics: no double-tap zoom delay, no grey tap flash (visible :active instead) */
+a,
+button,
+input[type="submit"],
+input[type="button"],
+label[for],
+[role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (max-width: 767px) {
   input, select, textarea {
     font-size: 16px !important;
   }
+}
+
+/* Text-like inputs/selects get a 44px touch height (checkbox/radio/range excluded) */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+select,
+textarea {
+  min-height: 44px;
+  /* Keep the focused field above the on-screen keyboard */
+  scroll-margin-block: 80px;
 }
 
 input:focus, select:focus, textarea:focus {

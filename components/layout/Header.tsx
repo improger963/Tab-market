@@ -114,8 +114,8 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_4px_20px_rgb(15,23,42,0.03)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[60px] md:h-16 flex items-center justify-between gap-3 sm:gap-6">
+    <header className="sticky top-0 z-header bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_4px_20px_rgb(15,23,42,0.03)]">
+      <div className="container-lux h-[var(--header-h)] flex items-center justify-between gap-3 sm:gap-6">
         {/* Brand Logo & Catalog Mega-Menu Dropdown */}
         <div className="flex items-center gap-3 md:gap-4 shrink-0" ref={menuRef}>
           <Link
@@ -170,7 +170,7 @@ export default function Header() {
                   </Link>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[60vh] overflow-y-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[60dvh] overflow-y-auto">
                   {categories.map((cat) => (
                     <Link
                       key={cat.id}
@@ -294,17 +294,17 @@ export default function Header() {
 
       {/* Mobile Fullscreen Search Overlay Modal */}
       {isMobileSearchOpen && (
-        <div className="fixed inset-0 z-50 bg-[#0F172A]/80 backdrop-blur-md flex flex-col p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 space-y-4 max-w-lg mx-auto w-full">
+        <div className="fixed inset-0 z-overlay h-dvh bg-[#0F172A]/80 backdrop-blur-md flex flex-col p-4 pt-[calc(1rem+env(safe-area-inset-top))] animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 space-y-4 max-w-lg mx-auto w-full overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Search className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-bold text-[#0F172A]">Որոնոևմ ապրանխ կամ կոդ</span>
+                <span className="text-xs font-bold text-[#0F172A]">Որոնել ապրանք կամ կոդ</span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsMobileSearchOpen(false)}
-                className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 btn-tactile"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 btn-tactile"
                 aria-label="Փակել որոնումը"
               >
                 <X className="w-5 h-5" />

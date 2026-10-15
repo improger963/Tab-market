@@ -197,7 +197,7 @@ export default function ProductDossierTabs({ product }: ProductDossierTabsProps)
                 <img
                   src={resolveImageUrl(product.blueprintImage)!}
                   alt={`${displayTitle(product.title)} CAD գծագիր խոշորացված`}
-                  className="max-h-[60vh] w-auto object-contain"
+                  className="max-h-[60dvh] w-auto object-contain"
                 />
               </div>
             </motion.div>

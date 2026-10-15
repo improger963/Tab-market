@@ -98,7 +98,7 @@ export default function CategoryNavStrip({
       {/* Scrollable Container */}
       <div
         ref={scrollContainerRef}
-        className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-1 touch-pan-x overscroll-x-contain"
+        className="w-full flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-1 touch-pan-x overscroll-x-contain"
       >
         {/* All Categories Chip */}
         {isInteractiveFilter ? (

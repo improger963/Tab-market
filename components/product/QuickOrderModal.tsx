@@ -65,7 +65,7 @@ export default function QuickOrderModal({
       />
 
       {/* Modal Dialog / Mobile Bottom Sheet */}
-      <div className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#E2E8F0] overflow-hidden z-10 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 max-h-[92vh] flex flex-col">
+      <div className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#E2E8F0] overflow-hidden z-10 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 max-h-[92dvh] flex flex-col">
         {/* Mobile drag handle */}
         <div className="sm:hidden flex justify-center pt-2.5 pb-1 bg-[#0F172A]">
           <div className="w-12 h-1.5 rounded-full bg-slate-700" />

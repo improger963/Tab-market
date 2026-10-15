@@ -27,7 +27,7 @@ export default function WishlistPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-in fade-in-50 duration-200">
+    <div className="container-lux py-8 space-y-8 animate-in fade-in-50 duration-200">
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500">
         <Link href="/" className="hover:text-blue-600 transition-colors">

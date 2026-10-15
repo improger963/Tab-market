@@ -21,7 +21,7 @@ export default function ToastContainer() {
   return (
     <div
       aria-live="polite"
-      className="fixed z-50 pointer-events-none flex flex-col gap-2.5 max-w-sm w-full top-4 left-4 right-4 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto mx-auto sm:mx-0"
+      className="fixed z-toast pointer-events-none flex flex-col gap-2.5 max-w-sm top-4 left-4 right-4 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto sm:w-[calc(100vw-3rem)] sm:max-w-sm mx-auto sm:mx-0"
     >
       <AnimatePresence mode="popLayout">
         {toasts.map((toast) => (

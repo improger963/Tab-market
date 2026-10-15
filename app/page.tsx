@@ -13,7 +13,7 @@ import PlumberFaqSection from '@/components/home/PlumberFaqSection';
 
 export default function HomePage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-16 sm:space-y-20">
+    <div className="container-lux py-8 space-y-16 sm:space-y-20">
       {/* Step 2: High-Converting Advertising Hero Slider */}
       <HeroBanner />
 

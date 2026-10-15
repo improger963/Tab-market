@@ -61,7 +61,7 @@ export default function StickyMobileBuyBar({
 
   return (
     <div
-      className={`lg:hidden fixed bottom-[calc(env(safe-area-inset-bottom,12px)+76px)] left-3 right-3 z-30 max-w-lg mx-auto bg-white/95 backdrop-blur-md border border-[#E2E8F0] p-3 rounded-2xl shadow-2xl transition-all duration-300 ease-out transform ${
+      className={`lg:hidden fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-buybar max-w-lg mx-auto bg-white/95 backdrop-blur-md border border-[#E2E8F0] p-3 rounded-2xl shadow-2xl transition-all duration-300 ease-out transform ${
         isVisible
           ? 'translate-y-0 opacity-100 pointer-events-auto'
           : 'translate-y-12 opacity-0 pointer-events-none'

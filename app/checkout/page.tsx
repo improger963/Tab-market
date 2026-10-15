@@ -78,7 +78,7 @@ export default function CheckoutPage() {
 
   if (orderSuccessNumber) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div className="container-lux py-10">
         <OrderSuccess orderData={formData} orderNumber={orderSuccessNumber} />
       </div>
     );
@@ -110,7 +110,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <div className="container-lux py-8 space-y-8">
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500">
         <Link href="/" className="hover:text-blue-600 transition-colors">
@@ -143,7 +143,7 @@ export default function CheckoutPage() {
           />
         </div>
 
-        <div className="lg:col-span-5 lg:sticky lg:top-24">
+        <div className="lg:col-span-5 lg:sticky lg:top-[calc(var(--topbar-h)+var(--header-h)+1rem)]">
           <OrderSummary
             shippingCost={shippingCost}
             deliveryMethod={formData.deliveryMethod}

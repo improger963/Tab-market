@@ -189,7 +189,7 @@ export default function CartDrawer() {
       role="dialog"
       aria-modal="true"
       aria-label="Գնումների զամբյուղ"
-      className={`fixed inset-0 z-50 overflow-hidden transition-all duration-300 ${
+      className={`fixed inset-0 z-sheet overflow-hidden transition-all duration-300 ${
         isDrawerOpen ? 'visible pointer-events-auto' : 'invisible pointer-events-none'
       }`}
     >
@@ -274,7 +274,7 @@ export default function CartDrawer() {
           )}
 
           {/* Drawer Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4 overscroll-contain">
             {items.length === 0 ? (
               /* Empty state */
               <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-12">

@@ -54,11 +54,11 @@ export default function TabbedProductShowcase() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#F8FAFC] border border-slate-200 shadow-2xs">
+        <div className="flex w-full sm:w-auto items-center gap-1.5 p-1 rounded-2xl bg-[#F8FAFC] border border-slate-200 shadow-2xs overflow-x-auto no-scrollbar">
           <button
             type="button"
             onClick={() => handleTabChange('hits')}
-            className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile ${
+            className={`min-h-[44px] shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile ${
               activeTab === 'hits'
                 ? 'bg-[#0F172A] text-white shadow-md'
                 : 'text-slate-600 hover:text-[#0F172A]'
@@ -71,7 +71,7 @@ export default function TabbedProductShowcase() {
           <button
             type="button"
             onClick={() => handleTabChange('new')}
-            className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile ${
+            className={`min-h-[44px] shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile ${
               activeTab === 'new'
                 ? 'bg-[#0F172A] text-white shadow-md'
                 : 'text-slate-600 hover:text-[#0F172A]'
@@ -84,7 +84,7 @@ export default function TabbedProductShowcase() {
           <button
             type="button"
             onClick={() => handleTabChange('discount')}
-            className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile ${
+            className={`min-h-[44px] shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile ${
               activeTab === 'discount'
                 ? 'bg-[#0F172A] text-white shadow-md'
                 : 'text-slate-600 hover:text-[#0F172A]'
