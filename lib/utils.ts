@@ -38,13 +38,25 @@ export function formatAMD(price: number): string {
 }
 
 /**
+ * Extracts the 8 Armenian national digits from any raw input, robustly
+ * stripping the international prefix (`+374`/`374`) and the common trunk
+ * leading zero. Examples: "095530435" and "+37495530435" → "95530435".
+ */
+function arNationalDigits(raw: string): string {
+  let d = raw.replace(/\D/g, '');
+  if (d.startsWith('374')) d = d.slice(3); // international country code
+  if (d.startsWith('0')) d = d.slice(1); // national trunk prefix
+  return d.slice(0, 8);
+}
+
+/**
  * Progressive auto-formatter for Armenian phone numbers.
- * Accepts raw input (optionally with +374 country code) and renders the
- * `+374 (XX) XX-XX-XX` grouping on the 8 local digits, e.g. "95530435"
- * -> "(95) 53-04-35".
+ * Accepts raw input (optionally with +374 country code or a leading trunk 0)
+ * and renders the `+374 (XX) XX-XX-XX` grouping on the 8 local digits, e.g.
+ * "095530435" -> "(95) 53-04-35".
  */
 export function formatArPhone(raw: string): string {
-  const d = raw.replace(/\D/g, '').replace(/^374/, '').slice(0, 8);
+  const d = arNationalDigits(raw);
   if (d.length === 0) return '';
   let out = `(${d.slice(0, 2)}`;
   if (d.length <= 2) return out;
@@ -59,10 +71,10 @@ export function formatArPhone(raw: string): string {
 /**
  * Normalizes an Armenian phone value to the canonical `+374 (XX) XX-XX-XX`
  * form for submission. Returns null when fewer than the required 8 local
- * digits are present.
+ * digits are present (after stripping `+374` and any leading trunk `0`).
  */
 export function normalizeArPhone(input: string): string | null {
-  const d = input.replace(/\D/g, '').replace(/^374/, '');
+  const d = arNationalDigits(input);
   if (d.length !== 8) return null;
   return `+374 (${d.slice(0, 2)}) ${d.slice(2, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
 }

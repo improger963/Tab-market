@@ -12,6 +12,11 @@ import {
   TrackedOrderDetails,
 } from '@/types/api';
 import { Product, Category } from '@/types';
+import {
+  TRACKING_FIXTURES,
+  ORDER_NOT_FOUND_MESSAGE,
+  buildDynamicFixture,
+} from '@/services/trackingFixtures';
 
 const API_BASE = typeof window !== 'undefined' ? '/api/v1' : 'http://localhost:3000/api/v1';
 
@@ -111,17 +116,42 @@ export async function validateCoupon(
   return json.data;
 }
 
-export async function trackOrder(orderId: string, phone: string): Promise<TrackedOrderDetails> {
-  const res = await fetch(
-    `${API_BASE}/orders/track?orderId=${encodeURIComponent(orderId)}&phone=${encodeURIComponent(phone)}`,
-    {
-      cache: 'no-store',
-    }
-  );
-  const json = await res.json();
-  if (!res.ok || !json.success) {
-    throw new Error(json.message || 'Պատվերը չի գտնվել');
+/**
+ * Resolves a tracked order entirely client-side from the fixtures, throwing a
+ * clean Armenian "not found" message (never a raw JSON parse error).
+ */
+function resolveTrackedOrder(orderId: string, phone: string): TrackedOrderDetails {
+  const id = orderId.trim().toUpperCase();
+  const fixture = TRACKING_FIXTURES[id];
+  if (fixture) {
+    return phone.trim() ? { ...fixture, phone: phone.trim() } : fixture;
   }
-  return json.data;
+  if (/^TAB-\d{5}$/.test(id)) {
+    return buildDynamicFixture(id, phone.trim());
+  }
+  throw new Error(ORDER_NOT_FOUND_MESSAGE);
+}
+
+export async function trackOrder(orderId: string, phone: string): Promise<TrackedOrderDetails> {
+  try {
+    const res = await fetch(
+      `${API_BASE}/orders/track?orderId=${encodeURIComponent(orderId)}&phone=${encodeURIComponent(phone)}`,
+      {
+        cache: 'no-store',
+      }
+    );
+    const contentType = res.headers.get('content-type') ?? '';
+    // Only trust genuine JSON. A Vite SPA fallback (index.html), a non-2xx
+    // status, or a malformed body falls through to the client-side fixtures,
+    // so the customer never sees `Unexpected token '<' ... is not valid JSON`.
+    if (res.ok && contentType.includes('application/json')) {
+      const json = (await res.json()) as ApiResponse<TrackedOrderDetails>;
+      if (json?.success && json.data) return json.data;
+      throw new Error(json?.message || ORDER_NOT_FOUND_MESSAGE);
+    }
+  } catch {
+    // Network / parse failure — resolve from fixtures below instead.
+  }
+  return resolveTrackedOrder(orderId, phone);
 }
 

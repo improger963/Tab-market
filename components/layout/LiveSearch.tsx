@@ -18,7 +18,7 @@ interface LiveSearchProps {
 /* ---------------------------------------------------------------------------
  * SMART SPOTLIGHT: Armenian ↔ Latin translit normalization engine.
  * Typing "corak"/"tsorak" matches "ծորակ", "ganzer" matches "GANZER",
- * exact SKU "31297" matches instantly, and Armenian glyphs match Latin brands.
+ * exact SKU "11463" matches instantly, and Armenian glyphs match Latin brands.
  * ------------------------------------------------------------------------- */
 
 /* Canonical Armenian glyph → Latin approximation pairs (used for both directions). */
@@ -26,18 +26,25 @@ const ARM_LATIN_PAIRS: [string, string][] = [
   ['ա', 'a'], ['բ', 'p'], ['գ', 'g'], ['դ', 't'], ['ե', 'ye'], ['զ', 'z'],
   ['է', 'e'], ['ը', 'e'], ['թ', 'd'], ['ժ', 'zh'], ['ի', 'i'], ['լ', 'l'],
   ['խ', 'kh'], ['ծ', 'ts'], ['կ', 'k'], ['հ', 'h'], ['ձ', 'dz'], ['ղ', 'gh'],
-  ['ճ', 'ch'], ['մ', 'm'], ['յ', 'y'], ['ն', 'n'], ['շ', 'sh'], ['ո', 'vo'],
-  ['չ', 'ch'], ['պ', 'b'], ['ջ', 'j'], ['ռ', 'r'], ['ս', 's'], ['վ', 'v'],
+  ['ճ', 'ch'], ['մ', 'm'], ['յ', 'y'], ['ն', 'n'], ['շ', 'sh'], ['ո', 'o'],
+  ['չ', 'ch'], ['պ', 'b'], ['ջ', 'j'], ['ր', 'r'], ['ռ', 'rr'], ['ս', 's'], ['վ', 'v'],
   ['տ', 't'], ['ց', 'ts'], ['ւ', 'w'], ['փ', 'p'], ['ք', 'k'], ['օ', 'o'],
   ['ֆ', 'f'],
 ];
 
 // Digraph-first ordered Latin → Armenian map ('ev' and 'ou' must beat single letters)
-const ARM_DIGRAPHS: [string, string][] = [
+const ARM_DIGRAPHS: [string, string][] = ([
   ['ev', 'էվ'],
   ['ou', 'ու'],
   ...ARM_LATIN_PAIRS.map(([arm, latin]) => [latin, arm] as [string, string]),
-];
+  // Forward-only correction: customers type "corak" for the Armenian faucet
+  // word, but 'c' has no canonical pair. Map it to 'ծ' so the greedy
+  // translit reaches the correct glyph instead of a literal 'c'.
+  ['c', 'ծ'],
+] as [string, string][])
+  // Longest latin key first so digraphs ('ts', 'ch', 'sh', 'rr', …) always beat
+  // their single-letter prefixes ('t', 'c', 's', 'r', …) in the greedy pass.
+  .sort((a, b) => b[0].length - a[0].length);
 
 const ARM_SINGLE: Record<string, string> = Object.fromEntries(ARM_DIGRAPHS);
 
@@ -331,7 +338,7 @@ export default function LiveSearch({
             if (query.trim()) setIsOpen(true);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Որոնել՝ ԾԾ Կոդ, անուն կամ translit (օր. 31297, corak, ganzer)..."
+          placeholder="Որոնել՝ ԾԾ Կոդ, անուն կամ translit (օր. 11463, corak, ganzer)..."
           aria-label="Որոնել սանտեխնիկա"
           role="combobox"
           aria-expanded={isOpen && debouncedQuery.length > 0}
@@ -381,7 +388,7 @@ export default function LiveSearch({
               <h4 className="text-sm font-bold text-ink">Արդյունք չի գտնվել</h4>
               <p className="text-xs text-muted max-w-xs mx-auto">
                 «<span className="font-semibold text-body">{debouncedQuery}</span>» հարցմամբ
-                Կոդ Կոդ կամ ապրանք չկա: Փորձեք <b>31297</b>, <b>corak</b> կամ <b>ganzer</b>:
+                Կոդ Կոդ կամ ապրանք չկա: Փորձեք <b>11463</b>, <b>corak</b> կամ <b>ganzer</b>:
               </p>
             </div>
           ) : (

@@ -4,8 +4,15 @@
  */
 
 import { Category } from '../types';
+import { products } from './products';
 
-export const categories: Category[] = [
+/**
+ * Static category metadata. The `itemCount` values below are placeholders
+ * that are recomputed from the live catalog at the bottom of this file, so
+ * every customer-facing count is truthful and can never advertise a fabricated
+ * number (e.g. "359" / "753") that does not match the actual assortment.
+ */
+const RAW_CATEGORIES: Category[] = [
   {
     id: 1,
     title: 'Ծորակներ',
@@ -87,3 +94,12 @@ export const categories: Category[] = [
     icon: 'Filter',
   },
 ];
+
+/**
+ * Truthful per-category counts derived directly from the live PRODUCTS array.
+ * Zero-product categories simply resolve to 0 so consumers can hide the badge.
+ */
+export const categories: Category[] = RAW_CATEGORIES.map((cat) => ({
+  ...cat,
+  itemCount: products.filter((p) => p.categorySlug === cat.slug).length,
+}));

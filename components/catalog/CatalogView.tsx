@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   SlidersHorizontal,
@@ -34,6 +34,57 @@ interface CatalogViewProps {
   initialCategorySlug?: string;
 }
 
+const VALID_SORTS = ['popular', 'price-asc', 'price-desc'] as const;
+type SortKey = (typeof VALID_SORTS)[number];
+
+/**
+ * Builds the initial filter state from the shareable URL query string, so a
+ * deep link like `/catalog?brand=VIEIR&stock=1` restores the exact view. The
+ * route-path category (from `/category/[slug]`) is used as a fallback.
+ */
+function readFiltersFromUrl(
+  pathCategory: string | null,
+  priceBounds: { min: number; max: number }
+): FilterState {
+  const base: FilterState = {
+    category: pathCategory,
+    brands: [],
+    colors: [],
+    diameters: [],
+    materials: [],
+    inStockOnly: false,
+    minPrice: priceBounds.min,
+    maxPrice: priceBounds.max,
+  };
+  if (typeof window === 'undefined') return base;
+  try {
+    const sp = new URLSearchParams(window.location.search);
+    const minRaw = sp.get('min');
+    const maxRaw = sp.get('max');
+    return {
+      ...base,
+      category: sp.get('category') || pathCategory,
+      brands: (sp.get('brand') || '').split(',').map((s) => s.trim()).filter(Boolean),
+      inStockOnly: sp.get('stock') === '1',
+      minPrice: minRaw !== null && Number.isFinite(Number(minRaw)) ? Number(minRaw) : priceBounds.min,
+      maxPrice: maxRaw !== null && Number.isFinite(Number(maxRaw)) ? Number(maxRaw) : priceBounds.max,
+    };
+  } catch {
+    return base;
+  }
+}
+
+/** Restores the active sort from the URL query string (defaults to `popular`). */
+function readSortFromUrl(): SortKey {
+  if (typeof window === 'undefined') return 'popular';
+  try {
+    const s = new URLSearchParams(window.location.search).get('sort');
+    return s && (VALID_SORTS as readonly string[]).includes(s) ? (s as SortKey) : 'popular';
+  } catch {
+    return 'popular';
+  }
+}
+
 export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   // Compute global price bounds
   const priceBounds = useMemo(() => {
@@ -44,19 +95,12 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
     };
   }, []);
 
-  // Filter state
-  const [filters, setFilters] = useState<FilterState>(() => ({
-    category: initialCategorySlug || null,
-    brands: [],
-    colors: [],
-    diameters: [],
-    materials: [],
-    inStockOnly: false,
-    minPrice: priceBounds.min,
-    maxPrice: priceBounds.max,
-  }));
+  // Filter state (seeded from the URL query for shareable / reloadable views)
+  const [filters, setFilters] = useState<FilterState>(() =>
+    readFiltersFromUrl(initialCategorySlug || null, priceBounds)
+  );
 
-  const [sortBy, setSortBy] = useState<'popular' | 'price-asc' | 'price-desc'>('popular');
+  const [sortBy, setSortBy] = useState<SortKey>(() => readSortFromUrl());
   const [viewMode, setViewMode] = useState<'gallery' | 'compact'>('gallery');
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -83,12 +127,38 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
     return () => clearTimeout(timer);
   }, [filters, sortBy, isMounted]);
 
-  // Sync if initialCategorySlug changes
+  // Route-driven category sync (Back / Forward between /catalog and
+  // /category/[slug]). The first run is skipped so a category parsed from the
+  // URL query on initial mount is preserved; afterwards the path is
+  // authoritative — leaving a category route resets the category filter to null
+  // instead of leaving a stale category / heading behind (BUG-04).
+  const pathCategoryMountedRef = useRef(false);
   useEffect(() => {
-    if (initialCategorySlug) {
-      setFilters((prev) => ({ ...prev, category: initialCategorySlug }));
+    if (!pathCategoryMountedRef.current) {
+      pathCategoryMountedRef.current = true;
+      return;
     }
+    const nextCategory = initialCategorySlug || null;
+    setFilters((prev) =>
+      prev.category === nextCategory ? prev : { ...prev, category: nextCategory }
+    );
   }, [initialCategorySlug]);
+
+  // Serialize the active filters + sort into the URL query string (no reload),
+  // making branded / filtered views shareable and reloadable (BUG-03).
+  useEffect(() => {
+    if (!isMounted) return;
+    const params = new URLSearchParams();
+    if (filters.category) params.set('category', filters.category);
+    if (filters.brands.length) params.set('brand', filters.brands.join(','));
+    if (filters.inStockOnly) params.set('stock', '1');
+    if (filters.minPrice > priceBounds.min) params.set('min', String(filters.minPrice));
+    if (filters.maxPrice < priceBounds.max) params.set('max', String(filters.maxPrice));
+    if (sortBy !== 'popular') params.set('sort', sortBy);
+    const query = params.toString();
+    const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+    window.history.replaceState({}, '', nextUrl);
+  }, [filters, sortBy, isMounted, priceBounds]);
 
   // Lock body scroll and allow Escape to dismiss the mobile filter sheet (no layout jump).
   useEffect(() => {
