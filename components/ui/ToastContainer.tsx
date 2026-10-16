@@ -32,13 +32,13 @@ export default function ToastContainer() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -15, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 500, damping: 32 }}
-            className="pointer-events-auto w-full bg-[#0F172A]/95 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-2xl border border-slate-700/80 flex items-center justify-between gap-3"
+            className="pointer-events-auto w-full bg-ink/95 backdrop-blur-sm text-white rounded-panel p-3.5 shadow-e2 border border-body/80 flex items-center justify-between gap-3"
           >
             {/* Left Content */}
             <div className="flex items-center gap-3 min-w-0 flex-1">
               {toast.type === 'cart' && toast.product ? (
                 <>
-                  <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700">
+                  <div className="relative w-12 h-12 rounded-control overflow-hidden bg-ink shrink-0 border border-body">
                     <img
                       src={toast.product.images[0]}
                       alt={toast.product.title}
@@ -46,38 +46,38 @@ export default function ToastContainer() {
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-blue-400">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-accent">
                       <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
                       <span>{toast.title || 'Ավելացվել է զամբյուղ'}</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-100 truncate mt-0.5">
+                    <div className="text-xs font-bold text-canvas truncate mt-0.5">
                       {toast.product.title}
                     </div>
-                    <div className="text-[11px] font-mono text-slate-400 tabular-nums">
+                    <div className="text-xs font-mono text-muted tabular-nums">
                       {formatAMD(toast.product.price)}
                     </div>
                   </div>
                 </>
               ) : toast.type === 'copy' ? (
                 <>
-                  <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/30">
+                  <div className="w-9 h-9 rounded-control bg-accent/20 text-accent flex items-center justify-center shrink-0 border border-accent/30">
                     <CheckCircle2 className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-xs font-bold text-slate-100">{toast.title || 'Պատճենված է'}</div>
-                    <div className="text-[11px] text-blue-200 truncate">{toast.message}</div>
+                    <div className="text-xs font-bold text-canvas">{toast.title || 'Պատճենված է'}</div>
+                    <div className="text-xs text-accent/80 truncate">{toast.message}</div>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                  <div className="w-9 h-9 rounded-control bg-ink text-on-dark flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-accent" />
                   </div>
                   <div className="min-w-0 flex-1">
                     {toast.title && (
-                      <div className="text-xs font-bold text-slate-100">{toast.title}</div>
+                      <div className="text-xs font-bold text-canvas">{toast.title}</div>
                     )}
-                    <div className="text-xs text-slate-300">{toast.message}</div>
+                    <div className="text-xs text-on-dark">{toast.message}</div>
                   </div>
                 </>
               )}
@@ -92,7 +92,7 @@ export default function ToastContainer() {
                     openDrawer();
                     removeToast(toast.id);
                   }}
-                  className="min-h-[36px] px-3 py-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-95 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
+                  className="min-h-[36px] px-3 py-1.5 rounded-control bg-accent hover:bg-accent-hover active:scale-95 text-white text-xs font-bold transition-all shadow-e1 flex items-center gap-1.5 cursor-pointer shrink-0"
                 >
                   <span>Զամբյուղ</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -103,7 +103,7 @@ export default function ToastContainer() {
                 type="button"
                 onClick={() => removeToast(toast.id)}
                 aria-label="Փակել"
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-1 rounded-card text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>

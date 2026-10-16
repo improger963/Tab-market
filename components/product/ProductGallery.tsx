@@ -6,8 +6,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Camera, Layers, Maximize2, ShieldCheck, X, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
+import {
+  Camera,
+  Layers,
+  Maximize2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon,
+} from 'lucide-react';
 import { resolveImageUrl } from '@/lib/config';
+import { HY } from '@/lib/copy/hy';
 import ProductImage from '@/components/ui/ProductImage';
 
 interface ProductGalleryProps {
@@ -16,6 +25,28 @@ interface ProductGalleryProps {
   title: string;
 }
 
+/**
+ * Canonical Armenian strings for this component (byte-verbatim from git HEAD;
+ * stored as escapes to stay immune to homoglyph corruption).
+ */
+const TEXT = {
+  T_PHOTOS: '\u053c\u0578\u0582\u057d\u0561\u0576\u056f\u0561\u0580\u0576\u0565\u0580', // Lusanakanner
+  T_CAD_MM: 'CAD \u0533\u056e\u0561\u0563\u056b\u0580 (\u0574\u0574)', // CAD Gtsagir (mm)
+  T_CAD: 'CAD \u0533\u056e\u0561\u0563\u056b\u0580',
+  T_HOVER_HINT: '\u054d\u0561\u0570\u0565\u0581\u0580\u0565\u0584 \u0574\u056f\u0576\u056b\u056f\u0568\u055d \u056d\u0578\u0577\u0578\u0580\u0561\u0581\u0576\u0565\u056c\u0578\u0582 \u0570\u0561\u0574\u0561\u0580',
+  T_PREV: '\u0546\u0561\u056d\u0578\u0580\u0564 \u056c\u0578\u0582\u057d\u0561\u0576\u056f\u0561\u0580',
+  T_NEXT: '\u0540\u0561\u057b\u0578\u0580\u0564 \u056c\u0578\u0582\u057d\u0561\u0576\u056f\u0561\u0580',
+  T_ZOOM: '\u053d\u0578\u0577\u0578\u0580\u0561\u0581\u0576\u0565\u056c',
+  T_PHOTO_N: '\u053c\u0578\u0582\u057d\u0561\u0576\u056f\u0561\u0580',
+  T_SCALE: '\u0544\u0561\u057d\u0577\u057f\u0561\u0562 1:10 (\u0574\u0574)', // Masshtab 1:10 (mm) — CAD sheet fact
+} as const;
+
+/**
+ * Gallery: pointer devices get hover lens-zoom, touch gets swipe + arrows +
+ * tap-to-expand on the CAD blueprint. Thumbnails >= 44px. CAD toggle kept.
+ * The fabricated "DIN EN" certification stamp is removed — no data field
+ * backs it. Zoom hint only renders on hover-capable pointers.
+ */
 export default function ProductGallery({
   images,
   blueprintImage,
@@ -47,52 +78,55 @@ export default function ProductGallery({
     const diff = touchStartX - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 40 && activeTab === 'photo' && images.length > 1) {
       if (diff > 0) {
-        // Swipe left -> next
         setSelectedImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
       } else {
-        // Swipe right -> prev
         setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
       }
     }
     setTouchStartX(null);
   };
 
+  const toggleBase =
+    'btn-tactile inline-flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-control px-4 py-2 text-xs font-semibold transition-colors duration-hover ease-precision focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:flex-none';
+
   return (
     <div className="space-y-3 sm:space-y-4">
-      {/* CAD Blueprint toggle placed directly above the image for instant thumb accessibility */}
-      <div className="flex items-center gap-2 p-1 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] w-full sm:w-fit">
+      {/* Photo / CAD toggle */}
+      <div className="flex w-full gap-1 rounded-card border border-line bg-canvas p-1 sm:w-fit">
         <button
           type="button"
           onClick={() => setActiveTab('photo')}
-          className={`flex-1 sm:flex-none min-h-[42px] px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-            activeTab === 'photo'
-              ? 'bg-white text-[#0F172A] shadow-xs border border-slate-200'
-              : 'text-slate-600 hover:text-[#0F172A]'
-          }`}
+          aria-pressed={activeTab === 'photo'}
+          className={`${toggleBase} ${
+ activeTab === 'photo'
+ ? 'border border-line bg-surface text-ink'
+ : 'border border-transparent text-body hover:text-ink'
+ }`}
         >
-          <Camera className="w-4 h-4 text-blue-600" aria-hidden="true" />
-          <span>Լուսանկարներ</span>
+          <Camera className="h-4 w-4 text-accent" aria-hidden="true" />
+          <span>{TEXT.T_PHOTOS}</span>
         </button>
 
         {resolvedBlueprint && (
           <button
             type="button"
             onClick={() => setActiveTab('blueprint')}
-            className={`flex-1 sm:flex-none min-h-[42px] px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-              activeTab === 'blueprint'
-                ? 'bg-[#0F172A] text-white shadow-xs'
-                : 'text-slate-600 hover:text-[#0F172A]'
-            }`}
+            aria-pressed={activeTab === 'blueprint'}
+            className={`${toggleBase} ${
+ activeTab === 'blueprint'
+ ? 'bg-ink text-white'
+ : 'border border-transparent text-body hover:text-ink'
+ }`}
           >
-            <Layers className="w-4 h-4 text-blue-400" aria-hidden="true" />
-            <span>CAD Գծագիր (մմ)</span>
+            <Layers className="h-4 w-4 text-accent" aria-hidden="true" />
+            <span>{TEXT.T_CAD_MM}</span>
           </button>
         )}
       </div>
 
-      {/* Main Viewport Container with Swipe Gestures and Desktop Lens Zoom */}
+      {/* Main viewport: hover lens-zoom (pointer) + swipe (touch) */}
       <div
-        className="relative aspect-square rounded-2xl sm:rounded-3xl overflow-hidden bg-white border border-[#E2E8F0] shadow-xs group cursor-zoom-in touch-pan-y"
+        className="group relative aspect-square cursor-zoom-in touch-pan-y overflow-hidden rounded-card border border-line bg-canvas"
         onMouseEnter={() => setIsZoomed(true)}
         onMouseLeave={() => setIsZoomed(false)}
         onMouseMove={handleMouseMove}
@@ -100,36 +134,30 @@ export default function ProductGallery({
         onTouchEnd={handleTouchEnd}
       >
         {activeTab === 'photo' ? (
-          <div className="w-full h-full relative overflow-hidden bg-[#F8FAFC] flex items-center justify-center select-none">
+          <div className="relative flex h-full w-full select-none items-center justify-center overflow-hidden bg-canvas">
             {currentImage ? (
               <img
                 src={currentImage}
                 alt={title}
-                className={`w-full h-full object-cover transition-transform duration-200 ease-out ${
-                  isZoomed ? 'scale-175' : 'scale-100 group-hover:scale-104'
-                }`}
-                style={
-                  isZoomed
-                    ? {
-                        transformOrigin: `${mousePos.x}% ${mousePos.y}%`,
-                      }
-                    : undefined
-                }
+                className={`h-full w-full object-contain p-4 transition-transform duration-hover ease-precision sm:p-6 ${
+ isZoomed ? 'scale-[1.75]' : 'group-hover:scale-[1.03]'
+ }`}
+                style={isZoomed ? { transformOrigin: `${mousePos.x}% ${mousePos.y}%` } : undefined}
                 loading="eager"
               />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-slate-50 text-slate-300">
-                <ImageIcon className="w-16 h-16" aria-hidden="true" />
+              <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-ice-chrome ring-ice">
+                <ImageIcon className="h-16 w-16 text-faint" aria-hidden="true" />
                 <span className="sr-only">{title}</span>
               </div>
             )}
 
-            {/* Desktop zoom tip */}
-            <div className="hidden sm:block absolute bottom-3 right-3 bg-[#0F172A]/70 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg pointer-events-none border border-slate-700">
-              Սահեցրեք մկնիկը՝ խոշորացնելու համար
+            {/* Desktop zoom hint (pointer devices only) */}
+            <div className="pointer-events-none absolute bottom-3 right-3 hidden rounded-control bg-ink/80 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm sm:block">
+              {TEXT.T_HOVER_HINT}
             </div>
 
-            {/* Mobile swipe arrows */}
+            {/* Mobile swipe arrows (44px targets) */}
             {images.length > 1 && (
               <>
                 <button
@@ -138,10 +166,10 @@ export default function ProductGallery({
                     e.stopPropagation();
                     setSelectedImageIndex((p) => (p > 0 ? p - 1 : images.length - 1));
                   }}
-                  className="sm:hidden absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur text-slate-800 shadow-md flex items-center justify-center"
-                  aria-label="Նախորդ լուսանկար"
+                  aria-label={TEXT.T_PREV}
+                  className="btn-tactile absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-surface/90 text-ink shadow-e1 backdrop-blur-sm transition-colors duration-hover hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:hidden"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
@@ -149,64 +177,63 @@ export default function ProductGallery({
                     e.stopPropagation();
                     setSelectedImageIndex((p) => (p < images.length - 1 ? p + 1 : 0));
                   }}
-                  className="sm:hidden absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur text-slate-800 shadow-md flex items-center justify-center"
-                  aria-label="Հաջորդ լուսանկար"
+                  aria-label={TEXT.T_NEXT}
+                  className="btn-tactile absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-surface/90 text-ink shadow-e1 backdrop-blur-sm transition-colors duration-hover hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:hidden"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="h-4 w-4" />
                 </button>
               </>
             )}
           </div>
         ) : (
-          <div className="w-full h-full bg-[#0F172A] p-4 sm:p-6 flex flex-col items-center justify-center relative group/blueprint">
+          <div className="relative flex h-full w-full flex-col items-center justify-center bg-ink p-4 sm:p-6">
             <img
               src={resolvedBlueprint!}
               alt={`${title} - CAD Blueprint`}
-              className="max-h-[85%] max-w-[85%] object-contain cursor-pointer"
+              className="max-h-[85%] max-w-[85%] cursor-zoom-in object-contain"
               onClick={() => setIsBlueprintModalOpen(true)}
             />
-            {/* Inspect Blueprint Lightbox Trigger Button */}
             <button
               type="button"
               onClick={() => setIsBlueprintModalOpen(true)}
-              className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-slate-900/90 hover:bg-slate-800 text-white text-xs font-bold px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 shadow-lg transition-all cursor-pointer"
+              className="btn-tactile absolute right-3 top-3 flex min-h-[44px] items-center gap-1.5 rounded-control border border-line/20 bg-surface/10 px-3.5 py-2 text-xs font-semibold text-white transition-colors duration-hover hover:bg-surface/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:right-4 sm:top-4"
             >
-              <Maximize2 className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
-              <span>Խոշորացնել</span>
+              <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>{TEXT.T_ZOOM}</span>
             </button>
 
-            {/* Engineering Badge */}
-            <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 font-mono bg-black/60 backdrop-blur-md px-3 py-1.5 sm:py-2 rounded-xl border border-slate-800">
-              <span className="flex items-center gap-1.5 text-blue-400 font-bold">
-                <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-                DIN EN
-              </span>
-              <span>Մասշտաբ 1:10 (մմ)</span>
+            {/* CAD sheet meta strip — scale is a property of the drawing file */}
+            <div className="absolute inset-x-3 bottom-3 flex items-end justify-between font-mono text-xs text-on-dark-muted sm:inset-x-4 sm:bottom-4">
+              <span>{TEXT.T_SCALE}</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* Mobile Swipe Dots & Thumbnails Row */}
+      {/* Dots (mobile) + thumbnail strip (>=44px targets) */}
       {activeTab === 'photo' && images.length > 1 && (
         <div className="space-y-2">
-          {/* Mobile Dot Indicators */}
-          <div className="flex sm:hidden items-center justify-center gap-1.5 py-1">
+          <div className="flex items-center justify-center gap-1 sm:hidden">
             {images.map((_, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => setSelectedImageIndex(idx)}
-                aria-label={`Լուսանկար ${idx + 1}`}
-                className={`h-1.5 rounded-full transition-all ${
-                  selectedImageIndex === idx ? 'w-5 bg-[#2563EB]' : 'w-1.5 bg-slate-300'
-                }`}
-              />
+                aria-label={`${TEXT.T_PHOTO_N} ${idx + 1}`}
+                aria-current={selectedImageIndex === idx}
+                className="flex min-h-[44px] items-center px-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`h-1.5 rounded-full transition-all duration-hover ease-precision ${
+ selectedImageIndex === idx ? 'w-5 bg-accent' : 'w-1.5 bg-line-strong'
+ }`}
+                />
+              </button>
             ))}
           </div>
 
-          {/* Desktop/Tablet Thumbnail Strip */}
-          <div className="flex items-center gap-2.5 sm:gap-3 overflow-x-auto pb-1 no-scrollbar">
+          <div className="no-scrollbar flex items-center gap-2.5 overflow-x-auto pb-1 sm:gap-3">
             {images.map((img, idx) => {
               const isSelected = selectedImageIndex === idx;
               return (
@@ -214,13 +241,13 @@ export default function ProductGallery({
                   key={idx}
                   type="button"
                   onClick={() => setSelectedImageIndex(idx)}
-                  className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-[#F8FAFC] cursor-pointer ${
-                    isSelected
-                      ? 'border-[#2563EB] ring-2 ring-blue-500/20 shadow-xs'
-                      : 'border-[#E2E8F0] hover:border-slate-300'
-                  }`}
+                  aria-label={`${TEXT.T_PHOTO_N} ${idx + 1}`}
+                  aria-current={isSelected}
+                  className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-control border-2 bg-canvas transition-colors duration-hover ease-precision focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:h-[72px] sm:w-[72px] ${
+ isSelected ? 'border-accent' : 'border-line hover:border-line-strong'
+ }`}
                 >
-                  <ProductImage src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full" />
+                  <ProductImage src={img} alt="" className="h-full w-full" />
                 </button>
               );
             })}
@@ -228,22 +255,38 @@ export default function ProductGallery({
         </div>
       )}
 
-      {/* Blueprint Zoom Modal */}
+      {/* Blueprint lightbox */}
       {isBlueprintModalOpen && resolvedBlueprint && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#0F172A]/80 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
-            <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between sticky top-0 bg-white z-10">
-              <h4 className="font-bold text-sm text-[#0F172A] truncate mr-2">{title} - CAD Գծագիր</h4>
+        <div
+          className="fixed inset-0 z-overlay flex animate-fade-in items-center justify-center bg-ink/80 p-3 backdrop-blur-sm sm:p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${title} ${TEXT.T_CAD}`}
+          onClick={() => setIsBlueprintModalOpen(false)}
+        >
+          <div
+            className="flex max-h-[90dvh] w-full max-w-3xl flex-col overflow-y-auto rounded-panel border border-line bg-surface shadow-e2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-surface p-4">
+              <h4 className="mr-2 truncate text-sm font-semibold text-ink">
+                {title} - {TEXT.T_CAD}
+              </h4>
               <button
                 type="button"
                 onClick={() => setIsBlueprintModalOpen(false)}
-                className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                aria-label={HY.CLOSE}
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control text-muted transition-colors duration-hover hover:bg-canvas hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="p-4 sm:p-6 bg-[#0F172A] flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
-              <img src={resolvedBlueprint} alt="CAD Scheme Full" className="max-h-[500px] w-auto object-contain" />
+            <div className="flex min-h-[300px] items-center justify-center bg-ink p-4 sm:min-h-[400px] sm:p-6">
+              <img
+                src={resolvedBlueprint}
+                alt="CAD Scheme Full"
+                className="max-h-[500px] w-auto object-contain"
+              />
             </div>
           </div>
         </div>

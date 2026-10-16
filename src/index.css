@@ -1,11 +1,75 @@
 @import "tailwindcss";
 
-/* Phase 6: Armenian-capable font stack (Noto Sans Armenian + Inter).
-   Loaded via <link> in index.html; Tailwind v4 theme overrides the default
-   font-sans utility so no component needs to opt in explicitly. */
+/* ===========================================================================
+ * TAB.AM DESIGN SYSTEM — single source of truth for all design values.
+ * "Quiet luxury, built to sell": clarity > trust > conversion > decoration.
+ * Components MUST consume these tokens (bg-ink, border-line, shadow-e1,
+ * rounded-card, duration-200, ease-precision …). No scattered hex values,
+ * magic radii or ad-hoc shadows are allowed in TSX.
+ *
+ * Palette is FIXED: white / slate canvas / midnight ink / royal blue accent.
+ * Status colors only: emerald = success, red = danger, amber = low-stock only
+ * when backed by data.
+ * ========================================================================= */
+
+/* Armenian-capable font stack (Noto Sans Armenian + Inter), loaded via
+   <link> in index.html with display=swap; Tailwind v4 overrides font-sans. */
 @theme {
   --font-sans: "Inter", "Noto Sans Armenian", ui-sans-serif, system-ui,
     -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- Color tokens ------------------------------------------------------
+     surface/canvas/ink/body/muted/accent/border + status. Slate ramp exists
+     ONLY for the fixed palette's neutral steps and dark-surface text. */
+  --color-surface: #ffffff; /* cards, sheets, elevated surfaces */
+  --color-canvas: #f8fafc; /* page wash, image pedestals, chips */
+  --color-ink: #0f172a; /* headings + primary action background */
+  --color-body: #475569; /* readable body text on light surfaces (AA) */
+  --color-muted: #64748b; /* secondary labels — never lighter for readable text */
+  --color-faint: #94a3b8; /* decorative glyphs/icons only, never text */
+  --color-line: #e2e8f0; /* all hairline borders */
+  --color-line-strong: #cbd5e1; /* hover borders + light dividers (never text) */
+  --color-accent: #2563eb; /* interactive accent, links, focus ring */
+  --color-accent-hover: #1d4ed8; /* accent hover/pressed */
+  --color-success: #059669; /* in-stock, confirmations */
+  --color-danger: #dc2626; /* discount badge, destructive only */
+  --color-warning: #d97706; /* low-stock ONLY when data exists */
+  --color-on-dark: #cbd5e1; /* AA body text on ink surfaces (footer, dock) */
+  --color-on-dark-muted: #94a3b8; /* AA secondary text on ink surfaces */
+  --color-slate-50: #f8fafc; /* alias: canvas */
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0; /* alias: border */
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b; /* alias: muted */
+  --color-slate-600: #475569; /* alias: body */
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a; /* alias: ink */
+
+  /* ---- Radius: exactly four shapes ---------------------------------------
+     card (1rem) · panel (1.5rem) · control (0.75rem) · full (chips) */
+  --radius-card: 1rem; /* rounded-card */
+  --radius-panel: 1.5rem; /* rounded-panel: modals, sheets, hero */
+  --radius-control: 0.75rem; /* rounded-control: buttons, inputs */
+
+  /* ---- Elevation: three levels only -------------------------------------
+     e0 border only · e1 resting cards · e2 floating layers. */
+  --shadow-e0: 0 0 0 0 transparent;
+  --shadow-e1: 0 1px 2px 0 rgba(15, 23, 42, 0.04),
+    0 8px 24px -12px rgba(15, 23, 42, 0.08);
+  --shadow-e2: 0 20px 50px -20px rgba(15, 23, 42, 0.18);
+
+  /* ---- Motion tokens -----------------------------------------------------
+     120ms press · 200ms hover/color · 280ms sheets/drawers.
+     Only transform + opacity are ever animated. */
+  --ease-precision: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.5, 1); /* gentle spring, sheets only */
+  --duration-press: 120ms;
+  --duration-hover: 200ms;
+  --duration-sheet: 280ms;
+  --animate-sheet-in: sheet-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade-in: fade-in 200ms cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Single z-index scale: header < dock < buy bar < overlay < sheet/drawer < toast */
   --z-index-header: 20;
@@ -14,6 +78,26 @@
   --z-index-overlay: 50;
   --z-index-sheet: 60;
   --z-index-toast: 70;
+}
+
+/*
+ * Motion-duration TOKENS as first-class utilities.
+ * Tailwind v4 has no `--duration-*` namespace, so `duration-hover/press/sheet`
+ * would otherwise be dead classes. Registering them here (mirroring what the
+ * built-in `.duration-150` emits) makes every component consume the semantic
+ * token value from a single source while composing correctly with `transition-*`.
+ */
+@utility duration-press {
+  --tw-duration: var(--duration-press);
+  transition-duration: var(--duration-press);
+}
+@utility duration-hover {
+  --tw-duration: var(--duration-hover);
+  transition-duration: var(--duration-hover);
+}
+@utility duration-sheet {
+  --tw-duration: var(--duration-sheet);
+  transition-duration: var(--duration-sheet);
 }
 
 /*
@@ -42,58 +126,73 @@ body {
 }
 
 @layer utilities {
-  /* Sanitary Precision Finishes & Ice Chrome Specular Gradients */
+  /* ---- Ice chrome: placeholders / pedestals ONLY (never text or buttons) */
   .bg-ice-chrome {
-    background: linear-gradient(135deg, #f1f5f9 0%, #ffffff 50%, #cbd5e1 100%);
+    background: linear-gradient(135deg, #f1f5f9 0%, #ffffff 50%, #e2e8f0 100%);
   }
-  .border-ice-chrome {
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.04);
+  .ring-ice {
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
   }
 
-  .bg-metallic-chrome {
+  /* Product finish swatches — depict real finishes from product data, so the
+     metal tints are data-driven color chips, not decorative palette. */
+  .bg-finish-chrome {
     background: linear-gradient(135deg, #f1f5f9 0%, #ffffff 50%, #cbd5e1 100%);
     box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 1px #cbd5e1;
   }
-  .bg-metallic-gold {
-    background: linear-gradient(135deg, #eab308 0%, #fef08a 50%, #ca8a04 100%);
-    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px #a16207;
+  .bg-finish-gold {
+    background: linear-gradient(135deg, #b45309 0%, #f1f5f9 50%, #92400e 100%);
+    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px #92400e;
   }
-  .bg-metallic-bronze {
-    background: linear-gradient(135deg, #b45309 0%, #fde68a 50%, #78350f 100%);
-    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.6), 0 0 0 1px #78350f;
+  .bg-finish-bronze {
+    background: linear-gradient(135deg, #78716c 0%, #e7e5e4 50%, #57534e 100%);
+    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.6), 0 0 0 1px #57534e;
   }
-  .bg-metallic-black {
+  .bg-finish-black {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 0 0 1px #334155;
   }
-  .bg-metallic-gunmetal {
+  .bg-finish-gunmetal {
     background: linear-gradient(135deg, #64748b 0%, #334155 100%);
     box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.4), 0 0 0 1px #475569;
   }
-  .bg-metallic-white {
+  .bg-finish-white {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     box-shadow: inset 0 1px 1px 0 rgba(0, 0, 0, 0.05), 0 0 0 1px #e2e8f0;
   }
 
-  .clean-card {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.06);
-    transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* Standard card: e0 at rest, e1→e2 + 2px lift on pointer devices only. */
+  .card-lux {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-e1);
+    transition: transform var(--duration-hover) var(--ease-precision),
+      box-shadow var(--duration-hover) var(--ease-precision),
+      border-color var(--duration-hover) var(--ease-precision);
   }
-  .clean-card:hover {
-    border-color: #93c5fd;
-    box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.1);
+  @media (hover: hover) and (pointer: fine) {
+    .card-lux:hover {
+      transform: translateY(-2px);
+      border-color: var(--color-line-strong);
+      box-shadow: var(--shadow-e2);
+    }
   }
 
-  .focus-ring {
-    outline: none;
-    transition: border-color 150ms ease, box-shadow 150ms ease;
+  /* Glass "showroom" layer (hero card, floating chips). */
+  .glass-surface {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: var(--shadow-e1);
   }
-  .focus-ring:focus {
-    border-color: #2563eb !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
+
+  /* Display type: fluid headline scale, tight tracking (sentence case only). */
+  .text-display {
+    font-size: clamp(2rem, 4vw + 1rem, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
   }
 
   .pb-safe {
@@ -116,100 +215,151 @@ body {
     overscroll-behavior-x: contain;
   }
 
-  /* Tactile & Sensory Micro-Interactions */
+  /* Horizontal rail edge fade (category stories, nav strips): scrolls
+     visually end in a soft mask instead of a hard clip. */
+  .edge-fade {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 24px,
+      #000 calc(100% - 24px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 24px,
+      #000 calc(100% - 24px),
+      transparent 100%
+    );
+  }
+
+  /* Press feedback: transform-only, 120ms. */
   .btn-tactile {
-    transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform var(--duration-press) var(--ease-precision);
   }
   .btn-tactile:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
   }
 
-  .glass-surface {
-    background-color: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 8px 30px rgb(15, 23, 42, 0.05);
-  }
-
+  /* One-shot confirmation pops (triggered by user action, never ambient). */
   @keyframes heart-pop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+    }
+    100% {
+      transform: scale(1);
+    }
   }
   .animate-heart-pop {
-    animation: heart-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: heart-pop 0.35s var(--ease-spring);
   }
 
+  /* Ambient ring — ONLY the WhatsApp button on the PDP buy box (≥2.5s cycle). */
   @keyframes beacon {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
-    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    0% {
+      box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.45);
+    }
+    70% {
+      box-shadow: 0 0 0 8px rgba(5, 150, 105, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(5, 150, 105, 0);
+    }
   }
   .pulse-beacon {
-    animation: beacon 2s infinite ease-in-out;
-  }
-
-  @keyframes glint {
-    0% { transform: translateX(-100%) rotate(25deg); }
-    100% { transform: translateX(200%) rotate(25deg); }
-  }
-  .shimmer-glint {
-    position: relative;
-    overflow: hidden;
-  }
-  .shimmer-glint::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transform: translateX(-100%) rotate(25deg);
-    pointer-events: none;
-  }
-  .shimmer-glint:hover::before {
-    animation: glint 0.8s ease-out;
+    animation: beacon 2.6s infinite var(--ease-precision);
   }
 
   /* Spring quantity roll (cart steppers): hardware-accelerated transform only */
   @keyframes qty-roll-up {
-    0% { transform: translateY(45%); opacity: 0.35; }
-    100% { transform: translateY(0); opacity: 1; }
+    0% {
+      transform: translateY(45%);
+      opacity: 0.35;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
   @keyframes qty-roll-down {
-    0% { transform: translateY(-45%); opacity: 0.35; }
-    100% { transform: translateY(0); opacity: 1; }
+    0% {
+      transform: translateY(-45%);
+      opacity: 0.35;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
   .animate-qty-roll-up {
-    animation: qty-roll-up 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: qty-roll-up 0.22s var(--ease-precision);
   }
   .animate-qty-roll-down {
-    animation: qty-roll-down 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: qty-roll-down 0.22s var(--ease-precision);
   }
 
   /* Checkmark morph pop (add-to-cart confirmation) */
   @keyframes check-pop {
-    0% { transform: scale(0.4) rotate(-12deg); opacity: 0; }
-    60% { transform: scale(1.15) rotate(2deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    0% {
+      transform: scale(0.4) rotate(-12deg);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.15) rotate(2deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
   }
   .animate-check-pop {
-    animation: check-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: check-pop 0.3s var(--ease-spring);
+  }
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
-/* Zero-CLS Shimmer Skeleton Engine: fixed 200% gradient track for stable 60fps sweeps */
+/*
+ * Zero-CLS Shimmer Skeleton Engine: fixed 200% gradient track for stable
+ * 60fps sweeps. Skeleton shimmer is the ONE ambient motion allowed on a
+ * loading screen and it is disabled under prefers-reduced-motion below.
+ */
 .animate-shimmer {
   position: relative;
   overflow: hidden;
-  background-color: #f1f5f9;
+  background-color: var(--color-slate-100);
 }
 .animate-shimmer::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-size: 200% 100%;
@@ -221,17 +371,17 @@ body {
     rgba(255, 255, 255, 0.6) 50%,
     rgba(255, 255, 255, 0) 100%
   );
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.5s infinite linear;
 }
 
 /* Skeleton placeholder blocks: reserve exact card geometry so data loads with zero layout shift */
 .skeleton-block {
-  background-color: #e2e8f0;
+  background-color: var(--color-line);
   position: relative;
   overflow: hidden;
 }
 .skeleton-block::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-size: 200% 100%;
@@ -241,16 +391,7 @@ body {
     rgba(255, 255, 255, 0.6) 50%,
     rgba(255, 255, 255, 0) 100%
   );
-  animation: shimmer 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: shimmer 1.4s infinite linear;
 }
 
 html {
@@ -275,20 +416,19 @@ html {
 body {
   min-height: 100vh;
   min-height: 100dvh;
-  background-color: #ffffff;
-  color: #334155;
-  selection-background-color: #2563eb;
-  selection-color: #ffffff;
+  background-color: var(--color-surface);
+  color: var(--color-body);
+  caret-color: var(--color-accent);
   overscroll-behavior-y: none;
 }
 
-/*
- * Mobile bottom clearance so the fixed dock never covers trailing content
- * (applied on the shell wrapper via `pb-shell` utility, see components).
- */
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-surface);
+}
 
 /*
- * One container token everywhere (replaces conflicting max-w-7xl / max-w-[1440px]).
+ * One container token everywhere (max-w-[1440px], px-4 sm:px-6 lg:px-8).
  * Text blocks are capped to a comfortable reading measure.
  */
 .container-lux {
@@ -333,7 +473,9 @@ label[for],
 }
 
 @media (max-width: 767px) {
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     font-size: 16px !important;
   }
 }
@@ -347,10 +489,24 @@ textarea {
   scroll-margin-block: 80px;
 }
 
-input:focus, select:focus, textarea:focus {
+/* Shared control focus recipe: accent border + 2px accent ring, offset 2. */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+/*
+ * Visible keyboard focus everywhere (single source of truth).
+ * Intentionally UNLAYERED so it wins over `@layer utilities` rules such as
+ * `focus:outline-hidden` on links/buttons, guaranteeing a consistent Royal-Blue
+ * focus ring for keyboard users without editing every component.
+ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 ::-webkit-scrollbar {
@@ -358,30 +514,19 @@ input:focus, select:focus, textarea:focus {
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #f8fafc;
+  background: var(--color-canvas);
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-line-strong);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-faint);
 }
 
 /*
- * Phase 1 — Visible keyboard focus everywhere (single source of truth).
- * Intentionally UNLAYERED so it wins over `@layer utilities` rules such as
- * `focus:outline-hidden` on links/buttons, guaranteeing a consistent Royal-Blue
- * focus ring for keyboard users without editing every component.
- */
-:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
-}
-
-/*
- * Phase 2 — Respect prefers-reduced-motion: disable shimmer, glint, zoom,
- * slide/roll micro-animations and infinite pulses for motion-sensitive users.
+ * prefers-reduced-motion: no translate/scale/pulse/shimmer/glint anywhere.
+ * Sheets and toasts fall back to plain fades (opacity only).
  */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -396,12 +541,16 @@ input:focus, select:focus, textarea:focus {
     scroll-behavior: auto !important;
   }
   .animate-shimmer::after,
-  .skeleton-block::after,
-  .shimmer-glint::before {
+  .skeleton-block::after {
     animation: none !important;
   }
-  .pulse-beacon,
-  .animate-pulse-subtle {
+  .pulse-beacon {
     animation: none !important;
+  }
+  .card-lux:hover {
+    transform: none !important;
+  }
+  .btn-tactile:active {
+    transform: none !important;
   }
 }

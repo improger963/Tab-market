@@ -7,7 +7,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'motion/react';
 import {
   ShoppingBag,
   Check,
@@ -16,8 +15,8 @@ import {
   Heart,
   ArrowLeftRight,
   Star,
+  Loader2,
   MessageCircle,
-  Zap,
 } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/store/useCart';
@@ -25,8 +24,34 @@ import { useToast } from '@/store/useToast';
 import { useWishlist } from '@/store/useWishlist';
 import { useCompare } from '@/store/useCompare';
 import { formatAMD, displayTitle } from '@/lib/utils';
-import { resolveImageUrl } from '@/lib/config';
+import { resolveImageUrl, SHOWROOM_INFO } from '@/lib/config';
 import ProductImage from '@/components/ui/ProductImage';
+
+/**
+ * Customer-facing Armenian copy. Written as \u escapes on purpose:
+ * typing Armenian literals through editors/transcripts has previously produced
+ * homoglyph corruption. Keep this block codepoint-only.
+ */
+const TEXT = {
+  T_FAV_ADDED: '\u0531\u057e\u0565\u056c\u0561\u0581\u057e\u0565\u0581 \u057d\u056b\u0580\u057e\u0561\u056e\u0576\u0565\u0580\u056b \u0581\u0561\u0576\u056f\u0578\u0582\u0574',
+  T_FAV_REMOVED: '\u0540\u0565\u057c\u0561\u0581\u057e\u0565\u0581 \u057d\u056b\u0580\u057e\u0561\u056e\u0576\u0565\u0580\u056b \u0581\u0561\u0576\u056f\u056b\u0581',
+  T_REMOVE_FAV: '\u0540\u0565\u057c\u0561\u0581\u0576\u0565\u056c \u057d\u056b\u0580\u057e\u0561\u056e\u0576\u0565\u0580\u056b\u0581',
+  T_ADD_FAV: '\u0531\u057e\u0565\u056c\u0561\u0581\u0576\u0565\u056c \u057d\u056b\u0580\u057e\u0561\u056e\u0576\u0565\u0580\u0578\u0582\u0574',
+  T_REMOVE_CMP: '\u0540\u0565\u057c\u0561\u0581\u0576\u0565\u056c \u0570\u0561\u0574\u0565\u0574\u0561\u057f\u0578\u0582\u0569\u0575\u0578\u0582\u0576\u056b\u0581',
+  T_COMPARE: '\u0540\u0561\u0574\u0565\u0574\u0561\u057f\u0565\u056c',
+  T_COPY_CODE: '\u054a\u0561\u057f\u0573\u0565\u0576\u0565\u056c \u053f\u0578\u0564',
+  L_CODE: '\u053f\u0578\u0564:',
+  L_IN_STOCK: '\u054d\u0580\u0561\u0570\u0578\u0582\u0574 \u056f\u0561',
+  L_PRICE_ASK: '\u0533\u056b\u0576\u0568\u055d \u0568\u057d\u057f \u0570\u0561\u0580\u0581\u0574\u0561\u0576',
+  L_ADD: '\u0531\u057e\u0565\u056c\u0561\u0581\u0576\u0565\u056c',
+  L_ADDED: '\u0531\u057e\u0565\u056c\u0561\u0581\u057e\u0565\u0581',
+  L_ADDING: '\u0531\u057e\u0565\u056c\u0561\u0581\u0578\u0582\u0574 \u0567\u2026',
+  L_ASK: '\u0540\u0561\u0580\u0581\u0576\u0565\u056c',
+  WA_HEAD: '\u0532\u0561\u0580\u0587 \u0571\u0565\u0566, \u056b\u0576\u0571 \u0570\u0565\u057f\u0561\u0584\u0580\u0584\u0580\u0578\u0582\u0574 \u0567 \u0561\u0575\u057d \u0561\u057a\u0580\u0561\u0576\u0584\u056b \u0563\u056b\u0576\u0568 \u0587 \u0561\u057c\u056f\u0561\u0575\u0578\u0582\u0569\u0575\u0578\u0582\u0576\u0568\u055d ',
+  WA_MID: ' (\u053f\u0578\u0564: ',
+  WA_TAIL: ') ',
+  WA_END: ' \u057d\u0580\u0561\u0570\u0578\u0582\u0574:',
+} as const;
 
 interface ProductCardProps {
   product: Product;
@@ -40,19 +65,29 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const [copied, setCopied] = useState(false);
   const [isHeartPopping, setIsHeartPopping] = useState(false);
-  const [justAdded, setJustAdded] = useState(false);
+  // Two-step add feedback: brief loading (spinner, same size) then success.
+  const [addState, setAddState] = useState<'idle' | 'loading' | 'added'>('idle');
 
   const isWishlisted = isInWishlist(product.id);
   const isCompared = isInCompare(product.id);
 
-  // Compute discount percentage if oldPrice exists
+  // Discount badge renders ONLY from real data: oldPrice > price.
   const discountPercent =
     product.oldPrice && product.oldPrice > product.price
       ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
       : null;
 
-  // Rocket line installment monthly estimate (approx price / 6)
-  const monthlyInstallment = product.price ? Math.round(product.price / 6) : 0;
+  useEffect(() => {
+    if (addState !== 'loading') return;
+    const timer = setTimeout(() => setAddState('added'), 240);
+    return () => clearTimeout(timer);
+  }, [addState]);
+
+  useEffect(() => {
+    if (addState !== 'added') return;
+    const timer = setTimeout(() => setAddState('idle'), 1200);
+    return () => clearTimeout(timer);
+  }, [addState]);
 
   const handleCopyCode = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -68,15 +103,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.stopPropagation();
     addItem(product, 1);
     showCartToast(product, 1);
-    // Tactile checkmark confirmation flash on the button
-    setJustAdded(true);
+    setAddState('loading');
   };
-
-  useEffect(() => {
-    if (!justAdded) return;
-    const timer = setTimeout(() => setJustAdded(false), 1200);
-    return () => clearTimeout(timer);
-  }, [justAdded]);
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -86,9 +114,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
     const added = toggleWishlist(product);
     if (added) {
-      showToast('Ավելացվեց սիրվածների ցանկում', product.title);
+      showToast(TEXT.T_FAV_ADDED, product.title);
     } else {
-      showToast('Հեռացվեց սիրվածների ցանկից', product.title);
+      showToast(TEXT.T_FAV_REMOVED, product.title);
     }
   };
 
@@ -99,27 +127,24 @@ export default function ProductCard({ product }: ProductCardProps) {
     showToast(res.message, product.title);
   };
 
-  // WhatsApp inquiry URL for hidden price / custom order
-  const whatsappUrl = `https://wa.me/37495530435?text=${encodeURIComponent(
-    `Բարև ձեզ, ինձ հետաքրքրում է այս ապրանքի գինը և առկայությունը՝ ${product.title} (կոդ ԿՈԴ: ${product.code}) Մելքումովի 40/1 սրահում:`
+  // WhatsApp inquiry URL (hidden-price / custom-order path)
+  const whatsappUrl = `https://wa.me/${SHOWROOM_INFO.phoneIntl}?text=${encodeURIComponent(
+    TEXT.WA_HEAD + product.title + TEXT.WA_MID + product.code + TEXT.WA_TAIL + SHOWROOM_INFO.address + TEXT.WA_END,
   )}`;
 
-  // Micro-spec pills: Material, Warranty, Connection size (from product.specs)
-  const specPills = ['Նյութ', 'Երաշխիք', 'Միացում']
-    .map((key) => {
-      const entry = Object.entries(product.specs).find(
-        ([k]) => k.toLowerCase() === key.toLowerCase()
-      );
-      if (!entry) return null;
-      const value = entry[1].replace(/\s*\(.*?\)\s*/g, '').trim();
-      return { label: value.length > 20 ? `${value.slice(0, 19)}…` : value };
-    })
-    .filter((pill): pill is { label: string } => pill !== null);
+  // Image badges: maximum TWO total — discount first, then one status
+  // (showroom availability, falling back to the CAD indicator).
+  const statusBadge = product.inStock
+    ? 'stock'
+    : resolveImageUrl(product.blueprintImage)
+      ? 'cad'
+      : null;
+  const badgeCount = (discountPercent ? 1 : 0) + (statusBadge ? 1 : 0);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 hover:-translate-y-1.5 hover:shadow-2xl hover:border-blue-400/50 transition-all duration-300 ease-out flex flex-col justify-between group relative overflow-hidden">
-      {/* Top Image Container: Ice-white pedestal */}
-      <div className="relative aspect-square bg-[#F8FAFC] overflow-hidden m-1.5 sm:m-2 rounded-xl">
+    <div className="card-lux rounded-card flex flex-col h-full group relative overflow-hidden">
+      {/* 1. Pedestal image area: fixed square, contained product, zero crop */}
+      <div className="relative aspect-square bg-canvas overflow-hidden m-1.5 sm:m-2 rounded-control">
         <Link
           href={`/product/${product.slug}`}
           className="block w-full h-full cursor-pointer focus:outline-hidden"
@@ -128,196 +153,171 @@ export default function ProductCard({ product }: ProductCardProps) {
           <ProductImage
             src={product.images[0]}
             alt={product.title}
-            className="w-full h-full"
-            imgClassName="scale-[1.02] group-hover:scale-[1.06] transition-transform duration-500 ease-out"
+            className="w-full h-full bg-canvas"
+            imgClassName="object-contain p-3 group-hover:scale-[1.03] transition-transform duration-hover ease-precision"
           />
         </Link>
 
-        {/* Top Floating Overlay Controls */}
+        {/* 2. Badges (max 2) + quick actions */}
         <div className="absolute top-2 left-2 right-2 flex items-start justify-between pointer-events-none gap-1 z-10">
-          {/* Left: Badges */}
           <div className="flex flex-col gap-1 items-start">
             {discountPercent ? (
-              <span className="px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg bg-rose-600 text-white font-extrabold text-[10px] sm:text-[11px] tracking-tight shadow-md shimmer-glint">
+              <span className="px-2 py-0.5 rounded-full bg-danger text-white font-bold text-xs tabular-nums leading-tight">
                 -{discountPercent}%
               </span>
             ) : null}
 
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full glass-surface text-slate-800 text-[9px] sm:text-[10px] font-bold shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-beacon shrink-0"></span>
-              <span className="hidden xs:inline">Առկա է</span>
-            </span>
+            {badgeCount < 2 && statusBadge === 'stock' ? (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full glass-surface text-body text-xs font-semibold leading-tight">
+                {/* Static dot — no ambient pulse on cards */}
+                <span className="w-2 h-2 rounded-full bg-success shrink-0" aria-hidden="true"></span>
+                <span>{TEXT.L_IN_STOCK}</span>
+              </span>
+            ) : null}
+
+            {badgeCount < 2 && statusBadge === 'cad' ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ink/90 text-white text-xs font-mono font-medium leading-tight">
+                <Layers className="w-3 h-3" aria-hidden="true" />
+                CAD
+              </span>
+            ) : null}
           </div>
 
-          {/* Right: Wishlist & Compare Buttons */}
+          {/* Wishlist & Compare (44px hit areas) */}
           <div className="flex flex-col gap-1 pointer-events-auto">
-            <motion.button
+            <button
               type="button"
-              whileTap={{ scale: 0.85 }}
               onClick={handleToggleWishlist}
-              title={isWishlisted ? 'Հեռացնել սիրվածներից' : 'Ավելացնել սիրվածներում'}
-              aria-label="Wishlist toggle"
-              className={`w-9 h-9 sm:w-10 sm:h-10 min-h-[44px] min-w-[44px] rounded-full flex items-center justify-center shadow-md glass-surface transition-all cursor-pointer ${
-                isWishlisted
-                  ? 'bg-rose-50 text-rose-500 border-rose-200 shadow-rose-200/50'
-                  : 'hover:bg-white text-slate-600 hover:text-rose-500 border-white/80'
-              } ${isHeartPopping ? 'animate-heart-pop' : ''}`}
+              title={isWishlisted ? TEXT.T_REMOVE_FAV : TEXT.T_ADD_FAV}
+              aria-label={isWishlisted ? TEXT.T_REMOVE_FAV : TEXT.T_ADD_FAV}
+              className={`w-11 h-11 rounded-full flex items-center justify-center shadow-e1 glass-surface transition-colors duration-hover ease-precision cursor-pointer ${
+ isWishlisted
+ ? 'bg-surface text-danger'
+ : 'text-body hover:bg-surface hover:text-ink'
+ } ${isHeartPopping ? 'animate-heart-pop' : ''}`}
             >
               <Heart
-                className={`w-3.5 h-3.5 transition-colors ${
-                  isWishlisted ? 'fill-rose-500 text-rose-500 drop-shadow-[0_0_6px_rgba(244,63,94,0.6)]' : ''
-                }`}
+                className={`w-4 h-4 ${isWishlisted ? 'fill-accent text-accent' : ''}`}
                 aria-hidden="true"
               />
-            </motion.button>
+            </button>
 
-            <motion.button
+            <button
               type="button"
-              whileTap={{ scale: 0.85 }}
               onClick={handleToggleCompare}
-              title={isCompared ? 'Հեռացնել համեմատությունից' : 'Համեմատել'}
-              aria-label="Compare toggle"
-              className={`w-9 h-9 sm:w-10 sm:h-10 min-h-[44px] min-w-[44px] rounded-full flex items-center justify-center shadow-md glass-surface transition-all cursor-pointer ${
-                isCompared
-                  ? 'bg-blue-50 text-blue-600 border-blue-300 shadow-blue-200/50'
-                  : 'hover:bg-white text-slate-600 hover:text-blue-600 border-white/80'
-              }`}
+              title={isCompared ? TEXT.T_REMOVE_CMP : TEXT.T_COMPARE}
+              aria-label={isCompared ? TEXT.T_REMOVE_CMP : TEXT.T_COMPARE}
+              className={`w-11 h-11 rounded-full flex items-center justify-center shadow-e1 glass-surface transition-colors duration-hover ease-precision cursor-pointer ${
+ isCompared
+ ? 'bg-surface text-accent'
+ : 'text-body hover:bg-surface hover:text-ink'
+ }`}
             >
-              <ArrowLeftRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </motion.button>
+              <ArrowLeftRight className="w-4 h-4" aria-hidden="true" />
+            </button>
           </div>
         </div>
-
-        {/* CAD Blueprint indicator badge if a real scheme image is available */}
-        {resolveImageUrl(product.blueprintImage) && (
-          <div className="absolute bottom-2 right-2 pointer-events-none">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0F172A]/90 backdrop-blur-md text-blue-300 text-[9px] sm:text-[10px] font-mono font-bold shadow-xs">
-              <Layers className="w-3 h-3 text-blue-400" aria-hidden="true" />
-              CAD
-            </span>
-          </div>
-        )}
       </div>
 
-      {/* Info Body Area */}
-      <div className="p-2.5 sm:p-4 pt-0 sm:pt-1 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
+      {/* 3. Info body: brand → title → code chip → price → CTA (equal heights) */}
+      <div className="p-3 sm:p-4 pt-0 sm:pt-1 flex-1 flex flex-col justify-between space-y-2">
         <div className="space-y-1">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 truncate">
+          <div className="flex items-center justify-between text-xs min-h-[1rem]">
+            <span className="text-xs font-semibold text-muted truncate">
               {product.brand}
             </span>
             {product.rating ? (
-              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-amber-500 shrink-0">
-                <Star className="w-3 h-3 fill-amber-400 text-amber-400" aria-hidden="true" />
-                <span className="text-slate-800 tabular-nums">{product.rating}</span>
+              <div className="flex items-center gap-1 text-xs font-semibold text-body shrink-0 tabular-nums">
+                <Star className="w-3.5 h-3.5 fill-ink text-ink" aria-hidden="true" />
+                <span>{product.rating}</span>
               </div>
             ) : null}
           </div>
 
           <Link
             href={`/product/${product.slug}`}
-            className="font-semibold sm:font-bold text-[#0F172A] text-xs sm:text-sm leading-snug hover:text-blue-600 transition-colors line-clamp-2 min-h-[2.4rem] sm:min-h-[2.5rem] block cursor-pointer"
+            className="font-semibold text-ink text-sm sm:text-base leading-snug hover:text-accent transition-colors duration-hover ease-precision line-clamp-2 min-h-[2.5rem] block cursor-pointer"
           >
             {displayTitle(product.title)}
           </Link>
 
-          {/* SKU chip */}
+          {/* Code chip - customer-facing label is always "Kod" (TEXT.L_CODE) */}
           <div className="pt-0.5 flex items-center justify-between gap-1.5">
-            <div className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-slate-200 text-slate-800 font-mono text-[10px] font-medium shadow-2xs truncate">
-              <span className="text-slate-400 text-[9px]">ԿՈԴ:</span>
-              <span className="text-slate-900 font-bold">{product.code}</span>
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-control bg-canvas border border-line font-mono text-xs text-ink tabular-nums truncate">
+              <span className="text-muted">{TEXT.L_CODE}</span>
+              <span className="font-bold">{product.code}</span>
             </div>
 
             <button
               type="button"
               onClick={handleCopyCode}
-              title="Պատճենել Կոդ"
-              className="hidden sm:inline-flex min-h-[30px] px-1.5 py-0.5 items-center gap-1 text-[10px] font-semibold text-slate-600 hover:text-blue-700 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-md transition-colors cursor-pointer active:scale-95 shrink-0 btn-tactile"
+              title={TEXT.T_COPY_CODE}
+              aria-label={`${TEXT.T_COPY_CODE} ${product.code}`}
+              className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center gap-1 text-xs font-semibold text-muted hover:text-accent rounded-control transition-colors duration-hover cursor-pointer active:scale-[0.98]"
             >
               {copied ? (
-                <>
-                  <Check className="w-3 h-3 text-blue-600" aria-hidden="true" />
-                  <span className="text-blue-700 font-bold">Կոպի</span>
-                </>
+                <Check className="w-4 h-4 text-accent" aria-hidden="true" />
               ) : (
-                <>
-                  <Copy className="w-3 h-3 text-slate-400" aria-hidden="true" />
-                  <span>Կոդ</span>
-                </>
+                <Copy className="w-4 h-4" aria-hidden="true" />
               )}
+              <span className="sr-only">{TEXT.T_COPY_CODE}</span>
             </button>
           </div>
-
-          {/* Micro-spec pills: Material / Warranty / Connection */}
-          {specPills.length > 0 && (
-            <div className="flex flex-wrap gap-1 pt-0.5">
-              {specPills.map((pill) => (
-                <span
-                  key={pill.label}
-                  className="px-1.5 py-0.5 rounded-md bg-[#F8FAFC] border border-slate-200 text-[9px] sm:text-[10px] font-semibold text-slate-600 truncate max-w-[110px]"
-                >
-                  {pill.label}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* Configurable Price Architecture & Rocket Line Badge */}
-        <div className="pt-2 sm:pt-3 border-t border-slate-100 space-y-2">
-          {product.price && product.price > 0 ? (
-            <>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <div className="text-sm sm:text-lg font-bold sm:font-extrabold text-[#0F172A] tabular-nums tracking-tight truncate">
-                    {formatAMD(product.price)}
-                  </div>
-                  {product.oldPrice && (
-                    <div className="text-[10px] sm:text-xs text-slate-400 line-through tabular-nums -mt-0.5 truncate">
-                      {formatAMD(product.oldPrice)}
-                    </div>
-                  )}
+        {/* 4. Price block (visual anchor) + CTA. Installments are only shown
+            when a real installment field exists in product data — currently
+            none does, so no financing claim is rendered. */}
+        <div className="pt-2 border-t border-line flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            {product.price > 0 ? (
+              <>
+                <div className="text-lg font-bold text-ink tabular-nums tracking-tight">
+                  {formatAMD(product.price)}
                 </div>
+                {product.oldPrice ? (
+                  <div className="text-sm text-muted line-through tabular-nums truncate">
+                    {formatAMD(product.oldPrice)}
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <div className="text-sm font-semibold text-body">{TEXT.L_PRICE_ASK}</div>
+            )}
+          </div>
 
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  aria-label={`Ավելացնել ${product.title} զամբյուղ`}
-                  className={`w-full sm:w-auto min-h-[44px] sm:min-w-[104px] px-2.5 sm:px-3.5 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer shrink-0 btn-tactile shimmer-glint ${
-                    justAdded ? 'bg-emerald-600 hover:bg-emerald-600 shadow-emerald-500/30' : 'bg-[#0F172A] hover:bg-[#2563EB]'
-                  }`}
-                >
-                  {justAdded ? (
-                    <Check className="w-4 h-4 text-white animate-check-pop" aria-hidden="true" />
-                  ) : (
-                    <ShoppingBag className="w-4 h-4 text-blue-400" aria-hidden="true" />
-                  )}
-                  <span className="whitespace-nowrap">
-                    {justAdded ? 'Ավելացված' : 'Ավելացնել'}
-                  </span>
-                </button>
-              </div>
-
-              {/* Rocket Line Installment Badge */}
-              <div className="flex items-center gap-1.5 text-[10px] text-blue-700 bg-blue-50/80 px-2 py-1.5 rounded-lg border border-blue-200/80 font-semibold tabular-nums">
-                <Zap className="w-3 h-3 text-blue-600 shrink-0 fill-blue-600 animate-pulse" />
-                <span>Rocket Line՝ սկսած {formatAMD(monthlyInstallment)}/ամս</span>
-              </div>
-            </>
+          {product.inStock ? (
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              aria-label={`${TEXT.L_ADD} ${product.title}` /* zambyugh */}
+              className={`w-full sm:w-auto min-h-[44px] sm:min-w-[120px] px-3 py-2 rounded-control text-white text-sm font-semibold transition-colors duration-hover ease-precision flex items-center justify-center gap-1.5 cursor-pointer shrink-0 active:scale-[0.98] ${
+ addState === 'added'
+ ? 'bg-success'
+ : 'bg-ink hover:bg-accent'
+ }`}
+            >
+              {addState === 'loading' ? (
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              ) : addState === 'added' ? (
+                <Check className="w-4 h-4 animate-check-pop" aria-hidden="true" />
+              ) : (
+                <ShoppingBag className="w-4 h-4" aria-hidden="true" />
+              )}
+              <span className="whitespace-nowrap">
+                {addState === 'loading' ? TEXT.L_ADDING : addState === 'added' ? TEXT.L_ADDED : TEXT.L_ADD}
+              </span>
+            </button>
           ) : (
-            /* Hidden or Null Price: Ask Price / Custom Order WhatsApp button */
-            <div className="space-y-2">
-              <div className="text-xs font-bold text-slate-700">Գինը՝ ըստ հարցման</div>
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full min-h-[40px] py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer btn-tactile"
-              >
-                <MessageCircle className="w-4 h-4 animate-bounce" />
-                <span>Հարցնել գինը WhatsApp-ով</span>
-              </a>
-            </div>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto min-h-[44px] sm:min-w-[120px] px-3 py-2 rounded-control bg-surface border border-line text-body text-sm font-semibold hover:border-line-strong hover:text-ink transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+            >
+              <MessageCircle className="w-4 h-4" aria-hidden="true" />
+              <span className="whitespace-nowrap">{TEXT.L_ASK}</span>
+            </a>
           )}
         </div>
       </div>

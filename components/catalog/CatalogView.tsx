@@ -223,22 +223,22 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
       <div className="space-y-6">
         {/* Breadcrumbs & Catalog Title Header */}
         <div className="space-y-3">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500">
-            <Link href="/" className="hover:text-blue-600 transition-colors">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-muted">
+            <Link href="/" className="hover:text-accent transition-colors">
               Գլխավոր
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
-            <span className="text-[#0F172A] font-bold">
+            <ChevronRight className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
+            <span className="text-ink font-bold">
               {activeCategory ? activeCategory.title : 'Ամբողջ Կատալոգ'}
             </span>
           </nav>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-4xl font-black text-[#0F172A] tracking-tight">
+              <h1 className="text-2xl sm:text-4xl font-bold text-ink tracking-tight">
                 {activeCategory ? activeCategory.title : 'Ցուցասրահի Ամբողջ Կատալոգ'}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              <p className="text-xs sm:text-sm text-muted mt-1">
                 {activeCategory
                   ? `${activeCategory.itemCount} պրեմիում տեսականի առկա է Մելքումովի 40/1 սրահում`
                   : 'Գնե՛ք հատով՝ մեծածախի արժեքով: Պաշտոնական 1-5 տարվա երաշխիք:'}
@@ -250,25 +250,25 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
               <button
                 type="button"
                 onClick={() => setIsMobileDrawerOpen(true)}
-                className="lg:hidden min-h-[44px] px-4 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-bold flex items-center gap-2 shadow-sm cursor-pointer btn-tactile"
+                className="lg:hidden min-h-[44px] px-4 py-2.5 rounded-control bg-ink text-white text-xs font-bold flex items-center gap-2 shadow-e1 cursor-pointer btn-tactile"
               >
-                <SlidersHorizontal className="w-4 h-4 text-blue-400" aria-hidden="true" />
+                <SlidersHorizontal className="w-4 h-4 text-accent" aria-hidden="true" />
                 <span>Ֆիլտրեր</span>
                 {activeFilterCount > 0 && (
-                  <span className="w-5 h-5 rounded-full bg-[#2563EB] text-white text-[10px] flex items-center justify-center font-black">
+                  <span className="w-5 h-5 rounded-full bg-accent text-white text-xs flex items-center justify-center font-bold">
                     {activeFilterCount}
                   </span>
                 )}
               </button>
 
-              <div className="relative flex min-w-0 items-center gap-2 bg-white border border-[#E2E8F0] rounded-xl px-3 py-2 shadow-2xs">
-                <ArrowUpDown className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
-                <span className="text-xs font-semibold text-slate-600 hidden sm:inline">Դասավորել՝</span>
+              <div className="relative flex min-w-0 items-center gap-2 bg-white border border-line rounded-control px-3 py-2 shadow-e1">
+                <ArrowUpDown className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
+                <span className="text-xs font-semibold text-body hidden sm:inline">Դասավորել՝</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as 'popular' | 'price-asc' | 'price-desc')}
                   aria-label="Դասավորել ըստ"
-                  className="min-w-0 max-w-[8rem] truncate bg-transparent text-xs font-bold text-[#0F172A] focus:outline-hidden cursor-pointer"
+                  className="min-w-0 max-w-[8rem] truncate bg-transparent text-xs font-bold text-ink focus:outline-hidden cursor-pointer"
                 >
                   <option value="popular">Նախընտրելի / Հանրաճանաչ</option>
                   <option value="price-asc">Գնով՝ Աճող</option>
@@ -277,16 +277,16 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
               </div>
 
               {/* View Switcher Toggle */}
-              <div className="flex items-center bg-white border border-[#E2E8F0] rounded-xl p-1 shadow-2xs">
+              <div className="flex items-center bg-white border border-line rounded-control p-1 shadow-e1">
                 <button
                   type="button"
                   onClick={() => setViewMode('gallery')}
                   title="Վիզուալ Ցանց (Gallery)"
-                  className={`p-2 rounded-lg transition-colors cursor-pointer btn-tactile ${
-                    viewMode === 'gallery'
-                      ? 'bg-[#0F172A] text-white shadow-xs'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
+                  className={`p-2 rounded-card transition-colors cursor-pointer btn-tactile ${
+ viewMode === 'gallery'
+ ? 'bg-ink text-white shadow-e1'
+ : 'text-muted hover:text-ink hover:bg-canvas'
+ }`}
                 >
                   <LayoutGrid className="w-4 h-4" />
                 </button>
@@ -294,11 +294,11 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   type="button"
                   onClick={() => setViewMode('compact')}
                   title="Կոմպակտ Աղյուսակ վարպետների համար (Compact)"
-                  className={`p-2 rounded-lg transition-colors cursor-pointer btn-tactile ${
-                    viewMode === 'compact'
-                      ? 'bg-[#0F172A] text-white shadow-xs'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
+                  className={`p-2 rounded-card transition-colors cursor-pointer btn-tactile ${
+ viewMode === 'compact'
+ ? 'bg-ink text-white shadow-e1'
+ : 'text-muted hover:text-ink hover:bg-canvas'
+ }`}
                 >
                   <Rows className="w-4 h-4" />
                 </button>
@@ -309,26 +309,26 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
           {/* Active Filter Chips Bar */}
           {activeFilterCount > 0 && (
             <div className="flex items-center gap-2 flex-wrap pt-2">
-              <span className="text-xs text-slate-500 font-semibold">Ակտիվ ֆիլտրեր.</span>
+              <span className="text-xs text-muted font-semibold">Ակտիվ ֆիլտրեր.</span>
               {filters.category && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-card bg-accent/5 border border-accent/15 text-accent-hover text-xs font-bold">
                   Բաժին: {activeCategory?.title}
                   <button
                     type="button"
                     onClick={() => setFilters((p) => ({ ...p, category: null }))}
-                    className="hover:text-blue-950 cursor-pointer"
+                    className="hover:text-ink cursor-pointer"
                   >
                     <X className="w-3 h-3" aria-hidden="true" />
                   </button>
                 </span>
               )}
               {filters.inStockOnly && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-card bg-success/10 border border-success text-ink text-xs font-bold">
                   Առկա է սրահում
                   <button
                     type="button"
                     onClick={() => setFilters((p) => ({ ...p, inStockOnly: false }))}
-                    className="hover:text-emerald-950 cursor-pointer"
+                    className="hover:text-ink cursor-pointer"
                   >
                     <X className="w-3 h-3" aria-hidden="true" />
                   </button>
@@ -337,7 +337,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
               {filters.brands.map((b) => (
                 <span
                   key={b}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-card bg-canvas border border-line text-ink text-xs font-bold"
                 >
                   {b}
                   <button
@@ -345,7 +345,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                     onClick={() =>
                       setFilters((p) => ({ ...p, brands: p.brands.filter((x) => x !== b) }))
                     }
-                    className="hover:text-slate-950 cursor-pointer"
+                    className="hover:text-ink cursor-pointer"
                   >
                     <X className="w-3 h-3" aria-hidden="true" />
                   </button>
@@ -354,7 +354,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="text-xs font-bold text-rose-600 hover:text-rose-700 underline underline-offset-2 ml-1 cursor-pointer"
+                className="text-xs font-bold text-danger hover:text-danger underline underline-offset-2 ml-1 cursor-pointer"
               >
                 Մաքրել բոլորը
               </button>
@@ -365,7 +365,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
         {/* Main Grid & Desktop Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Desktop Sticky Sidebar */}
-          <aside className="hidden lg:block lg:col-span-3 sticky top-[calc(var(--topbar-h)+var(--header-h)+1rem)] bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-xs max-h-[calc(100dvh-var(--topbar-h)-var(--header-h)-2rem)] overflow-y-auto overscroll-contain">
+          <aside className="hidden lg:block lg:col-span-3 sticky top-[calc(var(--topbar-h)+var(--header-h)+1rem)] bg-white p-5 rounded-panel border border-line shadow-e1 max-h-[calc(100dvh-var(--topbar-h)-var(--header-h)-2rem)] overflow-y-auto overscroll-contain">
             {!isMounted || isLoading ? (
               <CatalogFilterSkeleton />
             ) : (
@@ -389,22 +389,22 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
             ) : filteredProducts.length === 0 ? (
               /* Smart Zero-State Recovery */
               <div className="space-y-10">
-                <div className="bg-white rounded-3xl border border-[#E2E8F0] p-10 sm:p-14 text-center max-w-xl mx-auto space-y-5 shadow-xs">
-                  <div className="w-20 h-20 rounded-3xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-inner">
+                <div className="bg-white rounded-panel border border-line p-10 sm:p-14 text-center max-w-xl mx-auto space-y-5 shadow-e1">
+                  <div className="w-20 h-20 rounded-panel bg-accent/5 text-accent flex items-center justify-center mx-auto">
                     <PackageOpen className="w-10 h-10" aria-hidden="true" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-lg sm:text-xl font-black text-[#0F172A] tracking-tight">
+                    <h3 className="text-lg sm:text-xl font-bold text-ink tracking-tight">
                       Նշված ֆիլտրերով ապրանքներ չեն գտնվել
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+                    <p className="text-xs sm:text-sm text-muted max-w-md mx-auto leading-relaxed">
                       Ցավոք, ընտրված պարամետրերին համապատասխան ապրանքներ այս պահին առկա չեն: Խնդրում ենք մաքրել ֆիլտրերը կամ դիտել առաջարկվող այլընտրանքները:
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={resetFilters}
-                    className="min-h-[48px] px-8 py-3 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white text-xs font-extrabold uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer inline-flex items-center gap-2 btn-tactile"
+                    className="min-h-[48px] px-8 py-3 rounded-control bg-ink hover:bg-accent-hover text-white text-xs font-semibold transition-all shadow-e1 active:scale-98 cursor-pointer inline-flex items-center gap-2 btn-tactile"
                   >
                     <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     <span>Մաքրել Բոլոր Ֆիլտրերը</span>
@@ -412,8 +412,8 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                 </div>
 
                 {/* 4-Item Fallback Alternatives Grid */}
-                <div className="space-y-4 pt-4 border-t border-slate-200">
-                  <h4 className="text-sm font-black text-[#0F172A] uppercase tracking-wider">
+                <div className="space-y-4 pt-4 border-t border-line">
+                  <h4 className="text-sm font-bold text-ink ">
                     Առաջարկվող Այլընտրանքներ Մելքումովի 40/1 Սրահից
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -425,10 +425,10 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
               </div>
             ) : viewMode === 'compact' ? (
               /* Compact Contractor Table View */
-              <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-x-auto">
+              <div className="bg-white rounded-panel border border-line shadow-e1 overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+                    <tr className="bg-canvas border-b border-line-strong text-muted font-bold text-xs">
                       <th className="p-3.5">Կոդ / SKU</th>
                       <th className="p-3.5">Ապրանք</th>
                       <th className="p-3.5 hidden sm:table-cell">Բնութագիր (Specs)</th>
@@ -437,7 +437,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                       <th className="p-3.5 text-right">Գործողություն</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-line">
                     {filteredProducts.map((product) => {
                       // Contractor-core specs first: Diameter / Material / Cartridge, padded with Warranty
                       const specPriority = ['Միացում', 'Նյութ', 'Քարտրիջ', 'Երաշխիք'];
@@ -453,8 +453,8 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                         .map(([k, v]) => `${k}: ${v}`)
                         .join(' · ');
                       return (
-                        <tr key={product.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="p-3.5 font-mono font-bold text-blue-600 whitespace-nowrap">
+                        <tr key={product.id} className="hover:bg-canvas/60 transition-colors">
+                          <td className="p-3.5 font-mono font-bold text-accent whitespace-nowrap">
                             {product.code}
                           </td>
                           <td className="p-3.5">
@@ -462,25 +462,25 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                               <ProductImage
                                 src={product.images[0]}
                                 alt={product.title}
-                                className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 shrink-0"
+                                className="w-10 h-10 rounded-card bg-canvas border border-line shrink-0"
                               />
                               <Link
                                 href={`/product/${product.slug}`}
-                                className="font-bold text-[#0F172A] hover:text-blue-600 line-clamp-1 transition-colors"
+                                className="font-bold text-ink hover:text-accent line-clamp-1 transition-colors"
                               >
                                 {product.title}
                               </Link>
                             </div>
                           </td>
-                          <td className="p-3.5 hidden sm:table-cell text-slate-500 text-[11px] truncate max-w-xs">
+                          <td className="p-3.5 hidden sm:table-cell text-muted text-xs truncate max-w-xs">
                             {specSummary || product.categoryName}
                           </td>
-                          <td className="p-3.5 font-black text-[#0F172A] tabular-nums whitespace-nowrap">
+                          <td className="p-3.5 font-bold text-ink tabular-nums whitespace-nowrap">
                             {formatAMD(product.price)}
                           </td>
                           <td className="p-3.5 hidden md:table-cell whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-success bg-success/10 px-2 py-0.5 rounded border border-success">
+                              <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
                               Առկա ({product.stockQuantity})
                             </span>
                           </td>
@@ -492,7 +492,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                                 showCartToast(product, 1);
                                 openDrawer();
                               }}
-                              className="px-3.5 py-2 rounded-xl bg-[#0F172A] hover:bg-blue-600 text-white font-bold text-xs shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5 btn-tactile"
+                              className="px-3.5 py-2 rounded-control bg-ink hover:bg-accent text-white font-bold text-xs shadow-e1 transition-all cursor-pointer inline-flex items-center gap-1.5 btn-tactile"
                             >
                               <ShoppingCart className="w-3.5 h-3.5" />
                               <span>Ավելացնել</span>
@@ -520,22 +520,22 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
       {isMobileDrawerOpen && (
         <div className="fixed inset-0 z-sheet lg:hidden overflow-hidden">
           <div
-            className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            className="fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
             onClick={() => setIsMobileDrawerOpen(false)}
             aria-hidden="true"
           />
 
-          <div className="fixed inset-x-0 bottom-0 max-h-[85dvh] bg-white rounded-t-3xl shadow-2xl flex flex-col z-10 animate-in slide-in-from-bottom duration-300">
+          <div className="fixed inset-x-0 bottom-0 max-h-[85dvh] bg-white rounded-t-3xl shadow-e2 flex flex-col z-10 animate-in slide-in-from-bottom duration-300">
             {/* iOS Drag Handle */}
             <div className="flex justify-center pt-3 pb-1">
-              <div className="w-12 h-1.5 rounded-full bg-slate-300" />
+              <div className="w-12 h-1.5 rounded-full bg-line-strong" />
             </div>
 
             {/* Header */}
-            <div className="px-5 py-3 border-b border-[#E2E8F0] flex items-center justify-between shrink-0">
+            <div className="px-5 py-3 border-b border-line flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-blue-600" />
-                <h3 className="font-black text-sm uppercase tracking-wider text-[#0F172A]">
+                <SlidersHorizontal className="w-4 h-4 text-accent" />
+                <h3 className="font-bold text-sm text-ink">
                   Ֆիլտրեր {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
                 </h3>
               </div>
@@ -544,7 +544,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   <button
                     type="button"
                     onClick={resetFilters}
-                    className="text-xs font-bold text-rose-600 hover:text-rose-700 px-2 py-1"
+                    className="text-xs font-bold text-danger hover:text-danger px-2 py-1"
                   >
                     Մաքրել
                   </button>
@@ -552,7 +552,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                 <button
                   type="button"
                   onClick={() => setIsMobileDrawerOpen(false)}
-                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 btn-tactile"
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-body rounded-control hover:bg-canvas btn-tactile"
                   aria-label="Փակել"
                 >
                   <X className="w-5 h-5" />
@@ -576,11 +576,11 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
             </div>
 
             {/* Sticky Bottom Apply CTA with Safe Area */}
-            <div className="p-4 border-t border-[#E2E8F0] bg-white shrink-0 pb-[calc(env(safe-area-inset-bottom,16px)+16px)]">
+            <div className="p-4 border-t border-line bg-white shrink-0 pb-[calc(env(safe-area-inset-bottom,16px)+16px)]">
               <button
                 type="button"
                 onClick={() => setIsMobileDrawerOpen(false)}
-                className="w-full min-h-[48px] py-3 rounded-2xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 text-white text-xs font-bold uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer btn-tactile"
+                className="w-full min-h-[48px] py-3 rounded-panel bg-ink hover:bg-accent active:scale-98 text-white text-xs font-bold shadow-e1 flex items-center justify-center gap-2 transition-all cursor-pointer btn-tactile"
               >
                 <span>Կիրառել Ֆիլտրերը {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}</span>
               </button>

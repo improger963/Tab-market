@@ -7,51 +7,49 @@
 
 import React from 'react';
 
+/**
+ * Mirrors the exact ProductCard anatomy and dimensions so the grid swaps in
+ * with zero layout shift: pedestal → brand/title → code chip → price + CTA.
+ */
 export default function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 flex flex-col justify-between overflow-hidden shadow-xs animate-shimmer">
-      {/* Top Image Pedestal Placeholder (aspect-square reserved to match ProductCard → zero CLS) */}
-      <div className="relative aspect-square bg-slate-100 m-1.5 sm:m-2 rounded-xl overflow-hidden">
-        {/* Top-left badge placeholder */}
-        <div className="absolute top-2 left-2 w-12 h-5 bg-slate-200 rounded-md" />
-        {/* Top-right icon placeholders */}
+    <div className="rounded-card border border-line bg-surface shadow-e1 flex flex-col h-full overflow-hidden">
+      {/* Image pedestal (aspect-square reserved to match ProductCard → zero CLS) */}
+      <div className="relative aspect-square bg-canvas m-1.5 sm:m-2 rounded-control overflow-hidden">
+        {/* Badge placeholder */}
+        <div className="absolute top-2 left-2 w-12 h-5 skeleton-block rounded-full" />
+        {/* Quick-action placeholders (44px targets) */}
         <div className="absolute top-2 right-2 flex flex-col gap-1">
-          <div className="w-8 h-8 rounded-full bg-slate-200" />
-          <div className="w-8 h-8 rounded-full bg-slate-200" />
+          <div className="w-11 h-11 rounded-full skeleton-block" />
+          <div className="w-11 h-11 rounded-full skeleton-block" />
         </div>
       </div>
 
-      {/* Info Body Area */}
-      <div className="p-2.5 sm:p-4 pt-0 sm:pt-1 flex-1 flex flex-col justify-between space-y-3">
+      {/* Info body */}
+      <div className="p-3 sm:p-4 pt-0 sm:pt-1 flex-1 flex flex-col justify-between space-y-2">
         <div className="space-y-2">
-          {/* Brand & Rating */}
-          <div className="flex items-center justify-between">
-            <div className="w-16 h-3 skeleton-block rounded" />
-            <div className="w-10 h-3 skeleton-block rounded" />
+          {/* Brand & rating row */}
+          <div className="flex items-center justify-between min-h-[1rem]">
+            <div className="w-16 h-3 skeleton-block rounded-full" />
+            <div className="w-10 h-3 skeleton-block rounded-full" />
           </div>
 
-          {/* Title lines */}
-          <div className="space-y-1.5 pt-1">
-            <div className="w-full h-4 skeleton-block rounded" />
-            <div className="w-2/3 h-4 skeleton-block rounded" />
+          {/* Title lines (2 clamped rows = min-h-[2.5rem]) */}
+          <div className="space-y-1.5 pt-1 min-h-[2.5rem]">
+            <div className="w-full h-4 skeleton-block rounded-full" />
+            <div className="w-2/3 h-4 skeleton-block rounded-full" />
           </div>
 
-          {/* SKU chip placeholder */}
-          <div className="w-24 h-5 skeleton-block rounded-md mt-1" />
+          {/* Code chip placeholder */}
+          <div className="w-24 h-5 skeleton-block rounded-control mt-1" />
         </div>
 
-        {/* Price & Action Bar */}
-        <div className="pt-2 sm:pt-3 border-t border-slate-100 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <div className="w-24 h-5 skeleton-block rounded" />
-              <div className="w-16 h-3 skeleton-block rounded" />
-            </div>
-            <div className="w-10 h-10 sm:w-24 sm:h-10 rounded-xl skeleton-block shrink-0" />
+        {/* Price + CTA row, matching the card's footer layout */}
+        <div className="pt-2 border-t border-line flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-1">
+            <div className="w-24 h-5 skeleton-block rounded-full" />
           </div>
-
-          {/* Rocket line estimate pill placeholder */}
-          <div className="w-full h-6 skeleton-block rounded-lg" />
+          <div className="w-full sm:w-[120px] h-11 rounded-control skeleton-block shrink-0" />
         </div>
       </div>
     </div>

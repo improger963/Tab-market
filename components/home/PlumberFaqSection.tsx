@@ -58,14 +58,14 @@ export default function PlumberFaqSection() {
   return (
     <section className="space-y-6 pt-4">
       <div className="text-center max-w-2xl mx-auto space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-extrabold uppercase tracking-widest">
-          <Wrench className="w-3.5 h-3.5 text-blue-600" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/5 border border-accent/15 text-accent-hover text-xs font-semibold ">
+          <Wrench className="w-3.5 h-3.5 text-accent" />
           <span>Մասնագիտական Խորհրդատվություն</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
           Հաճախ Տրվող Հարցեր և Վարպետի Խորհուրդներ
         </h2>
-        <p className="text-xs sm:text-sm text-slate-500">
+        <p className="text-xs sm:text-sm text-muted">
           Մելքումովի 40/1 սրահի փորձառու ինժեներների պատասխանները սանտեխնիկայի ընտրության և տեղադրման մասին
         </p>
       </div>
@@ -77,34 +77,34 @@ export default function PlumberFaqSection() {
           return (
             <div
               key={faq.id}
-              className="border border-[#E2E8F0] rounded-2xl overflow-hidden bg-white shadow-xs transition-all"
+              className="border border-line rounded-panel overflow-hidden bg-white shadow-e1 transition-all"
             >
               <button
                 type="button"
                 onClick={() => toggle(faq.id)}
-                className="w-full p-4 sm:p-5 flex items-center justify-between text-left gap-4 hover:bg-slate-50/80 transition-colors cursor-pointer select-none"
+                className="w-full p-4 sm:p-5 flex items-center justify-between text-left gap-4 hover:bg-line/60 transition-colors cursor-pointer select-none"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                      isOpen ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
+                    className={`w-9 h-9 rounded-control flex items-center justify-center shrink-0 transition-colors ${
+ isOpen ? 'bg-accent text-white' : 'bg-canvas text-body'
+ }`}
                   >
                     <Icon className="w-4 h-4" />
                   </div>
-                  <span className="font-bold text-xs sm:text-sm text-[#0F172A] leading-snug">
+                  <span className="font-bold text-xs sm:text-sm text-ink leading-snug">
                     {faq.question}
                   </span>
                 </div>
                 <ChevronDown
-                  className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
-                    isOpen ? 'rotate-180 text-blue-600' : ''
-                  }`}
+                  className={`w-4 h-4 text-muted shrink-0 transition-transform duration-200 ${
+ isOpen ? 'rotate-180 text-accent' : ''
+ }`}
                 />
               </button>
 
               {isOpen && (
-                <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-[#F8FAFC]">
+                <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-body leading-relaxed border-t border-canvas bg-canvas">
                   {faq.answer}
                 </div>
               )}

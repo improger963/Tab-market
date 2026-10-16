@@ -28,21 +28,21 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
   if (displayItems.length === 0) return null;
 
   return (
-    <section className="space-y-6 pt-10 border-t border-[#E2E8F0]">
+    <section className="space-y-6 pt-10 border-t border-line">
       <div className="flex items-center justify-between">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-[#2563EB]">
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent">
             <History className="w-3.5 h-3.5" />
             <span>Դուք Վերջերս Դիտել Եք</span>
           </div>
-          <h2 className="text-2xl font-black text-[#0F172A] tracking-tight mt-0.5">
+          <h2 className="text-2xl font-bold text-ink tracking-tight mt-0.5">
             Վերջին Դիտված Ապրանքները
           </h2>
         </div>
 
         <Link
           href="/catalog"
-          className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+          className="text-xs font-bold text-accent hover:text-accent-hover flex items-center gap-1 transition-colors"
         >
           <span>Կատալոգ</span>
           <ArrowRight className="w-3.5 h-3.5" />

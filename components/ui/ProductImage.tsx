@@ -46,7 +46,7 @@ export default function ProductImage({
         role="img"
         aria-label={placeholderLabel ?? alt}
         className={cn(
-          'flex items-center justify-center bg-slate-50 text-slate-300',
+          'flex items-center justify-center bg-canvas text-faint',
           className,
         )}
       >
@@ -59,7 +59,7 @@ export default function ProductImage({
   }
 
   return (
-    <div className={cn('overflow-hidden bg-slate-50', className)}>
+    <div className={cn('overflow-hidden bg-canvas', className)}>
       <img
         src={resolved}
         alt={alt}

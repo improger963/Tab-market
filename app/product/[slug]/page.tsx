@@ -52,23 +52,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="container-lux py-6 sm:py-8 space-y-8 sm:space-y-12">
       {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-500 overflow-x-auto no-scrollbar whitespace-nowrap py-0.5">
-        <Link href="/" className="hover:text-blue-600 transition-colors shrink-0">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted overflow-x-auto no-scrollbar whitespace-nowrap py-0.5">
+        <Link href="/" className="hover:text-accent transition-colors shrink-0">
           Գլխավոր
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-        <Link href="/catalog" className="hover:text-blue-600 transition-colors shrink-0">
+        <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" />
+        <Link href="/catalog" className="hover:text-accent transition-colors shrink-0">
           Կատալոգ
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" />
         <Link
           href={`/category/${product.categorySlug}`}
-          className="hover:text-blue-600 transition-colors shrink-0"
+          className="hover:text-accent transition-colors shrink-0"
         >
           {product.categoryName}
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-        <span className="text-[#0F172A] font-bold truncate max-w-xs sm:max-w-md shrink-0">
+        <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" />
+        <span className="text-ink font-bold truncate max-w-xs sm:max-w-md shrink-0">
           {product.title}
         </span>
       </nav>
@@ -92,15 +92,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Description & Dossier Tabs: 3rd on mobile, underneath gallery on desktop in left 7 cols */}
         <div className="lg:col-span-7 space-y-6 sm:space-y-8">
           {/* Description Block */}
-          <div className="bg-white p-5 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-4">
-            <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
+          <div className="bg-white p-5 sm:p-8 rounded-panel border border-line shadow-e1 space-y-4">
+            <h2 className="text-base font-semibold text-ink">
               Ապրանքի Նկարագրություն
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-body leading-relaxed font-normal">
               {product.shortDesc}
             </p>
-            <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 text-xs text-blue-950 flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-panel bg-accent/5 border border-accent/15 text-xs text-ink flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-accent shrink-0 mt-0.5" />
               <span>
                 Այս մոդելն անցել է գործարանային 10 բար հիդրավլիկ ճնշման փորձարկում և ունի պաշտոնական
                 երաշխիքային կտրոն:
@@ -118,12 +118,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       {/* Related Products Section (2-col mobile, 4-col desktop) */}
       {relatedProducts.length > 0 && (
-        <section className="space-y-6 pt-10 border-t border-[#E2E8F0]">
+        <section className="space-y-6 pt-10 border-t border-line">
           <div>
-            <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563EB]">
+            <span className="text-xs font-semibold text-accent">
               Առաջարկներ
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight mt-0.5">
+            <h2 className="text-xl sm:text-2xl font-bold text-ink tracking-tight mt-0.5">
               Նմանատիպ Ապրանքներ Այս Բաժնում
             </h2>
           </div>

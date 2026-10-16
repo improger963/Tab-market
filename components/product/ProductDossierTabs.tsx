@@ -5,8 +5,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import React, { useRef, useState } from 'react';
 import {
   FileCheck2,
   Ruler,
@@ -17,193 +16,271 @@ import {
   ZoomIn,
 } from 'lucide-react';
 import { Product } from '@/types';
-import { resolveImageUrl } from '@/lib/config';
+import { DELIVERY_CONFIG, SHOWROOM_INFO, resolveImageUrl } from '@/lib/config';
 import { displayTitle } from '@/lib/utils';
+import { HY } from '@/lib/copy/hy';
 
 interface ProductDossierTabsProps {
   product: Product;
 }
 
 /**
- * Single source of truth for the full technical specifications table,
- * CAD blueprint and delivery/installation guidance (below-the-fold tab section).
+ * Canonical strings — byte-verbatim from git HEAD unless noted; sentence
+ * case applied by flipping non-initial capitals via the canonical letter
+ * pairs only (0532->0562, 054f->057f).
+ */
+const TEXT = {
+  TAB_SPECS: '\u054f\u0565\u056d\u0576\u056b\u056f\u0561\u056f\u0561\u0576 \u0562\u0576\u0578\u0582\u0569\u0561\u0563\u056b\u0580', // head L47, 2nd word sentence-cased
+  TAB_BLUEPRINT: '\u0533\u056e\u0561\u0563\u056b\u0580 \u0587 \u0549\u0561\u0583\u057d\u0565\u0580 (\u0574\u0574)', // head L48
+  TAB_DELIVERY: '\u0531\u057c\u0561\u0584\u0578\u0582\u0574 \u0587 \u057f\u0565\u0572\u0561\u0564\u0580\u0578\u0582\u0574', // head L49, 3rd word sentence-cased
+  BLUEPRINT_OPEN: '\u0532\u0561\u0581\u0565\u056c CAD \u0563\u056e\u0561\u0563\u056b\u0580\u0568 \u056d\u0578\u0577\u0578\u0580\u0561\u0581\u057e\u0561\u056e', // head L116
+  CAD_GTSAGIR: 'CAD \u0563\u056e\u0561\u0563\u056b\u0580', // head L170
+  CLICK_TO_ZOOM: '\u054d\u0565\u0572\u0574\u0565\u055b\u0584 \u056d\u0578\u0577\u0578\u0580\u0561\u0581\u0576\u0565\u056c\u0578\u0582 \u0570\u0561\u0574\u0561\u0580', // head L126
+  CHSAPER_MM: 'CAD \u0549\u0561\u0583\u057d\u0565\u0580 (\u0574\u0574)', // head L184
+  DELIVERY_HEAD: '\u0531\u057c\u0561\u0584\u0578\u0582\u0574 \u0535\u0580\u0587\u0561\u0576\u0578\u0582\u0574.', // head L136
+  DELIVERY_BODY_HEAD: '\u053c\u0580\u056b\u057e \u0561\u0576\u057e\u0573\u0561\u0580\u055d \u0570\u0565\u0576\u0581 \u057a\u0561\u057f\u057e\u0565\u0580\u056b \u0585\u0580\u0568 (\u056a\u0561\u0574\u0568 ', // head L136-137 prefix; times appended from SHOWROOM_INFO.hours
+  DELIVERY_BODY_TAIL: '\u056b\u0581 ', // "-its'" (between the two times, head L137)
+  DELIVERY_BODY_END: '):',
+  PICKUP_HEAD: '\u054e\u0565\u0580\u0581\u0576\u0565\u056c \u057d\u0580\u0561\u0570\u056b\u0581.', // head L143
+  PICKUP_TAIL: '\u057d\u0580\u0561\u0570\u056b\u0581\u055d \u0561\u0576\u057e\u0573\u0561\u0580:', // "srakhits', anvar" — address renders from SHOWROOM_INFO.address
+  INSTALL_HEAD: '\u054f\u0565\u0572\u0561\u0564\u0580\u0574\u0561\u0576 \u056d\u0578\u0580\u0570\u0578\u0582\u0580\u0564.', // head L150
+  INSTALL_BODY: '\u0544\u0578\u0576\u057f\u0561\u056a\u056b\u0581 \u0561\u057c\u0561\u057b \u056d\u0578\u0580\u0570\u0578\u0582\u0580\u0564 \u0567 \u057f\u0580\u057e\u0578\u0582\u0574 \u056c\u057e\u0561\u0576\u0561\u056c \u057b\u0580\u0561\u0563\u056e\u0565\u0580\u0568\u055d \u056d\u0578\u0572\u0578\u057e\u0561\u056f\u056b \u0561\u0572\u0562\u056b\u0581 \u0584\u0561\u0580\u057f\u0580\u056b\u057b\u0568 \u057a\u0561\u0577\u057f\u057a\u0561\u0576\u0565\u056c\u0578\u0582 \u0570\u0561\u0574\u0561\u0580:', // head L150-151 joined
+  NO_DATA: '\u054f\u057e\u0575\u0561\u056c\u0576\u0565\u0580 \u0579\u056b \u0563\u057f\u0576\u057e\u0565\u056c', // composed from HEAD word forms: "Tvyalner chi gtstvets" (both verbatim in HEAD)
+} as const;
+
+type TabId = 'specs' | 'blueprint' | 'delivery';
+
+/**
+ * Single source of truth for the full technical specifications table, CAD
+ * blueprint and delivery/installation guidance (below-the-fold tabs).
+ *
+ * - Accessible tablist: roles, aria-selected/controls, roving tabindex with
+ *   Arrow/Home/End keyboard navigation.
+ * - Panel switch animates opacity only (no x-slide => no perceived layout
+ *   shift) and respects prefers-reduced-motion via the global CSS block.
+ * - Delivery facts render from DELIVERY_CONFIG / SHOWROOM_INFO; the free
+ *   Yerevan line hides if the config ever stops granting it.
  */
 export default function ProductDossierTabs({ product }: ProductDossierTabsProps) {
-  const [dossierTab, setDossierTab] = useState<'specs' | 'blueprint' | 'delivery'>('specs');
+  const [dossierTab, setDossierTab] = useState<TabId>('specs');
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const tabListRef = useRef<HTMLDivElement>(null);
 
   const hasBlueprint = !!resolveImageUrl(product.blueprintImage);
   // Only render spec rows that carry real customer data; the internal SKU row
-  // (stored under key "code") is surfaced once as a "Կոդ" chip elsewhere and
+  // (stored under key "code") is surfaced once as a "Kod" chip elsewhere and
   // must not appear in the technical table.
   const specRows = Object.entries(product.specs).filter(
     ([key, value]) =>
-      key !== 'code' &&
-      typeof value === 'string' &&
-      value.trim().length > 0,
+      key !== 'code' && typeof value === 'string' && value.trim().length > 0,
   );
 
-  const tabs = [
-    { id: 'specs', label: 'Տեխնիկական Բնութագիր', Icon: FileCheck2 },
-    ...(hasBlueprint ? [{ id: 'blueprint', label: 'Գծագիր և Չափսեր (մմ)', Icon: Ruler }] : []),
-    { id: 'delivery', label: 'Առաքում և Տեղադրում', Icon: Wrench },
-  ] as const;
+  // Delivery window copy is assembled from the real published hours so it
+  // stays true if config ever changes (falls back silently if hours removed).
+  const dayHours = SHOWROOM_INFO.hours[1] ?? SHOWROOM_INFO.hours[0];
+  const deliveryHours = dayHours
+    ? `${dayHours.open}-${TEXT.DELIVERY_BODY_TAIL}${dayHours.close}`
+    : '';
+
+  const tabs: { id: TabId; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
+    { id: 'specs', label: TEXT.TAB_SPECS, Icon: FileCheck2 },
+    ...(hasBlueprint ? [{ id: 'blueprint' as TabId, label: TEXT.TAB_BLUEPRINT, Icon: Ruler }] : []),
+    { id: 'delivery', label: TEXT.TAB_DELIVERY, Icon: Wrench },
+  ];
+
+  const onTabListKeyDown = (e: React.KeyboardEvent) => {
+    const idx = tabs.findIndex((t) => t.id === dossierTab);
+    let next = -1;
+    if (e.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+    else if (e.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = tabs.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    setDossierTab(tabs[next].id);
+    const btn = tabListRef.current?.querySelector<HTMLButtonElement>(
+      `[data-tab-id="${tabs[next].id}"]`
+    );
+    btn?.focus();
+  };
+
+  const tabBase =
+    'btn-tactile inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-control px-3.5 py-2 text-xs font-semibold transition-colors duration-hover ease-precision focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2';
 
   return (
-    <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-xs overflow-hidden">
-      {/* Tab Headers */}
-      <div className="flex items-center gap-1 p-1.5 bg-[#F8FAFC] border-b border-[#E2E8F0] overflow-x-auto no-scrollbar">
-        {tabs.map((tab) => {
-          const TabIcon = tab.Icon;
-          const active = dossierTab === tab.id;
+    <div className="overflow-hidden rounded-panel border border-line bg-surface shadow-e1">
+      {/* Tab list */}
+      <div
+        ref={tabListRef}
+        role="tablist"
+        aria-label={TEXT.TAB_SPECS}
+        onKeyDown={onTabListKeyDown}
+        className="no-scrollbar flex items-center gap-1 overflow-x-auto border-b border-line bg-canvas p-1.5"
+      >
+        {tabs.map(({ id, label, Icon }) => {
+          const active = dossierTab === id;
           return (
             <button
-              key={tab.id}
+              key={id}
               type="button"
-              onClick={() => setDossierTab(tab.id as 'specs' | 'blueprint' | 'delivery')}
-              className={`min-h-[40px] px-3.5 py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer btn-tactile whitespace-nowrap ${
-                active
-                  ? 'bg-[#0F172A] text-white shadow-md'
-                  : 'text-slate-600 hover:text-[#0F172A] hover:bg-white'
-              }`}
+              role="tab"
+              data-tab-id={id}
+              id={`pdp-tab-${id}`}
+              aria-selected={active}
+              aria-controls={`pdp-panel-${id}`}
+              tabIndex={active ? 0 : -1}
+              onClick={() => setDossierTab(id)}
+              className={`${tabBase} ${
+ active
+ ? 'bg-ink text-white'
+ : 'text-body hover:bg-surface hover:text-ink'
+ }`}
             >
-              <TabIcon className={`w-3.5 h-3.5 ${active ? 'text-blue-400' : 'text-blue-600'}`} />
-              <span>{tab.label}</span>
-              {/* Mechanical switch LED: lights up when the tab is engaged */}
-              <span
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                  active ? 'bg-blue-400 scale-100 shadow-[0_0_8px_rgba(96,165,250,0.9)]' : 'bg-slate-300 scale-50'
-                }`}
+              <Icon
+                className={`h-3.5 w-3.5 ${active ? 'text-white' : 'text-accent'}`}
                 aria-hidden="true"
               />
+              <span>{label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Tab Panels */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={dossierTab}
-          initial={{ opacity: 0, x: 8 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -8 }}
-          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="p-5 sm:p-6"
-        >
-          {dossierTab === 'specs' && (
-            <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden">
-              <table className="w-full text-xs text-left">
-                <tbody className="divide-y divide-[#E2E8F0]">
+      {/* Panels (opacity-only switch, fixed mount => no layout shift) */}
+      <div key={dossierTab} className="animate-fade-in p-5 sm:p-6" role="presentation">
+        {dossierTab === 'specs' && (
+          <div
+            role="tabpanel"
+            id="pdp-panel-specs"
+            aria-labelledby="pdp-tab-specs"
+            tabIndex={0}
+            className="overflow-hidden rounded-card border border-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+          >
+            {specRows.length > 0 ? (
+              <table className="w-full text-left text-xs">
+                <tbody className="divide-y divide-line">
                   {specRows.map(([key, value]) => (
-                    <tr key={key} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-2.5 px-4 font-semibold text-slate-600 bg-slate-50/50 w-2/5">
+                    <tr key={key} className="transition-colors duration-hover hover:bg-canvas/60">
+                      <td className="w-2/5 bg-canvas px-4 py-2.5 font-semibold text-body">
                         {key}
                       </td>
-                      <td className="py-2.5 px-4 text-[#0F172A] font-bold">{value}</td>
+                      <td className="px-4 py-2.5 font-bold text-ink">{value}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
-          )}
+            ) : (
+              /* EMPTY state: clear message, honest about missing data. */
+              <p className="p-4 text-xs text-muted">{TEXT.NO_DATA}</p>
+            )}
+          </div>
+        )}
 
-          {dossierTab === 'blueprint' && hasBlueprint && (
+        {dossierTab === 'blueprint' && hasBlueprint && (
+          <div
+            role="tabpanel"
+            id="pdp-panel-blueprint"
+            aria-labelledby="pdp-tab-blueprint"
+            tabIndex={0}
+          >
             <button
               type="button"
               onClick={() => setIsZoomOpen(true)}
-              className="group w-full relative bg-[#0F172A] rounded-2xl overflow-hidden flex items-center justify-center min-h-[240px] cursor-zoom-in"
-              aria-label="Բացել CAD գծագիրը խոշորացված"
+              className="group relative flex min-h-[240px] w-full cursor-zoom-in items-center justify-center overflow-hidden rounded-card bg-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+              aria-label={TEXT.BLUEPRINT_OPEN}
             >
               <img
                 src={resolveImageUrl(product.blueprintImage)!}
-                alt={`${displayTitle(product.title)} CAD գծագիր`}
-                className="max-h-[280px] w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                alt={`${displayTitle(product.title)} CAD \u0563\u056e\u0561\u0563\u056b\u0580`}
+                className="max-h-[280px] w-auto object-contain transition-transform duration-hover ease-precision group-hover:scale-[1.03]"
                 loading="lazy"
               />
-              <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 backdrop-blur-md text-blue-300 text-[10px] font-bold border border-white/20 transition-colors group-hover:bg-white/20 group-hover:text-blue-200">
-                <ZoomIn className="w-3.5 h-3.5 transition-transform duration-300 ease-out group-hover:scale-125 group-hover:rotate-[-6deg]" />
-                Սեղմե՛ք խոշորացնելու համար
+              <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-control border border-line/20 bg-ink/70 px-2.5 py-1.5 text-xs font-medium text-on-dark backdrop-blur-sm transition-colors duration-hover group-hover:bg-ink/85">
+                <ZoomIn className="h-3.5 w-3.5" aria-hidden="true" />
+                {TEXT.CLICK_TO_ZOOM}
               </span>
             </button>
-          )}
-
-          {dossierTab === 'delivery' && (
-            <div className="space-y-3 text-xs text-slate-700">
-              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200">
-                <Truck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                <p>
-                  <b className="text-[#0F172A]">Առաքում Երևանում.</b> Լրիվ անվճար՝ հենց
-                  պատվերի օրը (ժամը 10:00-ից 20:00):
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[#F8FAFC] border border-slate-200">
-                <MapPin className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                <p>
-                  <b className="text-[#0F172A]">Վերցնել սրահից.</b> ք. Երևան,
-                  Մելքումովի 40/1 սրահից՝ անվճար:
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-blue-50/70 border border-blue-200 text-blue-950">
-                <Wrench className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                <p>
-                  <b>Տեղադրման խորհուրդ.</b> Մոնտաժից առաջ խորհուրդ է տրվում լվանալ
-                  ջրագծերը՝ խողովակի աղբից քարտրիջը պաշտպանելու համար:
-                </p>
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
-
-      {/* CAD Zoom Spotlight Modal (click-to-zoom on blueprint tab) */}
-      <AnimatePresence>
-        {isZoomOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/80 backdrop-blur-sm"
-            onClick={() => setIsZoomOpen(false)}
-            role="dialog"
-            aria-modal="true"
-            aria-label="CAD գծագիր"
-          >
-            <motion.div
-              initial={{ scale: 0.94, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.94, opacity: 0 }}
-              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="relative max-w-3xl w-full bg-[#0F172A] rounded-3xl border border-slate-700 overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between p-4 border-b border-slate-700">
-                <div>
-                  <h4 className="font-bold text-sm text-white">{displayTitle(product.title)}</h4>
-                  <span className="font-mono text-blue-400 text-xs font-bold">
-                    Կոդ: {product.code} • CAD Չափսեր (մմ)
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsZoomOpen(false)}
-                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
-                  aria-label="Փակել"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="p-6 flex items-center justify-center min-h-[320px]">
-                <img
-                  src={resolveImageUrl(product.blueprintImage)!}
-                  alt={`${displayTitle(product.title)} CAD գծագիր խոշորացված`}
-                  className="max-h-[60dvh] w-auto object-contain"
-                />
-              </div>
-            </motion.div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+
+        {dossierTab === 'delivery' && (
+          <div
+            role="tabpanel"
+            id="pdp-panel-delivery"
+            aria-labelledby="pdp-tab-delivery"
+            tabIndex={0}
+            className="space-y-3 text-xs leading-relaxed text-body"
+          >
+              {DELIVERY_CONFIG.yerevanFreeAlways && (
+              <div className="flex items-start gap-2.5 rounded-card border border-line bg-canvas p-3">
+                <Truck className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+                <p>
+                  <b className="font-semibold text-ink">{TEXT.DELIVERY_HEAD}</b>{' '}
+                  {TEXT.DELIVERY_BODY_HEAD}
+                  {deliveryHours}
+                  {TEXT.DELIVERY_BODY_END}
+                </p>
+              </div>
+            )}
+            <div className="flex items-start gap-2.5 rounded-card border border-line bg-canvas p-3">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              <p>
+                <b className="font-semibold text-ink">{TEXT.PICKUP_HEAD}</b>{' '}
+                {SHOWROOM_INFO.address} {TEXT.PICKUP_TAIL}
+              </p>
+            </div>
+            <div className="flex items-start gap-2.5 rounded-card border border-line bg-canvas p-3">
+              <Wrench className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              <p>
+                <b className="font-semibold text-ink">{TEXT.INSTALL_HEAD}</b>{' '}
+                {TEXT.INSTALL_BODY}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* CAD spotlight modal */}
+      {isZoomOpen && hasBlueprint && (
+        <div
+          className="fixed inset-0 z-overlay flex animate-fade-in items-center justify-center bg-ink/80 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label={TEXT.CAD_GTSAGIR}
+          onClick={() => setIsZoomOpen(false)}
+        >
+          <div
+            className="w-full max-w-3xl overflow-hidden rounded-panel border border-line/20 bg-ink shadow-e2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-line/20 p-4">
+              <div>
+                <h4 className="text-sm font-semibold text-white">
+                  {displayTitle(product.title)}
+                </h4>
+                <span className="font-mono text-xs font-semibold text-on-dark-muted tabular-nums">
+                  {HY.CODE_COLON} {product.code} · {TEXT.CHSAPER_MM}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsZoomOpen(false)}
+                aria-label={HY.CLOSE}
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control text-on-dark-muted transition-colors duration-hover hover:bg-surface/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="flex min-h-[320px] items-center justify-center p-6">
+              <img
+                src={resolveImageUrl(product.blueprintImage)!}
+                alt={`${displayTitle(product.title)} CAD \u0563\u056e\u0561\u0563\u056b\u0580 \u056d\u0578\u0577\u0578\u0580\u0561\u0581\u057e\u0561\u056e`}
+                className="max-h-[60dvh] w-auto object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useRef } from 'react';
+import type { ComponentType } from 'react';
 import Link from 'next/link';
 import {
   Droplets,
@@ -18,91 +18,85 @@ import {
   Grid,
   Layers,
   Filter,
+  ArrowRight,
 } from 'lucide-react';
 import { categories } from '@/data/categories';
+import { resolveImageUrl } from '@/lib/config';
+import { HY } from '@/lib/copy/hy';
+
+/**
+ * Category stories rail — built from the category data (any count).
+ * Anatomy per spec: 64–72px circle with real image or neutral icon
+ * placeholder, 1–2 line label below, scroll-snap momentum rail with hidden
+ * scrollbar and edge fade, >=44px touch targets, focus-visible ring.
+ * No rainbow gradients, no rotate/tilt decoration, no invented counts.
+ */
+
+const ICONS: Record<string, ComponentType<{ className?: string }>> = {
+  Droplets,
+  ShowerHead,
+  Box,
+  CircleDot,
+  Archive,
+  Sparkles,
+  Flame,
+  Grid,
+  Layers,
+  Filter,
+};
 
 export default function CategoryStories() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const getCategoryIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'Droplets':
-        return <Droplets className="w-6 h-6 text-blue-600" />;
-      case 'ShowerHead':
-        return <ShowerHead className="w-6 h-6 text-blue-600" />;
-      case 'Box':
-        return <Box className="w-6 h-6 text-blue-600" />;
-      case 'CircleDot':
-        return <CircleDot className="w-6 h-6 text-blue-600" />;
-      case 'Archive':
-        return <Archive className="w-6 h-6 text-blue-600" />;
-      case 'Sparkles':
-        return <Sparkles className="w-6 h-6 text-blue-600" />;
-      case 'Flame':
-        return <Flame className="w-6 h-6 text-blue-600" />;
-      case 'Grid':
-        return <Grid className="w-6 h-6 text-blue-600" />;
-      case 'Layers':
-        return <Layers className="w-6 h-6 text-blue-600" />;
-      case 'Filter':
-        return <Filter className="w-6 h-6 text-blue-600" />;
-      default:
-        return <Droplets className="w-6 h-6 text-blue-600" />;
-    }
-  };
-
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between px-1">
+    <section aria-label={HY.FAST_SEARCH} className="space-y-4">
+      <div className="flex items-end justify-between gap-4 px-1">
         <div>
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563EB]">
-            Արագ Որոնում
-          </span>
-          <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
-            10 Հիմնական Բաժիններ (Stories)
+          <span className="text-xs font-semibold text-accent">{HY.FAST_SEARCH}</span>
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-ink sm:text-2xl">
+            {categories.length} {HY.MAIN_CATEGORIES}
           </h2>
         </div>
         <Link
           href="/catalog"
-          className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+          className="btn-tactile inline-flex min-h-[44px] items-center gap-1.5 rounded-control px-3 text-sm font-semibold text-accent transition-colors duration-hover ease-precision hover:text-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
         >
-          Բոլորը →
+          <span>{HY.ALL}</span>
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
 
-      {/* Horizontal Scrollable Instagram Stories Bar */}
-      <div
-        ref={scrollRef}
-        className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth py-3 px-1 touch-pan-x overscroll-x-contain"
-      >
-        {categories.map((cat) => (
-          <Link
-            key={cat.id}
-            href={`/category/${cat.slug}`}
-            className="flex flex-col items-center gap-2 group shrink-0 cursor-pointer w-20 sm:w-24 text-center btn-tactile"
-          >
-            {/* Circular Bubble with Active Royal Blue Glowing Ring & Gentle Tilt */}
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-0.5 bg-gradient-to-tr from-blue-600 via-indigo-500 to-sky-400 group-hover:scale-110 group-hover:rotate-[-3deg] transition-all duration-300 shadow-md group-hover:shadow-blue-500/30">
-              <div className="w-full h-full rounded-full bg-white flex items-center justify-center p-2 border-2 border-white group-hover:border-blue-100 transition-colors">
-                <img
-                  src={cat.image}
-                  alt={cat.title}
-                  className="absolute inset-1 rounded-full w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover opacity-85 group-hover:opacity-100 transition-opacity"
-                />
-                <div className="absolute inset-1 rounded-full bg-[#0F172A]/30 group-hover:bg-transparent transition-colors flex items-center justify-center">
-                  <div className="w-8 h-8 rounded-full bg-white/95 backdrop-blur-xs flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
-                    {getCategoryIcon(cat.icon)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Category Title */}
-            <span className="text-[11px] sm:text-xs font-bold text-[#0F172A] group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
-              {cat.title}
-            </span>
-          </Link>
-        ))}
+      {/* Momentum-scrollable rail: snap, hidden scrollbar, edge fade. */}
+      <div className="edge-fade no-scrollbar -mx-1 snap-x overflow-x-auto overscroll-x-contain px-1 py-2">
+        <ul className="flex items-start gap-3 sm:gap-4">
+          {categories.map((cat) => {
+            const img = resolveImageUrl(cat.image);
+            const Icon = ICONS[cat.icon] ?? Droplets;
+            return (
+              <li key={cat.id} className="snap-center shrink-0">
+                <Link
+                  href={`/category/${cat.slug}`}
+                  className="group btn-tactile flex w-20 flex-col items-center gap-2 rounded-card px-1 py-1 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 sm:w-[76px]"
+                >
+                  {/* Pedestal circle: real image or neutral icon placeholder. */}
+                  <span className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-line bg-canvas ring-1 ring-inset ring-white/70 transition-[transform,border-color] duration-hover ease-precision group-hover:border-line-strong group-hover:scale-[1.04] sm:h-[72px] sm:w-[72px]">
+                    {img ? (
+                      <img
+                        src={img}
+                        alt=""
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Icon className="h-6 w-6 text-accent" aria-hidden="true" />
+                    )}
+                  </span>
+                  <span className="line-clamp-2 min-h-[2rem] text-xs font-medium leading-tight text-body transition-colors duration-hover group-hover:text-ink">
+                    {cat.title}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );

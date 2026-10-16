@@ -7,53 +7,63 @@
 
 import React from 'react';
 import { MapPin, Clock, Phone, MessageCircle, Truck } from 'lucide-react';
+import { DELIVERY_CONFIG, SHOWROOM_INFO } from '@/lib/config';
+import { HY } from '@/lib/copy/hy';
 
+/**
+ * Global utility bar. Every fact (address, hours, phone, WhatsApp, free
+ * delivery) renders from lib/config — nothing is hardcoded here. The free
+ * delivery chip hides itself as soon as DELIVERY_CONFIG.yerevanFreeAlways
+ * stops being true, so the bar can never lie about delivery.
+ */
 export default function TopBar() {
   return (
-    <div className="bg-[#0B192C] text-slate-200 text-xs border-b border-slate-800 transition-colors select-none h-[var(--topbar-h)] flex items-center">
+    <div className="flex h-[var(--topbar-h)] select-none items-center border-b border-white/10 bg-ink text-on-dark transition-colors">
       {/* Fixed-height, single line. Left group truncates, right group is shrink-proof. */}
-      <div className="container-lux flex items-center justify-between gap-3 min-w-0">
+      <div className="container-lux flex min-w-0 items-center justify-between gap-3">
         {/* Left: showroom address (always) + delivery/hours (secondary, hidden on small) */}
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex min-w-0 items-center gap-2">
           <a
-            href="https://maps.google.com/?q=Yerevan+Melkumovi+40/1"
+            href={SHOWROOM_INFO.mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center self-stretch gap-1.5 min-w-0 rounded-lg hover:text-white transition-colors"
+            className="inline-flex self-stretch min-w-0 items-center gap-1.5 rounded-control font-medium text-white transition-colors duration-hover hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
-            <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-            <span className="truncate font-medium">Մելքումովի 40/1</span>
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-accent" aria-hidden="true" />
+            <span className="truncate">{SHOWROOM_INFO.address}</span>
           </a>
 
-          <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-blue-600/20 text-blue-300 border border-blue-400/30 text-[11px] font-extrabold tracking-wide shrink-0">
-            <Truck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-            <span>🚚 Անվճար Առաքում Երևանում</span>
-          </span>
+          {DELIVERY_CONFIG.yerevanFreeAlways ? (
+            <span className="hidden shrink-0 items-center gap-1.5 rounded-control border border-white/15 bg-white/10 px-2.5 py-0.5 text-xs font-semibold text-white md:inline-flex">
+              <Truck className="h-3.5 w-3.5 shrink-0 text-accent" aria-hidden="true" />
+              <span>{HY.FREE_DELIVERY_YEREVAN}</span>
+            </span>
+          ) : null}
 
-          <span className="hidden lg:inline-flex items-center gap-1.5 text-[11px] text-slate-300 font-medium shrink-0">
-            <Clock className="w-3.5 h-3.5 text-slate-400" />
-            <span>Երկ-Կիրակի՝ 10:00 - 20:00</span>
+          <span className="hidden shrink-0 items-center gap-1.5 text-xs font-medium text-on-dark lg:inline-flex">
+            <Clock className="h-3.5 w-3.5 text-on-dark-muted" aria-hidden="true" />
+            <span>{SHOWROOM_INFO.hoursLabel}</span>
           </span>
         </div>
 
         {/* Right: tappable phone (always) + WhatsApp (secondary, hidden on small) */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex shrink-0 items-center gap-3">
           <a
-            href="tel:095530435"
-            className="inline-flex items-center self-stretch gap-1.5 px-2 rounded-lg text-white hover:text-blue-300 font-bold transition-colors tabular-nums tracking-wider text-xs"
-            title="Զանգահարել 095 53-04-35"
+            href={`tel:+${SHOWROOM_INFO.phoneIntl}`}
+            className="inline-flex self-stretch items-center gap-1.5 rounded-control px-2 text-xs font-bold tabular-nums text-white transition-colors duration-hover hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            title={`${HY.CALL} ${SHOWROOM_INFO.phone}`}
           >
-            <Phone className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-            <span>095 53-04-35</span>
+            <Phone className="h-3.5 w-3.5 shrink-0 text-accent" aria-hidden="true" />
+            <span>{SHOWROOM_INFO.phone}</span>
           </a>
 
           <a
-            href="https://wa.me/37495530435"
+            href={`https://wa.me/${SHOWROOM_INFO.phoneIntl}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center self-stretch gap-1.5 px-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all text-[11px] tracking-wide shadow-xs"
+            className="btn-tactile hidden items-center gap-1.5 self-stretch rounded-full bg-success px-3 text-xs font-semibold text-white transition-colors duration-hover hover:bg-accent sm:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
-            <MessageCircle className="w-3.5 h-3.5 shrink-0" />
+            <MessageCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span>WhatsApp</span>
           </a>
         </div>

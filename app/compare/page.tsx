@@ -49,29 +49,29 @@ export default function ComparePage() {
   return (
     <div className="container-lux py-8 space-y-8 animate-in fade-in-50 duration-200">
       {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500">
-        <Link href="/" className="hover:text-blue-600 transition-colors">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-muted">
+        <Link href="/" className="hover:text-accent transition-colors">
           Գլխավոր
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <Link href="/catalog" className="hover:text-blue-600 transition-colors">
+        <ChevronRight className="w-3.5 h-3.5 text-muted" />
+        <Link href="/catalog" className="hover:text-accent transition-colors">
           Կատալոգ
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <span className="text-[#0F172A] font-bold">Ապրանքների Համեմատում</span>
+        <ChevronRight className="w-3.5 h-3.5 text-muted" />
+        <span className="text-ink font-bold">Ապրանքների Համեմատում</span>
       </nav>
 
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-line">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-[#2563EB] mb-1">
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent mb-1">
             <ArrowLeftRight className="w-3.5 h-3.5" />
             <span>Տեխնիկական Համեմատական Մատրիցա</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-[#0F172A] tracking-tight">
+          <h1 className="text-2xl sm:text-4xl font-bold text-ink tracking-tight">
             Ապրանքների Համեմատում
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-muted mt-1">
             {items.length > 0
               ? `Համեմատվում է ${items.length} ապրանք (առավելագույնը՝ 4)`
               : 'Համեմատության ցանկը դատարկ է:'}
@@ -80,12 +80,12 @@ export default function ComparePage() {
 
         {items.length > 0 && (
           <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/70 text-xs font-bold text-slate-700 cursor-pointer select-none transition-colors">
+            <label className="flex items-center gap-2 px-3.5 py-2 rounded-control bg-canvas hover:bg-line text-xs font-bold text-body cursor-pointer select-none transition-colors">
               <input
                 type="checkbox"
                 checked={highlightDifferences}
                 onChange={(e) => setHighlightDifferences(e.target.checked)}
-                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300 accent-[#2563EB]"
+                className="w-4 h-4 rounded text-accent focus:ring-accent border-line-strong accent-accent"
               />
               <span>Տարբերվող պարամետրերը</span>
             </label>
@@ -93,7 +93,7 @@ export default function ComparePage() {
             <button
               type="button"
               onClick={clearCompare}
-              className="min-h-[40px] px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="min-h-[40px] px-3.5 py-2 rounded-control bg-canvas hover:bg-line text-body font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Trash2 className="w-4 h-4" />
               <span>Մաքրել</span>
@@ -105,20 +105,20 @@ export default function ComparePage() {
       {/* Content */}
       {items.length === 0 ? (
         <div className="max-w-md mx-auto py-16 text-center space-y-5">
-          <div className="w-20 h-20 rounded-3xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-inner border border-blue-100">
+          <div className="w-20 h-20 rounded-panel bg-accent/5 text-accent flex items-center justify-center mx-auto border border-accent/15">
             <ArrowLeftRight className="w-10 h-10 stroke-[1.5]" />
           </div>
           <div className="space-y-1.5">
-            <h2 className="text-xl font-black text-[#0F172A] tracking-tight">
+            <h2 className="text-xl font-bold text-ink tracking-tight">
               Համեմատության ցանկը դատարկ է
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted leading-relaxed">
               Կատալոգում սեղմեք համեմատության կոճակը՝ մոդելների տեխնիկական պարամետրերը կողք-կողքի համեմատելու համար:
             </p>
           </div>
           <Link
             href="/catalog"
-            className="min-h-[48px] inline-flex items-center gap-2 px-8 py-3 rounded-2xl bg-[#0F172A] hover:bg-[#2563EB] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer"
+            className="min-h-[48px] inline-flex items-center gap-2 px-8 py-3 rounded-panel bg-ink hover:bg-accent text-white font-bold text-xs transition-all shadow-e1 active:scale-98 cursor-pointer"
           >
             <span>Անցնել Կատալոգ</span>
             <ArrowRight className="w-4 h-4 text-white" />
@@ -126,30 +126,30 @@ export default function ComparePage() {
         </div>
       ) : (
         /* Comparison Matrix Table */
-        <div className="border border-[#E2E8F0] rounded-3xl overflow-hidden bg-white shadow-xs">
+        <div className="border border-line rounded-panel overflow-hidden bg-white shadow-e1">
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-[#E2E8F0]">
-                  <th className="p-4 sm:p-5 w-48 min-w-[180px] font-extrabold uppercase tracking-wider text-slate-400 text-[11px] align-top">
+                <tr className="bg-canvas/80 border-b border-line">
+                  <th className="p-4 sm:p-5 w-48 min-w-[180px] font-semibold text-muted text-xs align-top">
                     Համեմատվող Մոդելներ
                   </th>
                   {items.map((product) => (
                     <th
                       key={product.id}
-                      className="p-4 sm:p-5 min-w-[240px] max-w-[280px] align-top relative border-l border-[#E2E8F0]"
+                      className="p-4 sm:p-5 min-w-[240px] max-w-[280px] align-top relative border-l border-line"
                     >
                       <button
                         type="button"
                         onClick={() => removeItem(product.id)}
                         title="Հեռացնել"
-                        className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
+                        className="absolute top-3 right-3 w-7 h-7 rounded-card bg-canvas hover:bg-line text-muted hover:text-ink flex items-center justify-center transition-colors cursor-pointer"
                       >
                         <X className="w-4 h-4" />
                       </button>
 
                       <div className="space-y-3">
-                        <div className="aspect-square w-32 h-32 rounded-2xl overflow-hidden bg-[#F8FAFC] border border-slate-200 mx-auto">
+                        <div className="aspect-square w-32 h-32 rounded-panel overflow-hidden bg-canvas border border-line-strong mx-auto">
                           <ProductImage
                             src={product.images[0]}
                             alt={product.title}
@@ -158,27 +158,27 @@ export default function ComparePage() {
                         </div>
 
                         <div>
-                          <span className="font-mono text-[10px] font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                          <span className="font-mono text-xs font-bold text-ink bg-canvas px-2 py-0.5 rounded border border-line-strong">
                             Կոդ: {product.code}
                           </span>
                           <Link
                             href={`/product/${product.slug}`}
-                            className="font-bold text-[#0F172A] text-xs block mt-1 hover:text-blue-600 line-clamp-2 leading-snug"
+                            className="font-bold text-ink text-xs block mt-1 hover:text-accent line-clamp-2 leading-snug"
                           >
                             {product.title}
                           </Link>
                         </div>
 
-                        <div className="text-base font-black text-[#0F172A] tabular-nums">
+                        <div className="text-base font-bold text-ink tabular-nums">
                           {formatAMD(product.price)}
                         </div>
 
                         <button
                           type="button"
                           onClick={() => handleAddToCart(product)}
-                          className="w-full min-h-[40px] px-3 py-2 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                          className="w-full min-h-[40px] px-3 py-2 rounded-control bg-ink hover:bg-accent text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-e1 active:scale-95"
                         >
-                          <ShoppingBag className="w-3.5 h-3.5 text-blue-400" />
+                          <ShoppingBag className="w-3.5 h-3.5 text-accent" />
                           <span>Զամբյուղ</span>
                         </button>
                       </div>
@@ -187,34 +187,34 @@ export default function ComparePage() {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-line">
                 {/* Brand Row */}
-                <tr className="hover:bg-slate-50/50">
-                  <td className="p-4 font-bold text-slate-700 bg-slate-50/60">Արտադրող Բրենդ</td>
+                <tr className="hover:bg-line/60">
+                  <td className="p-4 font-bold text-body bg-line/60">Արտադրող Բրենդ</td>
                   {items.map((p) => (
-                    <td key={p.id} className="p-4 font-bold text-[#0F172A] border-l border-slate-100">
+                    <td key={p.id} className="p-4 font-bold text-ink border-l border-canvas">
                       {p.brand}
                     </td>
                   ))}
                 </tr>
 
                 {/* Category Row */}
-                <tr className="hover:bg-slate-50/50">
-                  <td className="p-4 font-bold text-slate-700 bg-slate-50/60">Բաժին</td>
+                <tr className="hover:bg-line/60">
+                  <td className="p-4 font-bold text-body bg-line/60">Բաժին</td>
                   {items.map((p) => (
-                    <td key={p.id} className="p-4 text-slate-700 border-l border-slate-100">
+                    <td key={p.id} className="p-4 text-body border-l border-canvas">
                       {p.categoryName}
                     </td>
                   ))}
                 </tr>
 
                 {/* Showroom Stock Row */}
-                <tr className="hover:bg-slate-50/50">
-                  <td className="p-4 font-bold text-slate-700 bg-slate-50/60">Մելքումովի 40/1 Առկայություն</td>
+                <tr className="hover:bg-line/60">
+                  <td className="p-4 font-bold text-body bg-line/60">Մելքումովի 40/1 Առկայություն</td>
                   {items.map((p) => (
-                    <td key={p.id} className="p-4 border-l border-slate-100">
-                      <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700">
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <td key={p.id} className="p-4 border-l border-canvas">
+                      <span className="inline-flex items-center gap-1.5 font-bold text-success">
+                        <Check className="w-3.5 h-3.5 text-success" />
                         Առկա է ({p.stockQuantity} հատ)
                       </span>
                     </td>
@@ -233,22 +233,22 @@ export default function ComparePage() {
                   return (
                     <tr
                       key={specKey}
-                      className={`hover:bg-slate-50/50 ${
-                        isDifferent && highlightDifferences ? 'bg-amber-50/40' : ''
-                      }`}
+                      className={`hover:bg-line/60 ${
+ isDifferent && highlightDifferences ? 'bg-warning/10' : ''
+ }`}
                     >
-                      <td className="p-4 font-bold text-slate-700 bg-slate-50/60 flex items-center justify-between">
+                      <td className="p-4 font-bold text-body bg-line/60 flex items-center justify-between">
                         <span>{specKey}</span>
                         {isDifferent && highlightDifferences && (
-                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          <span className="w-2 h-2 rounded-full bg-warning" />
                         )}
                       </td>
                       {items.map((p) => (
                         <td
                           key={p.id}
-                          className={`p-4 border-l border-slate-100 text-slate-800 ${
-                            isDifferent && highlightDifferences ? 'font-bold' : ''
-                          }`}
+                          className={`p-4 border-l border-canvas text-ink ${
+ isDifferent && highlightDifferences ? 'font-bold' : ''
+ }`}
                         >
                           {p.specs[specKey] || '—'}
                         </td>

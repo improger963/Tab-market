@@ -5,218 +5,170 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'motion/react';
-import {
-  ArrowRight,
-  MapPin,
-  Sparkles,
-  ChevronLeft,
-  ChevronRight,
-  Flame,
-  Truck,
-  ShieldCheck,
-} from 'lucide-react';
+import { ArrowRight, Clock, MapPin, Phone, Store } from 'lucide-react';
+import { SHOWROOM_INFO, SITE_CLAIMS, isShowroomOpen } from '@/lib/config';
+import { HY } from '@/lib/copy/hy';
 
-interface HeroSlide {
-  id: number;
-  badge: string;
-  badgeIcon: React.ComponentType<{ className?: string }>;
-  titlePrefix: string;
-  titleHighlight: string;
-  description: string;
-  primaryCtaText: string;
-  primaryCtaLink: string;
-  secondaryCtaText: string;
-  bgImage: string;
-  stat: string;
-  statLabel: string;
-}
-
-const SLIDES: HeroSlide[] = [
-  {
-    id: 1,
-    badge: 'ԵՎՐՈՊԱԿԱՆ ՍՏԱՆԴԱՐՏ • ՈՒՂԻՂ ՆԵՐՄՈՒԾՈՂԻՑ',
-    badgeIcon: Sparkles,
-    titlePrefix: 'Որակյալ Սանտեխնիկա՝',
-    titleHighlight: 'Մեծածախի Արժեքով',
-    description:
-      'Եվրոպական ստանդարտի ծորակներ, ցնցուղային համակարգեր և լոգարանի կահույք՝ անմիջապես ներմուծողից։ Պաշտոնական երաշխիքով և անվճար առաքումով Երևանում։',
-    primaryCtaText: 'Դիտել Ամբողջ Տեսականին',
-    primaryCtaLink: '/catalog',
-    secondaryCtaText: 'Մեր Սրահը (Մելքումովի 40/1)',
-    bgImage:
-      'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=1600&q=85',
-    stat: 'Ուղիղ Ներմուծում',
-    statLabel: 'Առանց Վերավաճառողի',
-  },
-  {
-    id: 2,
-    badge: 'ՊԱՏՐԱՍՏԻ ԱՌԿԱ ՄԵՐ ՊԱՀԵՍՏՈՒՄ',
-    badgeIcon: Flame,
-    titlePrefix: 'Լոգարանի Պահարաններ և',
-    titleHighlight: 'LED Հայելիներ',
-    description:
-      'Խոնավակայուն կահույք, սենսորային տաքացվող հայելիներ և կախովի լվացարաններ՝ պատրաստի առկա մեր պահեստում։',
-    primaryCtaText: 'Ընտրել Պահարաններ',
-    primaryCtaLink: '/catalog',
-    secondaryCtaText: 'Մեր Սրահը (Մելքումովի 40/1)',
-    bgImage:
-      'https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=1600&q=85',
-    stat: 'Առկա Է Սրահում',
-    statLabel: 'Մելքումովի 40/1',
-  },
-  {
-    id: 3,
-    badge: '🚚 ԱՆՎՃԱՐ ԱՌԱՔՈՒՄ ԵՐԵՎԱՆՈՒՄ',
-    badgeIcon: Truck,
-    titlePrefix: 'Անվճար Առաքում Երևանում՝',
-    titleHighlight: 'Գնման Օրը',
-    description:
-      'Պատվիրեք առցանց կամ մոտեցեք Մելքումովի 40/1 սրահ։ Առաքիչը կզանգահարի մոտենալուց 30 րոպե առաջ։',
-    primaryCtaText: 'Իմանալ Ավելին',
-    primaryCtaLink: '/catalog',
-    secondaryCtaText: 'Մեր Սրահը (Մելքումովի 40/1)',
-    bgImage:
-      'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1600&q=85',
-    stat: '0 ֏',
-    statLabel: 'Առաքում Երևանում',
-  },
-];
-
+/**
+ * Hero — asymmetric, text-left / visual-right on desktop, stacked on mobile.
+ *
+ * Rules honoured here:
+ * - All copy renders from SITE_CLAIMS / HY only; badge and subtitle are
+ *   HIDDEN when the config value is empty (no invented marketing claims).
+ * - No auto-rotating carousel and no ambient animation: at most zero
+ *   continuous animations on this screen (the only beacon in the app is the
+ *   PDP WhatsApp button).
+ * - Showroom open/closed is computed client-side AFTER mount from real hours
+ *   in Asia/Yerevan (no hydration mismatch); the static hours line is the
+ *   server-rendered fallback.
+ * - Visual panel is the ice-chrome gradient placeholder — genuine showroom
+ *   photography must be supplied by the owner before any image replaces it
+ *   (no unrelated stock photos).
+ */
 export default function HeroBanner() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  // null = not computed yet (SSR + first paint) -> only static hours render.
+  const [openNow, setOpenNow] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
-    }, 6000);
-    return () => clearInterval(timer);
+    setOpenNow(isShowroomOpen());
   }, []);
 
-  const slide = SLIDES[currentSlide];
-  const BadgeIcon = slide.badgeIcon;
+  const headline = SITE_CLAIMS.heroTitlePrefix || SITE_CLAIMS.heroTitleHighlight;
+  const highlight =
+    SITE_CLAIMS.heroTitlePrefix && SITE_CLAIMS.heroTitleHighlight
+      ? SITE_CLAIMS.heroTitleHighlight
+      : '';
 
   return (
-    <div className="relative rounded-3xl overflow-hidden bg-[#0F172A] border border-slate-800 shadow-2xl min-h-[480px] sm:min-h-[520px] flex flex-col justify-between">
-      {/* Background Image with AnimatePresence */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={slide.id}
-          initial={{ opacity: 0, scale: 1.03 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.98 }}
-          transition={{ duration: 0.7, ease: 'easeInOut' }}
-          className="absolute inset-0 z-0"
-        >
-          <img
-            src={slide.bgImage}
-            alt={slide.titleHighlight}
-            className="w-full h-full object-cover opacity-45"
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A] via-[#0F172A]/80 to-[#0F172A]/40" />
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Slide Content */}
-      <div className="relative z-10 p-6 sm:p-12 lg:p-16 max-w-3xl space-y-6 my-auto">
-        {/* Top trust pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-mono font-bold tracking-wider backdrop-blur-md uppercase">
-          <BadgeIcon className="w-3.5 h-3.5 text-blue-400" />
-          <span>{slide.badge}</span>
-        </div>
-
-        {/* Headline */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.12] text-white">
-          {slide.titlePrefix}{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-300 to-white block sm:inline">
-            {slide.titleHighlight}
-          </span>
-        </h1>
-
-        {/* Subtitle */}
-        <p className="text-slate-200 text-sm sm:text-base lg:text-lg leading-relaxed max-w-2xl font-normal">
-          {slide.description}
-        </p>
-
-        {/* Actions */}
-        <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
-          <Link
-            href={slide.primaryCtaLink}
-            className="min-h-[48px] inline-flex items-center justify-center gap-3 px-8 py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-98 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg cursor-pointer"
-          >
-            <span>{slide.primaryCtaText}</span>
-            <ArrowRight className="w-4 h-4 text-white" />
-          </Link>
-
-          <a
-            href="https://maps.google.com/?q=Yerevan+Melkumovi+40/1"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="min-h-[48px] inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 font-bold text-xs tracking-wider uppercase transition-all cursor-pointer shadow-xs"
-          >
-            <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
-            <span>{slide.secondaryCtaText}</span>
-          </a>
-        </div>
-      </div>
-
-      {/* Carousel controls & Stat badge */}
-      <div className="relative z-20 p-6 sm:p-8 flex items-center justify-between border-t border-slate-800/80 bg-[#0F172A]/80 backdrop-blur-md">
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>Պաշտոնական 1-5 տարվա երաշխիք • ապառիկ 0%</span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:block text-right">
-            <span className="text-sm font-black text-blue-400 block tabular-nums">
-              {slide.stat}
+    <section
+      aria-label={HY.OUR_SHOWROOM}
+      className="overflow-hidden rounded-panel border border-line bg-surface shadow-e1"
+    >
+      <div className="grid items-stretch lg:grid-cols-12">
+        {/* ---- Copy column ---------------------------------------------------- */}
+        <div className="flex flex-col justify-center gap-5 p-6 sm:p-10 lg:col-span-7 lg:p-12">
+          {SITE_CLAIMS.seasonalBadgeLabel ? (
+            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-canvas px-3 py-1.5 text-xs font-semibold text-body">
+              <SparkleDot />
+              {SITE_CLAIMS.seasonalBadgeLabel}
             </span>
-            <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
-              {slide.statLabel}
-            </span>
+          ) : null}
+
+          <h1 className="text-display text-ink">
+            {headline}
+            {highlight ? <span className="block">{highlight}</span> : null}
+          </h1>
+
+          {SITE_CLAIMS.heroSubtitle ? (
+            <p className="max-w-2xl text-base leading-relaxed text-body sm:text-lg">
+              {SITE_CLAIMS.heroSubtitle}
+            </p>
+          ) : null}
+
+          {/* Max two CTAs: catalog (primary) + directions (secondary). */}
+          <div className="flex flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center">
+            <Link
+              href="/catalog"
+              className="btn-tactile inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-control bg-ink px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-hover ease-precision hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            >
+              <span>{HY.VIEW_CATALOG}</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+
+            <a
+              href={SHOWROOM_INFO.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-tactile inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-control border border-line bg-surface px-7 py-3.5 text-sm font-semibold text-ink transition-colors duration-hover ease-precision hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            >
+              <MapPin className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              <span>{HY.OUR_SHOWROOM}</span>
+            </a>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-[#1E293B] p-1.5 rounded-2xl border border-slate-700 shadow-lg">
-            <button
-              type="button"
-              onClick={() =>
-                setCurrentSlide((prev) => (prev === 0 ? SLIDES.length - 1 : prev - 1))
-              }
-              aria-label="Նախորդ սլայդ"
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            <div className="flex gap-1.5 px-1.5">
-              {SLIDES.map((s, idx) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => setCurrentSlide(idx)}
-                  aria-label={`Սլայդ ${idx + 1}`}
-                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                    currentSlide === idx ? 'w-6 bg-blue-500' : 'w-1.5 bg-white/30'
-                  }`}
-                />
-              ))}
+          {/* ---- Glass "showroom" card (facts from config only) ------------ */}
+          <div className="glass-surface mt-1 max-w-md rounded-card p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 text-sm font-semibold text-ink">
+                <Store className="h-4 w-4 text-accent" aria-hidden="true" />
+                {HY.OUR_SHOWROOM}
+              </span>
+              {openNow !== null ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-xs font-semibold text-body">
+                  <span
+                    aria-hidden="true"
+                    className={`h-1.5 w-1.5 rounded-full ${
+ openNow ? 'bg-success' : 'bg-line-strong'
+ }`}
+                  />
+                  {openNow ? HY.OPEN : HY.CLOSED}
+                </span>
+              ) : null}
             </div>
 
-            <button
-              type="button"
-              onClick={() => setCurrentSlide((prev) => (prev + 1) % SLIDES.length)}
-              aria-label="Հաջորդ սլայդ"
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            <dl className="mt-3 space-y-2 text-xs text-body sm:text-sm">
+              <div className="flex items-start gap-2">
+                <dt className="sr-only">{HY.SHOWROOM}</dt>
+                <dd className="inline-flex items-start gap-2">
+                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
+                  <a
+                    href={SHOWROOM_INFO.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded underline-offset-4 transition-colors duration-hover hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                  >
+                    {SHOWROOM_INFO.address}
+                  </a>
+                </dd>
+              </div>
+              <div className="flex items-center gap-2">
+                <dt className="sr-only">{SHOWROOM_INFO.hoursLabel}</dt>
+                <dd className="inline-flex items-center gap-2 tabular-nums">
+                  <Clock className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
+                  {SHOWROOM_INFO.hoursLabel}
+                </dd>
+              </div>
+              <div className="flex items-center gap-2">
+                <dt className="sr-only">{HY.CALL}</dt>
+                <dd className="inline-flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
+                  <a
+                    href={`tel:+${SHOWROOM_INFO.phoneIntl}`}
+                    className="rounded font-semibold text-ink tabular-nums underline-offset-4 transition-colors duration-hover hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                  >
+                    {SHOWROOM_INFO.phone}
+                  </a>
+                </dd>
+              </div>
+            </dl>
           </div>
         </div>
+
+        {/* ---- Visual column: ice-chrome placeholder panel -------------------
+            Real showroom/product photography (owner-supplied) should replace
+            this panel. Until then NO stock imagery is rendered. ------------- */}
+        <div
+          aria-hidden="true"
+          className="relative flex min-h-[200px] items-center justify-center bg-ice-chrome ring-ice sm:min-h-[260px] lg:col-span-5 lg:min-h-full"
+        >
+          <span className="select-none text-5xl font-bold tracking-tight text-ink/80 sm:text-6xl">
+            tab.am
+          </span>
+          <span className="pointer-events-none absolute inset-x-6 bottom-6 h-px bg-line-strong/60" />
+        </div>
       </div>
-    </div>
+    </section>
+  );
+}
+
+/** Static decorative dot for the optional seasonal badge. */
+function SparkleDot() {
+  return (
+    <span
+      aria-hidden="true"
+      className="h-1.5 w-1.5 rounded-full bg-accent"
+    />
   );
 }

@@ -89,32 +89,32 @@ export default function Header() {
   const getCategoryIcon = (iconName: string) => {
     switch (iconName) {
       case 'Droplets':
-        return <Droplets className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Droplets className="w-4 h-4 text-accent shrink-0" />;
       case 'ShowerHead':
-        return <ShowerHead className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <ShowerHead className="w-4 h-4 text-accent shrink-0" />;
       case 'Box':
-        return <Box className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Box className="w-4 h-4 text-accent shrink-0" />;
       case 'CircleDot':
-        return <CircleDot className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <CircleDot className="w-4 h-4 text-accent shrink-0" />;
       case 'Archive':
-        return <Archive className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Archive className="w-4 h-4 text-accent shrink-0" />;
       case 'Sparkles':
-        return <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Sparkles className="w-4 h-4 text-accent shrink-0" />;
       case 'Flame':
-        return <Flame className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Flame className="w-4 h-4 text-accent shrink-0" />;
       case 'Grid':
-        return <Grid className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Grid className="w-4 h-4 text-accent shrink-0" />;
       case 'Layers':
-        return <Layers className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Layers className="w-4 h-4 text-accent shrink-0" />;
       case 'Filter':
-        return <Filter className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Filter className="w-4 h-4 text-accent shrink-0" />;
       default:
-        return <Droplets className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Droplets className="w-4 h-4 text-accent shrink-0" />;
     }
   };
 
   return (
-    <header className="sticky top-0 z-header bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_4px_20px_rgb(15,23,42,0.03)]">
+    <header className="sticky top-0 z-header bg-surface/90 backdrop-blur-sm border-b border-line shadow-e1">
       <div className="container-lux h-[var(--header-h)] flex items-center justify-between gap-3 sm:gap-6">
         {/* Brand Logo & Catalog Mega-Menu Dropdown */}
         <div className="flex items-center gap-3 md:gap-4 shrink-0" ref={menuRef}>
@@ -124,11 +124,11 @@ export default function Header() {
             aria-label="tab.am Գլխավոր էջ"
           >
             <div className="flex items-center gap-1">
-              <span className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-[#0F172A] group-hover:text-blue-600 transition-colors">
-                TAB<span className="text-blue-600">.AM</span>
+              <span className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-ink group-hover:text-accent transition-colors">
+                TAB<span className="text-accent">.AM</span>
               </span>
             </div>
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 -mt-1 group-hover:text-slate-700 transition-colors hidden xs:block">
+            <span className="text-xs font-semibold text-muted -mt-1 group-hover:text-ink transition-colors hidden sm:block">
               ՍԱՆՏԵԽՆԻԿԱՅԻ ԽԱՆՈՒԹ-ՍՐԱՀ
             </span>
           </Link>
@@ -138,33 +138,33 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
-              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-3.5 py-2 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white text-xs font-bold transition-all shadow-md cursor-pointer btn-tactile shimmer-glint"
+              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-3.5 py-2 rounded-control bg-ink hover:bg-accent text-white text-xs font-bold transition-colors shadow-e1 cursor-pointer btn-tactile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
             >
-              <LayoutGrid className="w-4 h-4 text-blue-400" />
+              <LayoutGrid className="w-4 h-4 text-white" />
               <span className="hidden md:inline">Կատալոգ</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 ${
-                  isMegaMenuOpen ? 'rotate-180' : ''
-                }`}
+                className={`w-3.5 h-3.5 text-on-dark transition-transform duration-200 ${
+ isMegaMenuOpen ? 'rotate-180' : ''
+ }`}
               />
             </button>
 
             {/* Mega Menu Dropdown */}
             {isMegaMenuOpen && (
-              <div className="absolute top-full left-0 mt-2 w-[90vw] max-w-[700px] bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200/90 p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+              <div className="absolute top-full left-0 mt-2 w-[90vw] max-w-[700px] bg-surface/95 backdrop-blur-sm rounded-panel shadow-e2 border border-line p-6 z-overlay animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="flex items-center justify-between pb-4 mb-4 border-b border-line">
                   <div>
-                    <h3 className="text-sm font-bold text-[#0F172A]">
+                    <h3 className="text-sm font-bold text-ink">
                       tab.am {categories.length} Կորային Բաժիններ
                     </h3>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-xs text-muted">
                       Ընտրեք սանտեխնիկայի և ջրամատակարարման պահանջվող բաժինը
                     </p>
                   </div>
                   <Link
                     href="/catalog"
                     onClick={() => setIsMegaMenuOpen(false)}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-700"
+                    className="text-xs font-bold text-accent hover:text-accent-hover"
                   >
                     Ամբողջ կատալոգը →
                   </Link>
@@ -176,22 +176,22 @@ export default function Header() {
                       key={cat.id}
                       href={`/category/${cat.slug}`}
                       onClick={() => setIsMegaMenuOpen(false)}
-                      className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-slate-100 border border-slate-200 hover:border-blue-300 transition-all group btn-tactile"
+                      className="flex items-center justify-between p-3 rounded-control bg-canvas hover:bg-line/60 border border-line hover:border-line-strong transition-colors group btn-tactile"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center border border-slate-200 group-hover:scale-110 transition-transform">
+                        <div className="w-9 h-9 rounded-card bg-surface shadow-e1 flex items-center justify-center border border-line group-hover:scale-110 transition-transform">
                           {getCategoryIcon(cat.icon)}
                         </div>
                         <div>
-                          <span className="text-xs font-bold text-[#0F172A] group-hover:text-blue-600 block transition-colors">
+                          <span className="text-xs font-bold text-ink group-hover:text-accent block transition-colors">
                             {cat.title}
                           </span>
-                          <span className="text-[10px] text-slate-400 font-medium">
+                          <span className="text-xs text-faint font-medium">
                             {cat.itemCount}+ ապրանք
                           </span>
                         </div>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all">
+                      <span className="text-xs font-bold text-faint group-hover:text-accent group-hover:translate-x-0.5 transition-colors">
                         →
                       </span>
                     </Link>
@@ -214,20 +214,20 @@ export default function Header() {
             type="button"
             onClick={() => setIsMobileSearchOpen(true)}
             aria-label="Որոնել ապրանխ կամ կոդ"
-            className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 active:scale-95 transition-all cursor-pointer btn-tactile"
+            className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-control bg-canvas hover:bg-line/60 border border-line text-body transition-colors cursor-pointer btn-tactile"
           >
-            <Search className="w-5 h-5 text-slate-600" />
+            <Search className="w-5 h-5 text-muted" />
           </button>
 
           {/* Compare shortcut (visible on tablet+) */}
           <Link
             href="/compare"
             title="Ապրանքների Համեմատում"
-            className="hidden sm:flex min-h-[44px] min-w-[44px] relative items-center justify-center rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-[#0F172A] transition-colors cursor-pointer btn-tactile"
+            className="hidden sm:flex min-h-[44px] min-w-[44px] relative items-center justify-center rounded-control bg-surface hover:bg-canvas border border-line text-body hover:text-ink transition-colors cursor-pointer btn-tactile"
           >
             <ArrowLeftRight className="w-4 h-4" />
             {compCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-[#2563EB] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-md">
+              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1">
                 {compCount}
               </span>
             )}
@@ -237,11 +237,11 @@ export default function Header() {
           <Link
             href="/wishlist"
             title="Սիրված Ապրանքներ"
-            className="hidden sm:flex min-h-[44px] min-w-[44px] relative items-center justify-center rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-rose-600 transition-colors cursor-pointer btn-tactile"
+            className="hidden sm:flex min-h-[44px] min-w-[44px] relative items-center justify-center rounded-control bg-surface hover:bg-canvas border border-line text-body hover:text-accent transition-colors cursor-pointer btn-tactile"
           >
-            <Heart className="w-4 h-4 text-rose-500 fill-rose-500/10" />
+            <Heart className="w-4 h-4 text-accent" />
             {wishCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-md animate-heart-pop">
+              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 animate-heart-pop">
                 {wishCount}
               </span>
             )}
@@ -251,7 +251,7 @@ export default function Header() {
           <Link
             href="/track-order"
             title="Ստուգել Պատվերի Կարգավիճակը"
-            className="hidden lg:inline-flex items-center gap-1.5 min-h-[44px] px-2 text-xs font-semibold text-slate-600 hover:text-blue-600 transition-colors"
+            className="hidden lg:inline-flex items-center gap-1.5 min-h-[44px] px-2 text-xs font-semibold text-muted hover:text-accent transition-colors"
           >
             <Package className="w-4 h-4" />
             <span>Ստուգել Պատվերը</span>
@@ -264,17 +264,17 @@ export default function Header() {
             type="button"
             onClick={openDrawer}
             aria-label={`Գնումների զամբյուղ, ${count} ապրանք`}
-            className={`min-h-[44px] min-w-[44px] relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#0F172A] hover:bg-[#1E3A8A] text-white font-medium text-xs transition-all shadow-md cursor-pointer btn-tactile shimmer-glint ${
-              isCartBumping ? 'scale-105' : ''
-            }`}
+            className={`min-h-[44px] min-w-[44px] relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-control bg-ink hover:bg-accent text-white font-medium text-xs transition-colors shadow-e1 cursor-pointer btn-tactile ${
+ isCartBumping ? 'scale-105' : ''
+ }`}
           >
             <div className="relative">
-              <ShoppingBag className="w-4 h-4 text-blue-400" />
+              <ShoppingBag className="w-4 h-4 text-white" />
               {count > 0 && (
                 <span
-                  className={`absolute -top-2 -right-2 bg-[#2563EB] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-md transition-transform duration-300 ${
-                    isCartBumping ? 'scale-125' : 'scale-100'
-                  }`}
+                  className={`absolute -top-2 -right-2 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 transition-transform duration-300 ${
+ isCartBumping ? 'scale-125' : 'scale-100'
+ }`}
                 >
                   {count > 99 ? '99+' : count}
                 </span>
@@ -284,7 +284,7 @@ export default function Header() {
             <span className="hidden sm:inline font-bold">Զամբյուղ</span>
 
             {price > 0 && (
-              <span className="hidden md:inline font-bold text-blue-300 border-l border-slate-700 pl-2 tabular-nums">
+              <span className="hidden md:inline font-bold text-on-dark border-l border-white/10 pl-2 tabular-nums">
                 {formatAMD(price)}
               </span>
             )}
@@ -294,17 +294,17 @@ export default function Header() {
 
       {/* Mobile Fullscreen Search Overlay Modal */}
       {isMobileSearchOpen && (
-        <div className="fixed inset-0 z-overlay h-dvh bg-[#0F172A]/80 backdrop-blur-md flex flex-col p-4 pt-[calc(1rem+env(safe-area-inset-top))] animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 space-y-4 max-w-lg mx-auto w-full overflow-y-auto overscroll-contain">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div className="fixed inset-0 z-overlay h-dvh bg-ink/80 backdrop-blur-sm flex flex-col p-4 pt-[calc(1rem+env(safe-area-inset-top))] animate-in fade-in duration-200">
+          <div className="bg-surface rounded-panel shadow-e2 border border-line p-4 space-y-4 max-w-lg mx-auto w-full overflow-y-auto overscroll-contain">
+            <div className="flex items-center justify-between pb-2 border-b border-line">
               <div className="flex items-center gap-2">
-                <Search className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-bold text-[#0F172A]">Որոնել ապրանք կամ կոդ</span>
+                <Search className="w-4 h-4 text-accent" />
+                <span className="text-xs font-bold text-ink">Որոնել ապրանք կամ կոդ</span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsMobileSearchOpen(false)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 btn-tactile"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-card text-faint hover:text-ink hover:bg-canvas btn-tactile"
                 aria-label="Փակել որոնումը"
               >
                 <X className="w-5 h-5" />

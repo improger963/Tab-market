@@ -73,7 +73,7 @@ function TrackOrderContent() {
       <div className="flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-body hover:text-accent transition-colors"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>Վերադառնալ Գլխավոր Էջ</span>
@@ -89,8 +89,8 @@ function TrackOrderContent() {
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2.5 animate-in fade-in">
-          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" aria-hidden="true" />
+        <div className="p-4 rounded-panel bg-danger/10 border border-danger/20 text-danger text-xs font-bold flex items-center gap-2.5 animate-in fade-in">
+          <AlertCircle className="w-4 h-4 text-danger shrink-0" aria-hidden="true" />
           <span>{errorMessage}</span>
         </div>
       )}
@@ -110,7 +110,7 @@ export default function TrackOrderPage() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-4xl mx-auto px-4 py-20 text-center text-xs text-slate-500">
+        <div className="max-w-4xl mx-auto px-4 py-20 text-center text-xs text-muted">
           Բեռնվում է...
         </div>
       }

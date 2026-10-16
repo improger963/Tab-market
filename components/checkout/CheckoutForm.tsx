@@ -57,20 +57,20 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
   return (
     <div className="space-y-8">
       {/* SECTION 1: Customer Personal Details */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-5">
-        <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-xs">
+      <div className="bg-white p-6 sm:p-7 rounded-panel border border-line shadow-e1 space-y-5">
+        <div className="flex items-center gap-2.5 pb-3 border-b border-canvas">
+          <div className="w-8 h-8 rounded-control bg-accent/5 text-accent flex items-center justify-center font-bold text-xs">
             1
           </div>
-          <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
+          <h2 className="text-base font-semibold text-ink">
             Գնորդի Տվյալներ
           </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Անուն, Ազգանուն <span className="text-rose-500">*</span>
+            <label className="block text-xs font-bold text-body mb-1">
+              Անուն, Ազգանուն <span className="text-danger">*</span>
             </label>
             <div className="relative">
               <input
@@ -79,20 +79,20 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 value={data.fullName}
                 onChange={(e) => updateField('fullName', e.target.value)}
                 placeholder="օր.՝ Արմեն Գասպարյան"
-                className="w-full h-12 pl-10 pr-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs font-medium focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full h-12 pl-10 pr-3 rounded-control bg-canvas border border-line text-base md:text-xs font-medium focus:bg-white focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
               />
-              <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <User className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Հեռախոսահամար <span className="text-rose-500">*</span>
+            <label className="block text-xs font-bold text-body mb-1">
+              Հեռախոսահամար <span className="text-danger">*</span>
             </label>
             <div className="relative flex items-center">
-              <div className="absolute left-3.5 flex items-center gap-1 text-xs font-bold text-slate-500 pointer-events-none">
-                <span>🇦🇲 +374</span>
-                <span className="text-slate-300">|</span>
+              <div className="absolute left-3.5 flex items-center gap-1 text-xs font-bold text-muted pointer-events-none">
+                <span>+374</span>
+                <span className="text-line-strong">|</span>
               </div>
               <input
                 type="tel"
@@ -100,14 +100,14 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 value={data.phone}
                 onChange={handlePhoneChange}
                 placeholder="(95) 53-04-35"
-                className="w-full h-12 pl-22 pr-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs font-mono font-bold focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full h-12 pl-22 pr-3 rounded-control bg-canvas border border-line text-base md:text-xs font-mono font-bold focus:bg-white focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Էլ. Փոստ <span className="text-slate-400 font-normal">(ըստ ցանկության)</span>
+            <label className="block text-xs font-bold text-body mb-1">
+              Էլ. Փոստ <span className="text-muted font-normal">(ըստ ցանկության)</span>
             </label>
             <div className="relative">
               <input
@@ -115,21 +115,21 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 value={data.email}
                 onChange={(e) => updateField('email', e.target.value)}
                 placeholder="օր.՝ armen@example.am"
-                className="w-full h-12 pl-10 pr-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs font-medium focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full h-12 pl-10 pr-3 rounded-control bg-canvas border border-line text-base md:text-xs font-medium focus:bg-white focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
               />
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Mail className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
         </div>
       </div>
 
       {/* SECTION 2: Delivery Method (Strictly 2 Options) */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-5">
-        <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-xs">
+      <div className="bg-white p-6 sm:p-7 rounded-panel border border-line shadow-e1 space-y-5">
+        <div className="flex items-center gap-2.5 pb-3 border-b border-canvas">
+          <div className="w-8 h-8 rounded-control bg-accent/5 text-accent flex items-center justify-center font-bold text-xs">
             2
           </div>
-          <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
+          <h2 className="text-base font-semibold text-ink">
             Ստացման Եղանակ
           </h2>
         </div>
@@ -142,27 +142,27 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
             tabIndex={data.deliveryMethod === 'yerevan' ? 0 : -1}
             onClick={() => updateField('deliveryMethod', 'yerevan')}
             onKeyDown={activateOnKey(() => updateField('deliveryMethod', 'yerevan'))}
-            className={`p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
-              data.deliveryMethod === 'yerevan'
-                ? 'border-[#2563EB] bg-blue-50/50 shadow-xs ring-2 ring-blue-500/10'
-                : 'border-[#E2E8F0] hover:border-slate-300 bg-[#F8FAFC]'
-            }`}
+            className={`p-4 sm:p-5 rounded-panel border-2 transition-all cursor-pointer flex flex-col justify-between ${
+ data.deliveryMethod === 'yerevan'
+ ? 'border-accent bg-accent/5 shadow-e1 ring-2 ring-accent/10'
+ : 'border-line hover:border-line-strong bg-canvas'
+ }`}
           >
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                    data.deliveryMethod === 'yerevan' ? 'bg-[#2563EB] text-white' : 'bg-slate-200 text-slate-700'
-                  }`}
+                  className={`w-9 h-9 rounded-control flex items-center justify-center ${
+ data.deliveryMethod === 'yerevan' ? 'bg-accent text-white' : 'bg-line text-body'
+ }`}
                 >
                   <Truck className="w-5 h-5" />
                 </div>
-                <span className="text-[11px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-success bg-success/10 border border-success px-2.5 py-0.5 rounded-full">
                   ԱՆՎՃԱՐ (0 ֏)
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-[#0F172A]">Անվճար Առաքում Երևանի Տարածքում</h3>
-              <p className="text-xs text-slate-500 mt-1 leading-normal">
+              <h3 className="text-sm font-bold text-ink">Անվճար Առաքում Երևանի Տարածքում</h3>
+              <p className="text-xs text-muted mt-1 leading-normal">
                 Առաքիչը կզանգահարի մոտենալուց 30 րոպե առաջ:
               </p>
             </div>
@@ -175,27 +175,27 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
             tabIndex={data.deliveryMethod === 'pickup' ? 0 : -1}
             onClick={() => updateField('deliveryMethod', 'pickup')}
             onKeyDown={activateOnKey(() => updateField('deliveryMethod', 'pickup'))}
-            className={`p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
-              data.deliveryMethod === 'pickup'
-                ? 'border-[#2563EB] bg-blue-50/50 shadow-xs ring-2 ring-blue-500/10'
-                : 'border-[#E2E8F0] hover:border-slate-300 bg-[#F8FAFC]'
-            }`}
+            className={`p-4 sm:p-5 rounded-panel border-2 transition-all cursor-pointer flex flex-col justify-between ${
+ data.deliveryMethod === 'pickup'
+ ? 'border-accent bg-accent/5 shadow-e1 ring-2 ring-accent/10'
+ : 'border-line hover:border-line-strong bg-canvas'
+ }`}
           >
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                    data.deliveryMethod === 'pickup' ? 'bg-[#2563EB] text-white' : 'bg-slate-200 text-slate-700'
-                  }`}
+                  className={`w-9 h-9 rounded-control flex items-center justify-center ${
+ data.deliveryMethod === 'pickup' ? 'bg-accent text-white' : 'bg-line text-body'
+ }`}
                 >
                   <MapPin className="w-5 h-5" />
                 </div>
-                <span className="text-[11px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-success bg-success/10 border border-success px-2.5 py-0.5 rounded-full">
                   ԱՆՎՃԱՐ (0 ֏)
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-[#0F172A]">Ինքնաարտահանում Սրահից</h3>
-              <p className="text-xs text-slate-500 mt-1 leading-normal">
+              <h3 className="text-sm font-bold text-ink">Ինքնաարտահանում Սրահից</h3>
+              <p className="text-xs text-muted mt-1 leading-normal">
                 ք. Երևան, Մելքումովի 40/1 (Ամեն օր՝ 10:00 - 20:00):
               </p>
             </div>
@@ -204,17 +204,17 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
 
         {/* Conditional Address Inputs for Yerevan Delivery */}
         {data.deliveryMethod === 'yerevan' && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-4 animate-in fade-in duration-200">
+          <div className="p-4 sm:p-5 rounded-panel bg-canvas border border-line space-y-4 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold text-[#0F172A]">Երևանի Առաքման Հասցե</h4>
-              <span className="text-[11px] font-black text-emerald-700 tabular-nums">
+              <h4 className="text-xs font-bold text-ink">Երևանի Առաքման Հասցե</h4>
+              <span className="text-xs font-bold text-success tabular-nums">
                 Առաքման արժեք՝ {formatAMD(shippingCost)}
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
-                  Փողոց, Շենք <span className="text-rose-500">*</span>
+                <label className="block text-xs font-semibold text-body mb-1">
+                  Փողոց, Շենք <span className="text-danger">*</span>
                 </label>
                 <input
                   type="text"
@@ -222,12 +222,12 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                   value={data.addressStreet}
                   onChange={(e) => updateField('addressStreet', e.target.value)}
                   placeholder="օր.՝ Կոմիտասի պող. 25, շենք 3"
-                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-[#E2E8F0] text-base md:text-xs focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full h-12 px-3.5 rounded-control bg-white border border-line text-base md:text-xs focus:border-accent focus:ring-2 focus:ring-accent/20"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="block text-xs font-semibold text-body mb-1">
                   Բնակարան / Մուտք / Հարկ
                 </label>
                 <input
@@ -235,7 +235,7 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                   value={data.addressApartment}
                   onChange={(e) => updateField('addressApartment', e.target.value)}
                   placeholder="բն. 14, 2-րդ մուտք, 4-րդ հարկ"
-                  className="w-full h-12 px-3.5 rounded-xl bg-white border border-[#E2E8F0] text-base md:text-xs focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full h-12 px-3.5 rounded-control bg-white border border-line text-base md:text-xs focus:border-accent focus:ring-2 focus:ring-accent/20"
                 />
               </div>
             </div>
@@ -244,12 +244,12 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
       </div>
 
       {/* SECTION 3: Payment Method Selectors */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-5">
-        <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-xs">
+      <div className="bg-white p-6 sm:p-7 rounded-panel border border-line shadow-e1 space-y-5">
+        <div className="flex items-center gap-2.5 pb-3 border-b border-canvas">
+          <div className="w-8 h-8 rounded-control bg-accent/5 text-accent flex items-center justify-center font-bold text-xs">
             3
           </div>
-          <h2 className="text-base font-extrabold uppercase tracking-wider text-[#0F172A]">
+          <h2 className="text-base font-semibold text-ink">
             Վճարման Եղանակ
           </h2>
         </div>
@@ -266,22 +266,22 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 tabIndex={isSelected ? 0 : -1}
                 onClick={() => updateField('paymentMethod', item.id)}
                 onKeyDown={activateOnKey(() => updateField('paymentMethod', item.id))}
-                className={`p-4.5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
-                  isSelected
-                    ? 'border-[#2563EB] bg-blue-50/50 shadow-xs ring-2 ring-blue-500/10'
-                    : 'border-[#E2E8F0] hover:border-slate-300 bg-[#F8FAFC]'
-                }`}
+                className={`p-4.5 rounded-panel border-2 transition-all cursor-pointer flex flex-col justify-between ${
+ isSelected
+ ? 'border-accent bg-accent/5 shadow-e1 ring-2 ring-accent/10'
+ : 'border-line hover:border-line-strong bg-canvas'
+ }`}
               >
                 <div>
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${
-                      isSelected ? 'bg-[#2563EB] text-white' : 'bg-slate-200 text-slate-700'
-                    }`}
+                    className={`w-9 h-9 rounded-control flex items-center justify-center mb-3 ${
+ isSelected ? 'bg-accent text-white' : 'bg-line text-body'
+ }`}
                   >
                     <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-xs font-bold text-[#0F172A] leading-snug">{item.title}</h3>
-                  <p className="text-[11px] text-slate-500 mt-1 leading-normal">{item.desc}</p>
+                  <h3 className="text-xs font-bold text-ink leading-snug">{item.title}</h3>
+                  <p className="text-xs text-muted mt-1 leading-normal">{item.desc}</p>
                 </div>
               </div>
             );
@@ -290,15 +290,15 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
 
         {/* Order Notes */}
         <div className="pt-2">
-          <label className="block text-xs font-bold text-slate-700 mb-1">
-            Նշումներ պատվերի վերաբերյալ <span className="text-slate-400 font-normal">(ըստ ցանկության)</span>
+          <label className="block text-xs font-bold text-body mb-1">
+            Նշումներ պատվերի վերաբերյալ <span className="text-muted font-normal">(ըստ ցանկության)</span>
           </label>
           <textarea
             rows={2}
             value={data.orderNotes}
             onChange={(e) => updateField('orderNotes', e.target.value)}
             placeholder="Հարկ, դոմոֆոնի կոդ կամ առաքման հատուկ ժամ..."
-            className="w-full p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 font-medium"
+            className="w-full p-3 rounded-control bg-canvas border border-line text-base md:text-xs focus:bg-white focus:border-accent focus:ring-2 focus:ring-accent/20 font-medium"
           />
         </div>
       </div>

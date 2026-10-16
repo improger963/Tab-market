@@ -46,19 +46,19 @@ export default function MobileNav() {
   return (
     <nav
       aria-label="Մոբայլ նավիգացիա"
-      className="md:hidden fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-dock max-w-lg mx-auto bg-[#0F172A]/95 backdrop-blur-xl text-white rounded-2xl border border-slate-800 px-2 py-1 flex items-center justify-around shadow-2xl"
+      className="md:hidden fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-dock max-w-lg mx-auto bg-ink/95 backdrop-blur-sm text-white rounded-panel border border-white/10 px-2 py-1 flex items-center justify-around shadow-e2"
     >
       {/* 1. Home */}
       <Link
         href="/"
-        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
-          isHome ? 'text-[#2563EB]' : 'text-slate-300 hover:text-white'
-        }`}
+        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-colors text-xs font-semibold gap-0.5 px-2 rounded-control ${
+ isHome ? 'text-accent' : 'text-on-dark hover:text-white'
+ }`}
       >
         <div className="relative">
-          <Home className={`w-5 h-5 ${isHome ? 'text-[#2563EB]' : 'text-slate-300'}`} />
+          <Home className={`w-5 h-5 ${isHome ? 'text-accent' : 'text-on-dark'}`} />
           {isHome && (
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-accent" />
           )}
         </div>
         <span className={isHome ? 'font-bold text-white' : ''}>Գլխավոր</span>
@@ -67,14 +67,14 @@ export default function MobileNav() {
       {/* 2. Catalog */}
       <Link
         href="/catalog"
-        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
-          isCatalog ? 'text-[#2563EB]' : 'text-slate-300 hover:text-white'
-        }`}
+        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-colors text-xs font-semibold gap-0.5 px-2 rounded-control ${
+ isCatalog ? 'text-accent' : 'text-on-dark hover:text-white'
+ }`}
       >
         <div className="relative">
-          <LayoutGrid className={`w-5 h-5 ${isCatalog ? 'text-[#2563EB]' : 'text-slate-300'}`} />
+          <LayoutGrid className={`w-5 h-5 ${isCatalog ? 'text-accent' : 'text-on-dark'}`} />
           {isCatalog && (
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-accent" />
           )}
         </div>
         <span className={isCatalog ? 'font-bold text-white' : ''}>Կատալոգ</span>
@@ -83,14 +83,14 @@ export default function MobileNav() {
       {/* 3. Track Order */}
       <Link
         href="/track-order"
-        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 ${
-          isTrack ? 'text-[#2563EB]' : 'text-slate-300 hover:text-white'
-        }`}
+        className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center transition-colors text-xs font-semibold gap-0.5 px-2 rounded-control ${
+ isTrack ? 'text-accent' : 'text-on-dark hover:text-white'
+ }`}
       >
         <div className="relative">
-          <Package className={`w-5 h-5 ${isTrack ? 'text-[#2563EB]' : 'text-slate-300'}`} />
+          <Package className={`w-5 h-5 ${isTrack ? 'text-accent' : 'text-on-dark'}`} />
           {isTrack && (
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-accent" />
           )}
         </div>
         <span className={isTrack ? 'font-bold text-white' : ''}>Ստուգել</span>
@@ -100,14 +100,14 @@ export default function MobileNav() {
       <Link
         href="/wishlist"
         aria-label={`Սիրվածներ, ${wishCount} ապրանք`}
-        className={`min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl active:scale-95 cursor-pointer ${
-          isWishlist ? 'text-rose-400' : 'text-slate-300 hover:text-white'
-        }`}
+        className={`min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center transition-colors text-xs font-semibold gap-0.5 px-2 rounded-control cursor-pointer ${
+ isWishlist ? 'text-accent' : 'text-on-dark hover:text-white'
+ }`}
       >
         <div className="relative">
-          <Heart className={`w-5 h-5 ${isWishlist ? 'fill-rose-500 text-rose-500' : 'text-slate-300'}`} />
+          <Heart className={`w-5 h-5 ${isWishlist ? 'fill-accent text-accent' : 'text-on-dark'}`} />
           {isMounted && wishCount > 0 && (
-            <span className="absolute -top-1.5 -right-2 bg-rose-500 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center tabular-nums leading-none shadow-xs">
+            <span className="absolute -top-1.5 -right-2 bg-accent text-white text-[10px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center tabular-nums leading-none shadow-e1">
               {wishCount > 99 ? '99+' : wishCount}
             </span>
           )}
@@ -120,12 +120,12 @@ export default function MobileNav() {
         type="button"
         onClick={openDrawer}
         aria-label={`Զամբյուղ, ${count} ապրանք`}
-        className="min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all text-[11px] font-semibold gap-0.5 px-2 rounded-xl cursor-pointer"
+        className="min-h-[48px] min-w-[48px] relative flex flex-col items-center justify-center text-on-dark hover:text-white transition-colors text-xs font-semibold gap-0.5 px-2 rounded-control cursor-pointer"
       >
         <div className="relative">
-          <ShoppingBag className="w-5 h-5 text-slate-300" />
+          <ShoppingBag className="w-5 h-5 text-on-dark" />
           {isMounted && count > 0 && (
-            <span className="absolute -top-1.5 -right-2 bg-[#2563EB] text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center tabular-nums leading-none shadow-xs">
+            <span className="absolute -top-1.5 -right-2 bg-accent text-white text-[10px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center tabular-nums leading-none shadow-e1">
               {count > 99 ? '99+' : count}
             </span>
           )}

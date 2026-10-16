@@ -64,38 +64,38 @@ export default function TrackOrderForm({
   };
 
   return (
-    <div className="bg-white p-6 sm:p-10 rounded-3xl border border-[#E2E8F0] shadow-xs space-y-6">
+    <div className="bg-white p-6 sm:p-10 rounded-panel border border-line shadow-e1 space-y-6">
       <div className="space-y-2 text-center sm:text-left">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold">
-          <Sparkles className="w-3.5 h-3.5 text-blue-600" aria-hidden="true" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/5 border border-accent/15 text-accent-hover text-xs font-bold">
+          <Sparkles className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
           <span> Ինտեգրված Համակարգ</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
           Ստուգել Պատվերի Կարգավիճակը
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 max-w-lg leading-relaxed">
+        <p className="text-xs sm:text-sm text-muted max-w-lg leading-relaxed">
           Մուտքագրեք Ձեր պատվերի համարը (օր.՝ TAB-84920) և հեռախոսահամարը՝ ընթացքը տեսնելու համար։
         </p>
       </div>
 
       {/* Quick Demo Pill Buttons */}
-      <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-3">
-        <span className="text-xs font-bold text-slate-700">Արագ փորձարկման օրինակներ.</span>
+      <div className="p-3.5 rounded-panel bg-canvas border border-line flex flex-col sm:flex-row items-center justify-between gap-3">
+        <span className="text-xs font-bold text-body">Արագ փորձարկման օրինակներ.</span>
         <div className="flex items-center gap-2 flex-wrap">
           <button
             type="button"
             onClick={() => loadDemoOrder('TAB-84920', '(95) 53-04-35')}
-            className="px-3 py-1.5 rounded-xl bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-xs font-bold text-slate-800 transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5"
+            className="px-3 py-1.5 rounded-control bg-white hover:bg-accent/5 border border-line-strong hover:border-accent text-xs font-bold text-ink transition-colors shadow-e1 cursor-pointer flex items-center gap-1.5"
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-success" aria-hidden="true" />
             <span>Փորձել TAB-84920</span>
           </button>
           <button
             type="button"
             onClick={() => loadDemoOrder('TAB-11496', '(77) 12-34-56')}
-            className="px-3 py-1.5 rounded-xl bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-xs font-bold text-slate-800 transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5"
+            className="px-3 py-1.5 rounded-control bg-white hover:bg-accent/5 border border-line-strong hover:border-accent text-xs font-bold text-ink transition-colors shadow-e1 cursor-pointer flex items-center gap-1.5"
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" aria-hidden="true" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
             <span>Փորձել TAB-11496</span>
           </button>
         </div>
@@ -104,8 +104,8 @@ export default function TrackOrderForm({
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Պատվերի համար <span className="text-rose-500">*</span>
+            <label className="block text-xs font-bold text-body mb-1">
+              Պատվերի համար <span className="text-danger">*</span>
             </label>
             <div className="relative">
               <input
@@ -116,15 +116,15 @@ export default function TrackOrderForm({
                 placeholder="օր.՝ TAB-84920"
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? 'order-id-error' : undefined}
-                className="w-full h-12 pl-10 pr-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs font-mono font-bold uppercase focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full h-12 pl-10 pr-3 rounded-control bg-canvas border border-line text-base md:text-xs font-mono font-bold uppercase focus:bg-white focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
               />
-              <Package className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+              <Package className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
             </div>
             {error && (
               <p
                 id="order-id-error"
                 role="alert"
-                className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-rose-600"
+                className="mt-1 flex items-center gap-1 text-xs font-semibold text-danger"
               >
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span>{error}</span>
@@ -133,20 +133,20 @@ export default function TrackOrderForm({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Հեռախոսահամար <span className="text-slate-400 font-normal">(ըստ ցանկության)</span>
+            <label className="block text-xs font-bold text-body mb-1">
+              Հեռախոսահամար <span className="text-muted font-normal">(ըստ ցանկության)</span>
             </label>
             <div className="relative flex items-center">
-              <div className="absolute left-3.5 flex items-center gap-1.5 text-xs font-bold text-slate-500 pointer-events-none">
-                <span>🇦🇲 +374</span>
-                <span className="text-slate-300">|</span>
+              <div className="absolute left-3.5 flex items-center gap-1.5 text-xs font-bold text-muted pointer-events-none">
+                <span>+374</span>
+                <span className="text-line-strong">|</span>
               </div>
               <input
                 type="tel"
                 value={phone}
                 onChange={handlePhoneChange}
                 placeholder="95 53-04-35"
-                className="w-full h-12 pl-22 pr-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-base md:text-xs font-mono font-bold focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full h-12 pl-22 pr-3 rounded-control bg-canvas border border-line text-base md:text-xs font-mono font-bold focus:bg-white focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
               />
             </div>
           </div>
@@ -155,13 +155,13 @@ export default function TrackOrderForm({
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full min-h-[52px] py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#2563EB] active:scale-98 disabled:opacity-50 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full min-h-[52px] py-3.5 rounded-control bg-ink hover:bg-accent active:scale-98 disabled:opacity-50 text-white font-semibold text-xs transition-all shadow-e1 flex items-center justify-center gap-2 cursor-pointer"
         >
           {isLoading ? (
             <span>Որոնվում է...</span>
           ) : (
             <>
-              <Search className="w-4 h-4 text-blue-400" aria-hidden="true" />
+              <Search className="w-4 h-4 text-accent" aria-hidden="true" />
               <span>Ստուգել Կարգավիճակը</span>
             </>
           )}
