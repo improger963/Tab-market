@@ -1,11 +1,14 @@
 import React from 'react';
+import { pushRoute } from './navigation';
 
 export interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   href: string;
   children?: React.ReactNode;
+  /** Next.js parity: `scroll={false}` keeps the viewport where it is (filters, pagination). */
+  scroll?: boolean;
 }
 
-export default function Link({ href, children, onClick, ...props }: LinkProps) {
+export default function Link({ href, children, onClick, scroll = true, ...props }: LinkProps) {
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (onClick) onClick(e);
     if (
@@ -20,9 +23,10 @@ export default function Link({ href, children, onClick, ...props }: LinkProps) {
     ) {
       e.preventDefault();
       if (window.location.pathname !== href) {
-        window.history.pushState({}, '', href);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // No scrollTo here: the app-level popstate handler owns route-change
+        // scroll (instant top on push, restore on Back/Forward). A smooth
+        // animated jump-to-top on every link was the primary bug.
+        pushRoute(href, { scroll });
       }
     }
   };

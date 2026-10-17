@@ -82,6 +82,11 @@ export default function FilterSidebar({
     price: true,
   });
 
+  // Price slider draft: the thumb moves locally while dragging, and the filter
+  // (and its debounced URL sync) only updates on release/keyup, so re-filtering
+  // ~1.6k rows never runs on every pointermove.
+  const [sliderDraft, setSliderDraft] = useState<number | null>(null);
+
   const toggleSection = (key: string) => {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -596,10 +601,28 @@ export default function FilterSidebar({
               min={priceBounds.min}
               max={priceBounds.max}
               step={500}
-              value={filters.maxPrice}
-              onChange={(e) =>
-                onChange((prev) => ({ ...prev, maxPrice: Number(e.target.value) }))
-              }
+              value={sliderDraft ?? filters.maxPrice}
+              onChange={(e) => setSliderDraft(Number(e.target.value))}
+              onPointerUp={() => {
+                if (sliderDraft !== null) {
+                  onChange((prev) => ({ ...prev, maxPrice: sliderDraft }));
+                  setSliderDraft(null);
+                }
+              }}
+              onKeyUp={(e) => {
+                // Keyboard users commit on the first non-arrow key (Blur would
+                // also work; this keeps arrow-key previewing snappy).
+                if (sliderDraft !== null && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
+                  onChange((prev) => ({ ...prev, maxPrice: sliderDraft }));
+                  setSliderDraft(null);
+                }
+              }}
+              onBlur={() => {
+                if (sliderDraft !== null) {
+                  onChange((prev) => ({ ...prev, maxPrice: sliderDraft }));
+                  setSliderDraft(null);
+                }
+              }}
               className="w-full accent-accent cursor-pointer"
             />
             <div className="flex justify-between text-xs text-muted font-mono">

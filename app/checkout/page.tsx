@@ -72,7 +72,9 @@ export default function CheckoutPage() {
     setTimeout(() => {
       setOrderSuccessNumber(orderId);
       setIsSubmitting(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Success view replaces the form: snap to its top instantly. A smooth
+      // animated scroll reads as a violent jump from the middle of the form.
+      window.scrollTo(0, 0);
     }, 900);
   };
 

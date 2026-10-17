@@ -395,7 +395,9 @@ body {
 }
 
 html {
-  scroll-behavior: smooth;
+  /* No global `scroll-behavior: smooth`: it animates EVERY programmatic
+     scroll (route changes, history restoration) and caused slow jump-to-top.
+     Smooth scrolling is opted in per call site with a reduced-motion check. */
   /* Anchored content clears the fixed top bar + sticky header (computed, not hardcoded) */
   scroll-padding-top: calc(var(--topbar-h) + var(--header-h) + 1rem);
   /* Never disable zoom on text: keep font sizing predictable across iOS/Android */

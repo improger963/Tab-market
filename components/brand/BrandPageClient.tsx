@@ -46,6 +46,8 @@ export default function BrandPageClient({ slug }: BrandPageClientProps) {
 
   const [page, setPage] = useState(1);
   const resultsTopRef = useRef<HTMLDivElement | null>(null);
+  // Set only by explicit pagination clicks; consumed after the new page renders.
+  const pendingPageScrollRef = useRef(false);
 
   // A different brand means a different result set: start over on page 1.
   useEffect(() => {
@@ -60,14 +62,28 @@ export default function BrandPageClient({ slug }: BrandPageClientProps) {
   );
 
   const handlePageChange = (next: number) => {
+    pendingPageScrollRef.current = true;
     setPage(next);
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const top = resultsTopRef.current?.getBoundingClientRect().top ?? 0;
-    window.scrollTo({
-      top: top + window.scrollY - 96,
-      behavior: reduceMotion ? 'auto' : 'smooth',
-    });
   };
+
+  // Pagination-only scroll, run AFTER the new page of results is rendered:
+  // bring the listings container into view (scroll-margin-top keeps it below
+  // the sticky header), never the top of the document. Skipped when the
+  // container top is already visible.
+  useEffect(() => {
+    if (!pendingPageScrollRef.current) return;
+    pendingPageScrollRef.current = false;
+    const frame = requestAnimationFrame(() => {
+      const el = resultsTopRef.current;
+      if (!el) return;
+      if (el.getBoundingClientRect().top >= 0) return;
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+      // Move focus for keyboard/AT users without triggering another scroll.
+      el.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [page]);
 
   if (!brand) {
     return (
@@ -163,7 +179,11 @@ export default function BrandPageClient({ slug }: BrandPageClientProps) {
       ) : null}
 
       {/* Product listings for this brand */}
-      <div className="space-y-6" ref={resultsTopRef}>
+      <div
+        className="space-y-6 scroll-mt-[calc(var(--topbar-h)+var(--header-h)+1rem)] outline-none"
+        ref={resultsTopRef}
+        tabIndex={-1}
+      >
         <div className="flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-bold text-ink tracking-tight tabular-nums">
             {brand.name} {HY.ASSORTMENT} ({brandProducts.length} {HY.APRANQ})

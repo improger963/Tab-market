@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useTransition } from 'react';
 import Link from 'next/link';
 import {
   SlidersHorizontal,
@@ -126,10 +126,17 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   const [viewMode, setViewMode] = useState<'gallery' | 'compact'>('gallery');
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // Skeletons are only for the first mount. Filter/sort/page updates keep the
+  // previous results mounted and merely dim the grid while pending, so the
+  // document height never collapses (a collapsing grid was throwing the
+  // viewport around on every filter change).
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isGridPending, startGridTransition] = useTransition();
   // Scroll target for page changes: the results column, not the document top,
   // so the filter sidebar stays where the user left it.
   const resultsTopRef = useRef<HTMLDivElement | null>(null);
+  // Set only by explicit pagination clicks; consumed after the new page renders.
+  const pendingPageScrollRef = useRef(false);
 
   const { addItem, openDrawer } = useCart();
   const { showCartToast } = useToast();
@@ -137,20 +144,20 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   useEffect(() => {
     setIsMounted(true);
     const initialTimer = setTimeout(() => {
-      setIsLoading(false);
+      setIsInitialLoading(false);
     }, 1000);
     return () => clearTimeout(initialTimer);
   }, []);
 
-  // Trigger 1-second loading simulation whenever filters or sort changes
-  useEffect(() => {
-    if (!isMounted) return;
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [filters, sortBy, isMounted]);
+  // All filter/sort/page mutations run inside a transition: React exposes
+  // isGridPending (wired to opacity + aria-busy below) while the update is
+  // being applied, without unmounting anything.
+  const updateFilters = (updater: (prev: FilterState) => FilterState) => {
+    startGridTransition(() => setFilters(updater));
+  };
+  const updateSort = (next: SortKey) => {
+    startGridTransition(() => setSortBy(next));
+  };
 
   // A new filter set or ordering always restarts at page 1. The first run is
   // skipped so a deep link like `?page=3` survives the initial mount.
@@ -180,21 +187,27 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
     );
   }, [initialCategorySlug]);
 
-  // Serialize the active filters + sort into the URL query string (no reload),
-  // making branded / filtered views shareable and reloadable (BUG-03).
+  // Serialize the active filters + sort into the URL query string (no reload,
+  // no history entry, no scroll), making branded / filtered views shareable
+  // and reloadable (BUG-03). Debounced so slider drags and rapid toggles don't
+  // thrash the History API.
   useEffect(() => {
     if (!isMounted) return;
-    const params = new URLSearchParams();
-    if (filters.category) params.set('category', filters.category);
-    if (filters.brands.length) params.set('brand', filters.brands.join(','));
-    if (filters.inStockOnly) params.set('stock', '1');
-    if (filters.minPrice > priceBounds.min) params.set('min', String(filters.minPrice));
-    if (filters.maxPrice < priceBounds.max) params.set('max', String(filters.maxPrice));
-    if (sortBy !== 'catalogue') params.set('sort', sortBy);
-    if (page > 1) params.set('page', String(page));
-    const query = params.toString();
-    const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
-    window.history.replaceState({}, '', nextUrl);
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (filters.category) params.set('category', filters.category);
+      if (filters.brands.length) params.set('brand', filters.brands.join(','));
+      if (filters.inStockOnly) params.set('stock', '1');
+      if (filters.minPrice > priceBounds.min) params.set('min', String(filters.minPrice));
+      if (filters.maxPrice < priceBounds.max) params.set('max', String(filters.maxPrice));
+      if (sortBy !== 'catalogue') params.set('sort', sortBy);
+      if (page > 1) params.set('page', String(page));
+      const query = params.toString();
+      const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+      // replaceState never scrolls and never spams history (filter toggles).
+      window.history.replaceState({}, '', nextUrl);
+    }, 300);
+    return () => clearTimeout(timer);
   }, [filters, sortBy, isMounted, page, priceBounds]);
 
   // Lock body scroll and allow Escape to dismiss the mobile filter sheet (no layout jump).
@@ -215,18 +228,20 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   }, [isMobileDrawerOpen]);
 
   const resetFilters = () => {
-    setIsLoading(true);
-    setFilters({
-      category: null,
-      brands: [],
-      colors: [],
-      diameters: [],
-      materials: [],
-      inStockOnly: false,
-      minPrice: priceBounds.min,
-      maxPrice: priceBounds.max,
-    });
-    setTimeout(() => setIsLoading(false), 1000);
+    // Same no-scroll rule as every other filter change: results update in
+    // place, the viewport stays exactly where the user left it.
+    startGridTransition(() =>
+      setFilters({
+        category: null,
+        brands: [],
+        colors: [],
+        diameters: [],
+        materials: [],
+        inStockOnly: false,
+        minPrice: priceBounds.min,
+        maxPrice: priceBounds.max,
+      })
+    );
   };
 
   // Find active category title if filtered
@@ -326,15 +341,33 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   );
 
   const handlePageChange = (next: number) => {
-    setPage(next);
-    // Respect the OS "reduce motion" setting, same as the rest of the site.
-    const prefersReducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const top = resultsTopRef.current?.getBoundingClientRect().top ?? 0;
-    const offset = top + window.scrollY - 120;
-    window.scrollTo({ top: offset, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+    pendingPageScrollRef.current = true;
+    startGridTransition(() => setPage(next));
+    // The actual scroll happens in the effect below, AFTER the new page of
+    // results is rendered — scrolling to a stale offset mid-update was a
+    // source of jumpy motion. Filters/sort never set this flag, so they
+    // produce no viewport movement at all.
   };
+
+  // Pagination-only scroll: bring the results column into view (its
+  // scroll-margin-top keeps it clear of the sticky header), never the top of
+  // the document. Skipped when the grid top is already visible.
+  useEffect(() => {
+    if (!pendingPageScrollRef.current) return;
+    pendingPageScrollRef.current = false;
+    const frame = requestAnimationFrame(() => {
+      const el = resultsTopRef.current;
+      if (!el) return;
+      if (el.getBoundingClientRect().top >= 0) return; // grid top visible or below
+      const prefersReducedMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches;
+      el.scrollIntoView({ block: 'start', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      // Move focus for keyboard/AT users without triggering another scroll.
+      el.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [page]);
 
   // Fallback alternatives for zero-state
   const fallbackAlternatives = useMemo(() => {
@@ -346,7 +379,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
       {/* Category Scroll Strip */}
       <CategoryNavStrip
         selectedCategorySlug={filters.category}
-        onSelectCategory={(slug) => setFilters((p) => ({ ...p, category: slug }))}
+        onSelectCategory={(slug) => updateFilters((p) => ({ ...p, category: slug }))}
         isInteractiveFilter={true}
       />
 
@@ -396,7 +429,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                 <span className="text-xs font-semibold text-body hidden sm:inline">Դասավորել՝</span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as SortKey)}
+                  onChange={(e) => updateSort(e.target.value as SortKey)}
                   aria-label="Դասավորել ըստ"
                   className="min-w-0 max-w-[8rem] truncate bg-transparent text-xs font-bold text-ink focus:outline-hidden cursor-pointer"
                 >
@@ -445,7 +478,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   Բաժին: {activeCategory?.title}
                   <button
                     type="button"
-                    onClick={() => setFilters((p) => ({ ...p, category: null }))}
+                    onClick={() => updateFilters((p) => ({ ...p, category: null }))}
                     className="hover:text-ink cursor-pointer"
                   >
                     <X className="w-3 h-3" aria-hidden="true" />
@@ -457,7 +490,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   Առկա է սրահում
                   <button
                     type="button"
-                    onClick={() => setFilters((p) => ({ ...p, inStockOnly: false }))}
+                    onClick={() => updateFilters((p) => ({ ...p, inStockOnly: false }))}
                     className="hover:text-ink cursor-pointer"
                   >
                     <X className="w-3 h-3" aria-hidden="true" />
@@ -473,7 +506,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   <button
                     type="button"
                     onClick={() =>
-                      setFilters((p) => ({ ...p, brands: p.brands.filter((x) => x !== b) }))
+                      updateFilters((p) => ({ ...p, brands: p.brands.filter((x) => x !== b) }))
                     }
                     className="hover:text-ink cursor-pointer"
                   >
@@ -494,14 +527,16 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
         {/* Main Grid & Desktop Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Desktop Sticky Sidebar */}
+          {/* Desktop Sticky Sidebar — mounted as soon as the first load is
+              done; filter changes never swap it for a skeleton, so accordions
+              keep their state, focus stays put and its inner scroll survives. */}
           <aside className="hidden lg:block lg:col-span-3 sticky top-[calc(var(--topbar-h)+var(--header-h)+1rem)] bg-white p-5 rounded-panel border border-line shadow-e1 max-h-[calc(100dvh-var(--topbar-h)-var(--header-h)-2rem)] overflow-y-auto overscroll-contain">
-            {!isMounted || isLoading ? (
+            {isInitialLoading ? (
               <CatalogFilterSkeleton />
             ) : (
               <FilterSidebar
                 filters={filters}
-                onChange={setFilters}
+                onChange={updateFilters}
                 onReset={resetFilters}
                 priceBounds={priceBounds}
               />
@@ -509,8 +544,15 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
           </aside>
 
           {/* Product Grid Area */}
-          <div ref={resultsTopRef} className="lg:col-span-9 space-y-6">
-            {isLoading ? (
+          <div
+            ref={resultsTopRef}
+            tabIndex={-1}
+            aria-busy={isGridPending}
+            className={`lg:col-span-9 space-y-6 scroll-mt-[calc(var(--topbar-h)+var(--header-h)+1rem)] outline-none transition-opacity duration-200 ${
+ isGridPending ? 'opacity-60' : 'opacity-100'
+ }`}
+          >
+            {isInitialLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 lg:[grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-3 sm:gap-5 lg:gap-6">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                   <SkeletonCard key={i} />
@@ -645,7 +687,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
             {/* One page of ~1.6k listings: the controls sit below the results
                 in both the gallery and the contractor table view. */}
-            {!isLoading && filteredProducts.length > PAGE_SIZE ? (
+            {!isInitialLoading && filteredProducts.length > PAGE_SIZE ? (
               <Pagination
                 page={safePage}
                 pageSize={PAGE_SIZE}
@@ -703,12 +745,12 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
             {/* Scrollable Facets */}
             <div className="flex-1 overflow-y-auto p-5 overscroll-contain">
-              {!isMounted || isLoading ? (
+              {isInitialLoading ? (
                 <CatalogFilterSkeleton />
               ) : (
                 <FilterSidebar
                   filters={filters}
-                  onChange={setFilters}
+                  onChange={updateFilters}
                   onReset={resetFilters}
                   priceBounds={priceBounds}
                   isMobileDrawer={true}

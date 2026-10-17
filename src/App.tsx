@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
+import { consumePushNavigation } from '@/lib/next-compat/navigation';
 import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -44,9 +45,50 @@ export default function App() {
     return '/';
   });
 
+  // Route-change scroll policy (this SPA must own what the Next router does
+  // natively): forward navigation snaps the new page to the top instantly —
+  // never an animated jump — while real Back/Forward traversals restore the
+  // offset the user left on that page. Positions are captured per pathname.
+  const scrollPositionsRef = useRef<Map<string, number>>(new Map());
+
+  useEffect(() => {
+    let frame = 0;
+    const savePosition = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        scrollPositionsRef.current.set(window.location.pathname, window.scrollY);
+      });
+    };
+    window.addEventListener('scroll', savePosition, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', savePosition);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
   useEffect(() => {
     const handleLocationChange = () => {
-      setCurrentPath(window.location.pathname || '/');
+      const pathname = window.location.pathname || '/';
+      setCurrentPath(pathname);
+
+      const pushMode = consumePushNavigation();
+      if (pushMode === 'top') {
+        // Instant, before the re-render: no visible upward sliding.
+        window.scrollTo(0, 0);
+        scrollPositionsRef.current.set(pathname, 0);
+      } else if (pushMode === null) {
+        // Back/Forward: restore after React has committed the previous route,
+        // so the document is tall enough to hold the offset.
+        const saved = scrollPositionsRef.current.get(pathname) ?? 0;
+        requestAnimationFrame(() => {
+          if (window.location.pathname === pathname) {
+            window.scrollTo(0, saved);
+          }
+        });
+      }
+      // pushMode === 'preserve' (scroll={false}): filters/pagination keep the
+      // viewport exactly where it is; nothing to do.
     };
 
     window.addEventListener('popstate', handleLocationChange);
