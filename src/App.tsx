@@ -22,7 +22,6 @@ import CheckoutPage from '@/app/checkout/page';
 import WishlistPage from '@/app/wishlist/page';
 import ComparePage from '@/app/compare/page';
 import TrackOrderPage from '@/app/track-order/page';
-import ProductReviews from '@/components/product/ProductReviews';
 import RecentlyViewed from '@/components/product/RecentlyViewed';
 import { Product } from '@/types';
 import { products } from '@/data/products';
@@ -205,8 +204,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Customer Reviews & Social Proof */}
-          <ProductReviews product={currentProduct} />
 
           {/* Recently Viewed Carousel */}
           <RecentlyViewed currentProductId={currentProduct.id} />
@@ -313,7 +310,7 @@ export default function App() {
 
             <div className="p-4 border-t border-line bg-canvas flex items-center justify-between">
               <span className="text-xs text-muted">
-                {DELIVERY_CONFIG.pickupAddress} {'\u00B7'} {activeCadProduct.stockQuantity} {HY.HAT}
+                {DELIVERY_CONFIG.pickupAddress}
               </span>
               <button
                 type="button"

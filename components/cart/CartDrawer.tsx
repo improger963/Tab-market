@@ -24,8 +24,9 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
-import { formatAMD } from '@/lib/utils';
+import { formatAMD, stockCap } from '@/lib/utils';
 import { DELIVERY_CONFIG, SHOWROOM_INFO } from '@/lib/config';
+import { HY } from '@/lib/copy/hy';
 import { products } from '@/data/products';
 import ProductImage from '@/components/ui/ProductImage';
 import type { Product } from '@/types';
@@ -108,10 +109,20 @@ export default function CartDrawer() {
   const discountAmount = getDiscountAmount();
   const finalTotal = getFinalTotal(0);
 
-  // Frequently bought together: real featured products not already in the cart.
+  // Suggestions come from the real assortment: showroom-available listings from
+  // a section the cart already touches, deepest genuine price cut first. The
+  // HEAD copy claimed "frequently bought together", which needs order
+  // telemetry nobody has; the honest HEAD phrase for this block is "similar
+  // products", so that is what the heading says.
   const cartProductIds = new Set(items.map((i) => i.product.id));
+  const cartCategories = new Set(items.map((i) => i.product.categorySlug));
   const crossSellProducts = products
-    .filter((p) => !cartProductIds.has(p.id) && p.isFeatured)
+    .filter((p) => !cartProductIds.has(p.id) && p.inStock && cartCategories.has(p.categorySlug))
+    .sort((a, b) => {
+      const cut = (p: Product) =>
+        p.oldPrice && p.oldPrice > p.price ? (p.oldPrice - p.price) / p.oldPrice : 0;
+      return cut(b) - cut(a) || a.code.localeCompare(b.code);
+    })
     .slice(0, 2);
 
   const handleApplyPromo = (e: React.FormEvent) => {
@@ -273,7 +284,7 @@ export default function CartDrawer() {
                             <button
                               type="button"
                               onClick={() => stepQuantity(item.product.id, item.quantity + 1, 'up')}
-                              disabled={item.quantity >= item.product.stockQuantity}
+                              disabled={item.quantity >= stockCap(item.product.stockQuantity)}
                               aria-label="Ավելացնել քանակը"
                               className="min-w-[44px] min-h-[44px] flex items-center justify-center text-muted hover:bg-surface disabled:opacity-30 rounded-card transition-colors cursor-pointer btn-tactile"
                             >
@@ -292,12 +303,12 @@ export default function CartDrawer() {
                   ))}
                 </div>
 
-                {/* Frequently Bought Together (Cross-Sell) Section */}
+                {/* Same-section suggestions, picked from real assortment data */}
                 {crossSellProducts.length > 0 && (
                   <div className="pt-4 border-t border-line space-y-3">
                     <div className="flex items-center gap-2 text-xs font-bold text-ink ">
                       <Sparkles className="w-4 h-4 text-accent" />
-                      <span>Հաճախ գնվում է միասին</span>
+                      <span>{HY.SIMILAR_PRODUCTS}</span>
                     </div>
 
                     <div className="space-y-2.5">

@@ -8,7 +8,6 @@ import ProductGallery from '@/components/product/ProductGallery';
 import ProductDetailView from '@/components/product/ProductDetailView';
 import ProductDossierTabs from '@/components/product/ProductDossierTabs';
 import ProductCard from '@/components/product/ProductCard';
-import ProductReviews from '@/components/product/ProductReviews';
 import RecentlyViewed from '@/components/product/RecentlyViewed';
 
 interface ProductPageProps {
@@ -27,7 +26,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
   return {
     title: `${product.title} (ԿՈԴ: ${product.code}) | TAB.AM`,
-    description: `${product.title} - ${product.shortDesc} Առկա է Մելքումովի 40/1 սրահում (${product.stockQuantity} հատ): Գործարանային երաշխիք:`,
+    description: `${product.title} - ${product.shortDesc} Առկա է Մելքումովի 40/1 սրահում: Գործարանային երաշխիք:`,
     openGraph: {
       title: `${product.title} (Կոդ: ${product.code}) | tab.am`,
       description: product.shortDesc,
@@ -113,8 +112,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
       </div>
 
-      {/* Customer & Plumber Reviews */}
-      <ProductReviews product={product} />
 
       {/* Related Products Section (2-col mobile, 4-col desktop) */}
       {relatedProducts.length > 0 && (

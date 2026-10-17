@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, Product } from '../types';
 import { products } from '../data/products';
+import { stockCap } from '../lib/utils';
 
 // Persisted schema version. Bump when the stored shape changes and add a
 // matching branch in `migrate` below.
@@ -31,7 +32,7 @@ function revalidateCartItems(items: CartItem[]): CartItem[] {
       title: fresh.title,
       images: fresh.images,
     };
-    const maxQty = fresh.stockQuantity > 0 ? fresh.stockQuantity : item.quantity;
+    const maxQty = stockCap(fresh.stockQuantity);
     const quantity = Math.max(1, Math.min(item.quantity, maxQty));
     acc.push({ product: merged, quantity });
     return acc;
@@ -84,9 +85,7 @@ export const useCart = create<CartState>()(
         if (existingIndex > -1) {
           const updatedItems = [...currentItems];
           const newQty = updatedItems[existingIndex].quantity + qty;
-          const finalQty = product.stockQuantity > 0 
-            ? Math.min(newQty, product.stockQuantity) 
-            : newQty;
+          const finalQty = Math.min(newQty, stockCap(product.stockQuantity));
 
           updatedItems[existingIndex] = {
             ...updatedItems[existingIndex],
@@ -94,9 +93,7 @@ export const useCart = create<CartState>()(
           };
           set({ items: updatedItems });
         } else {
-          const initialQty = product.stockQuantity > 0 
-            ? Math.min(qty, product.stockQuantity) 
-            : qty;
+          const initialQty = Math.min(qty, stockCap(product.stockQuantity));
           set({
             items: [...currentItems, { product, quantity: initialQty }],
           });
@@ -118,8 +115,7 @@ export const useCart = create<CartState>()(
         set({
           items: get().items.map((item) => {
             if (item.product.id === productId) {
-              const maxStock = item.product.stockQuantity;
-              const safeQty = maxStock > 0 ? Math.min(qty, maxStock) : qty;
+              const safeQty = Math.min(qty, stockCap(item.product.stockQuantity));
               return { ...item, quantity: safeQty };
             }
             return item;

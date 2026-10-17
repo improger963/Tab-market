@@ -14,7 +14,11 @@ export interface Product {
   price: number; // In Armenian Dram (AMD / ֏)
   oldPrice?: number; // Pre-discount price in AMD
   inStock: boolean;
-  stockQuantity: number; // Inventory available at Melkumovi 40/1 showroom, Yerevan
+  /**
+   * Exact showroom units. Only present when the price list really carries a
+   * number — the imported sheet has none, so no count may be rendered.
+   */
+  stockQuantity?: number;
   images: string[];
   blueprintImage?: string; // Technical dimensional CAD drawing / scheme
   shortDesc: string;
@@ -24,6 +28,7 @@ export interface Product {
   reviewsCount?: number; // Count of verified customer reviews
   finish?: 'chrome' | 'gold' | 'black' | 'gunmetal' | 'white' | 'mirror';
   isNew?: boolean;
+  clearance?: boolean; // Sheet section Լիկվիդացիա (clearance lot)
 }
 
 export interface Review {

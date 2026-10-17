@@ -42,6 +42,8 @@ const TEXT = {
   T_COPY_CODE: '\u054a\u0561\u057f\u0573\u0565\u0576\u0565\u056c \u053f\u0578\u0564',
   L_CODE: '\u053f\u0578\u0564:',
   L_IN_STOCK: '\u054d\u0580\u0561\u0570\u0578\u0582\u0574 \u056f\u0561',
+  // Quoted from the price list's own clearance section name (products.xlsx).
+  L_CLEARANCE: '\u053C\u056B\u056F\u057E\u056B\u0564\u0561\u0581\u056B\u0561',
   L_PRICE_ASK: '\u0533\u056b\u0576\u0568\u055d \u0568\u057d\u057f \u0570\u0561\u0580\u0581\u0574\u0561\u0576',
   L_ADD: '\u0531\u057e\u0565\u056c\u0561\u0581\u0576\u0565\u056c',
   L_ADDED: '\u0531\u057e\u0565\u056c\u0561\u0581\u057e\u0565\u0581',
@@ -132,14 +134,19 @@ export default function ProductCard({ product }: ProductCardProps) {
     TEXT.WA_HEAD + product.title + TEXT.WA_MID + product.code + TEXT.WA_TAIL + SHOWROOM_INFO.address + TEXT.WA_END,
   )}`;
 
-  // Image badges: maximum TWO total — discount first, then one status
-  // (showroom availability, falling back to the CAD indicator).
+  // Image badges render only from real data, and a card never carries more than
+  // two. Priority: an actual price cut, the price list's own clearance tag, then
+  // one status indicator (showroom availability, else the CAD drawing).
   const statusBadge = product.inStock
     ? 'stock'
     : resolveImageUrl(product.blueprintImage)
       ? 'cad'
       : null;
-  const badgeCount = (discountPercent ? 1 : 0) + (statusBadge ? 1 : 0);
+  const visibleBadges = ([
+    discountPercent ? 'discount' : null,
+    product.clearance ? 'clearance' : null,
+    statusBadge,
+  ].filter(Boolean) as string[]).slice(0, 2);
 
   return (
     <div className="card-lux rounded-card flex flex-col h-full group relative overflow-hidden">
@@ -161,13 +168,19 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* 2. Badges (max 2) + quick actions */}
         <div className="absolute top-2 left-2 right-2 flex items-start justify-between pointer-events-none gap-1 z-10">
           <div className="flex flex-col gap-1 items-start">
-            {discountPercent ? (
+            {visibleBadges.includes('discount') ? (
               <span className="px-2 py-0.5 rounded-full bg-danger text-white font-bold text-xs tabular-nums leading-tight">
                 -{discountPercent}%
               </span>
             ) : null}
 
-            {badgeCount < 2 && statusBadge === 'stock' ? (
+            {visibleBadges.includes('clearance') ? (
+              <span className="px-2 py-0.5 rounded-full bg-ink text-white text-xs font-semibold leading-tight">
+                {TEXT.L_CLEARANCE}
+              </span>
+            ) : null}
+
+            {visibleBadges.includes('stock') ? (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full glass-surface text-body text-xs font-semibold leading-tight">
                 {/* Static dot — no ambient pulse on cards */}
                 <span className="w-2 h-2 rounded-full bg-success shrink-0" aria-hidden="true"></span>
@@ -175,7 +188,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               </span>
             ) : null}
 
-            {badgeCount < 2 && statusBadge === 'cad' ? (
+            {visibleBadges.includes('cad') ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ink/90 text-white text-xs font-mono font-medium leading-tight">
                 <Layers className="w-3 h-3" aria-hidden="true" />
                 CAD

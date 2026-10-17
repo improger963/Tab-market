@@ -13,7 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import { categories } from '@/data/categories';
-import { products } from '@/data/products';
+import { brands } from '@/data/brands';
 import { formatAMD } from '@/lib/utils';
 
 export interface FilterState {
@@ -36,9 +36,11 @@ interface FilterSidebarProps {
   onCloseMobileDrawer?: () => void;
 }
 
-// Brand facets are derived from the live catalog so the list never advertises
-// brands (or filters) that have zero products.
-const AVAILABLE_BRANDS = Array.from(new Set(products.map((p) => p.brand))).sort();
+// Brand facets come from the generated brand list, which the importer builds
+// from the price list's own brand column: only brands with real listings
+// appear, and listings without a brand stay unfilterable instead of turning
+// into a phantom "(none)" brand.
+const AVAILABLE_BRANDS = brands.map((b) => b.name);
 
 const COLOR_SWATCHES = [
   { id: 'chrome', label: 'Քրոմ', bgClass: 'bg-finish-chrome', textClass: 'text-ink' },
@@ -450,7 +452,9 @@ export default function FilterSidebar({
               <span className="text-xs font-semibold text-muted block">
                 Արտադրող Բրենդներ
               </span>
-              <div className="flex flex-wrap gap-1.5">
+              {/* The sheet lists 60+ brands; keep the facet scrollable so the
+                  sidebar stays usable at every viewport height. */}
+              <div className="flex flex-wrap gap-1.5 max-h-60 overflow-y-auto overscroll-contain pr-1">
                 {AVAILABLE_BRANDS.map((brand) => {
                   const isChecked = filters.brands.includes(brand);
                   return (

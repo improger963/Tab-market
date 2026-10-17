@@ -41,9 +41,10 @@ export async function GET(req: NextRequest) {
     filtered = filtered.filter((p) => p.finish === finish);
   }
 
-  // In stock only
+  // Showroom availability. The price list marks a line as available or not; it
+  // never publishes unit counts, so no quantity may be filtered on or shown.
   if (inStockOnly) {
-    filtered = filtered.filter((p) => p.inStock && p.stockQuantity > 0);
+    filtered = filtered.filter((p) => p.inStock);
   }
 
   // Price range
@@ -69,8 +70,9 @@ export async function GET(req: NextRequest) {
   } else if (sortBy === 'newest') {
     filtered.sort((a, b) => b.id - a.id);
   } else {
-    // popular / rating
-    filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    // Default ordering: the price list's own SKU order. It carries no rating or
+    // popularity data, so nothing else could be honestly ranked here.
+    filtered.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
   }
 
   const total = filtered.length;

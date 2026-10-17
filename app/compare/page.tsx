@@ -215,7 +215,7 @@ export default function ComparePage() {
                     <td key={p.id} className="p-4 border-l border-canvas">
                       <span className="inline-flex items-center gap-1.5 font-bold text-success">
                         <Check className="w-3.5 h-3.5 text-success" />
-                        Առկա է ({p.stockQuantity} հատ)
+                        Առկա է 
                       </span>
                     </td>
                   ))}

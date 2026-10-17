@@ -28,13 +28,19 @@ import CategoryNavStrip from './CategoryNavStrip';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { formatAMD } from '@/lib/utils';
+import { HY } from '@/lib/copy/hy';
 import ProductImage from '@/components/ui/ProductImage';
+import Pagination from '@/components/ui/Pagination';
 
 interface CatalogViewProps {
   initialCategorySlug?: string;
 }
 
-const VALID_SORTS = ['popular', 'price-asc', 'price-desc'] as const;
+// One page of listings. The imported price list carries ~1.6k rows, so the
+// catalogue is never rendered whole: 24 gallery cards is roughly two screens.
+const PAGE_SIZE = 24;
+
+const VALID_SORTS = ['catalogue', 'price-asc', 'price-desc'] as const;
 type SortKey = (typeof VALID_SORTS)[number];
 
 /**
@@ -74,25 +80,40 @@ function readFiltersFromUrl(
   }
 }
 
-/** Restores the active sort from the URL query string (defaults to `popular`). */
+/** Restores the active sort from the URL query string (defaults to `catalogue`). */
 function readSortFromUrl(): SortKey {
-  if (typeof window === 'undefined') return 'popular';
+  if (typeof window === 'undefined') return 'catalogue';
   try {
     const s = new URLSearchParams(window.location.search).get('sort');
-    return s && (VALID_SORTS as readonly string[]).includes(s) ? (s as SortKey) : 'popular';
+    return s && (VALID_SORTS as readonly string[]).includes(s) ? (s as SortKey) : 'catalogue';
   } catch {
-    return 'popular';
+    return 'catalogue';
+  }
+}
+
+/** Restores the page number from the URL query string (defaults to 1). */
+function readPageFromUrl(): number {
+  if (typeof window === 'undefined') return 1;
+  try {
+    const raw = Number(new URLSearchParams(window.location.search).get('page'));
+    return Number.isInteger(raw) && raw > 0 ? raw : 1;
+  } catch {
+    return 1;
   }
 }
 
 export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
-  // Compute global price bounds
+  // Price bounds come from the imported list itself. Hard-coding a ceiling used
+  // to hide every listing above it: the real range tops out at 650 000.
   const priceBounds = useMemo(() => {
-    const prices = products.map((p) => p.price);
-    return {
-      min: Math.min(...prices, 0),
-      max: Math.max(...prices, 400000),
-    };
+    let min = Infinity;
+    let max = 0;
+    for (const p of products) {
+      const value = Number(p.price) || 0;
+      if (value < min) min = value;
+      if (value > max) max = value;
+    }
+    return { min: Number.isFinite(min) ? min : 0, max };
   }, []);
 
   // Filter state (seeded from the URL query for shareable / reloadable views)
@@ -101,10 +122,14 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   );
 
   const [sortBy, setSortBy] = useState<SortKey>(() => readSortFromUrl());
+  const [page, setPage] = useState<number>(() => readPageFromUrl());
   const [viewMode, setViewMode] = useState<'gallery' | 'compact'>('gallery');
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  // Scroll target for page changes: the results column, not the document top,
+  // so the filter sidebar stays where the user left it.
+  const resultsTopRef = useRef<HTMLDivElement | null>(null);
 
   const { addItem, openDrawer } = useCart();
   const { showCartToast } = useToast();
@@ -126,6 +151,17 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
     }, 1000);
     return () => clearTimeout(timer);
   }, [filters, sortBy, isMounted]);
+
+  // A new filter set or ordering always restarts at page 1. The first run is
+  // skipped so a deep link like `?page=3` survives the initial mount.
+  const pageResetMountedRef = useRef(false);
+  useEffect(() => {
+    if (!pageResetMountedRef.current) {
+      pageResetMountedRef.current = true;
+      return;
+    }
+    setPage(1);
+  }, [filters, sortBy]);
 
   // Route-driven category sync (Back / Forward between /catalog and
   // /category/[slug]). The first run is skipped so a category parsed from the
@@ -154,11 +190,12 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
     if (filters.inStockOnly) params.set('stock', '1');
     if (filters.minPrice > priceBounds.min) params.set('min', String(filters.minPrice));
     if (filters.maxPrice < priceBounds.max) params.set('max', String(filters.maxPrice));
-    if (sortBy !== 'popular') params.set('sort', sortBy);
+    if (sortBy !== 'catalogue') params.set('sort', sortBy);
+    if (page > 1) params.set('page', String(page));
     const query = params.toString();
     const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
     window.history.replaceState({}, '', nextUrl);
-  }, [filters, sortBy, isMounted, priceBounds]);
+  }, [filters, sortBy, isMounted, page, priceBounds]);
 
   // Lock body scroll and allow Escape to dismiss the mobile filter sheet (no layout jump).
   useEffect(() => {
@@ -218,8 +255,10 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
       if (filters.category && p.categorySlug !== filters.category) {
         return false;
       }
-      // Showroom stock filter
-      if (filters.inStockOnly && (!p.inStock || p.stockQuantity <= 0)) {
+      // Showroom availability filter. The price list says whether a line is in
+      // the showroom, not how many units are on the shelf, so `inStock` alone
+      // decides.
+      if (filters.inStockOnly && !p.inStock) {
         return false;
       }
       // Brand filter
@@ -264,17 +303,38 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
       return true;
     });
 
-    // Sorting
+    // Sorting. The default is the price list's own SKU order: the sheet has no
+    // popularity, "newness" or editorial ranking to sort by.
     if (sortBy === 'price-asc') {
       list = [...list].sort((a, b) => a.price - b.price);
     } else if (sortBy === 'price-desc') {
       list = [...list].sort((a, b) => b.price - a.price);
     } else {
-      list = [...list].sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
+      list = [...list].sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
     }
 
     return list;
   }, [filters, sortBy]);
+
+  // One page of the result set. With ~1.6k listings, rendering everything would
+  // build ~1.6k product cards at once.
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageProducts = useMemo(
+    () => filteredProducts.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [filteredProducts, safePage],
+  );
+
+  const handlePageChange = (next: number) => {
+    setPage(next);
+    // Respect the OS "reduce motion" setting, same as the rest of the site.
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const top = resultsTopRef.current?.getBoundingClientRect().top ?? 0;
+    const offset = top + window.scrollY - 120;
+    window.scrollTo({ top: offset, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  };
 
   // Fallback alternatives for zero-state
   const fallbackAlternatives = useMemo(() => {
@@ -336,11 +396,11 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                 <span className="text-xs font-semibold text-body hidden sm:inline">Դասավորել՝</span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'popular' | 'price-asc' | 'price-desc')}
+                  onChange={(e) => setSortBy(e.target.value as SortKey)}
                   aria-label="Դասավորել ըստ"
                   className="min-w-0 max-w-[8rem] truncate bg-transparent text-xs font-bold text-ink focus:outline-hidden cursor-pointer"
                 >
-                  <option value="popular">Նախընտրելի / Հանրաճանաչ</option>
+                  <option value="catalogue">{HY.BY_CODE}</option>
                   <option value="price-asc">Գնով՝ Աճող</option>
                   <option value="price-desc">Գնով՝ Նվազող</option>
                 </select>
@@ -449,7 +509,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
           </aside>
 
           {/* Product Grid Area */}
-          <div className="lg:col-span-9 space-y-6">
+          <div ref={resultsTopRef} className="lg:col-span-9 space-y-6">
             {isLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 lg:[grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-3 sm:gap-5 lg:gap-6">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -508,7 +568,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line">
-                    {filteredProducts.map((product) => {
+                    {pageProducts.map((product) => {
                       // Contractor-core specs first: Diameter / Material / Cartridge, padded with Warranty
                       const specPriority = ['Միացում', 'Նյութ', 'Քարտրիջ', 'Երաշխիք'];
                       const specEntries = Object.entries(product.specs);
@@ -551,7 +611,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                           <td className="p-3.5 hidden md:table-cell whitespace-nowrap">
                             <span className="inline-flex items-center gap-1.5 text-xs font-bold text-success bg-success/10 px-2 py-0.5 rounded border border-success">
                               <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
-                              Առկա ({product.stockQuantity})
+                              Առկա 
                             </span>
                           </td>
                           <td className="p-3.5 text-right whitespace-nowrap">
@@ -577,11 +637,22 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
             ) : (
               /* Responsive 2-column on mobile, 3-column on tablet and desktop */
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 lg:[grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-3 sm:gap-5 lg:gap-6">
-                {filteredProducts.map((product) => (
+                {pageProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             )}
+
+            {/* One page of ~1.6k listings: the controls sit below the results
+                in both the gallery and the contractor table view. */}
+            {!isLoading && filteredProducts.length > PAGE_SIZE ? (
+              <Pagination
+                page={safePage}
+                pageSize={PAGE_SIZE}
+                total={filteredProducts.length}
+                onChange={handlePageChange}
+              />
+            ) : null}
           </div>
         </div>
       </div>

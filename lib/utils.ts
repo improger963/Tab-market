@@ -23,6 +23,23 @@ export function displayTitle(title: string): string {
 }
 
 /**
+ * Showroom unit counts exist only where the price list really carries a number.
+ * The assortment file prices the catalogue but does not publish per-address
+ * stock, so `null` means "no unit claim may be shown" rather than "zero".
+ */
+export function stockUnits(stockQuantity: number | undefined | null): number | null {
+  return typeof stockQuantity === 'number' && stockQuantity > 0 ? stockQuantity : null;
+}
+
+/**
+ * Largest quantity the stock data still allows an order for. Infinity when the
+ * data carries no count: nothing may be asserted about a limit that is unknown.
+ */
+export function stockCap(stockQuantity: number | undefined | null): number {
+  return stockUnits(stockQuantity) ?? Infinity;
+}
+
+/**
  * Formats an amount into Armenian Dram (֏ / AMD) with tabular digits,
  * space thousand separators, and non-breaking space (\u00A0).
  * Money is always an integer amount; e.g. 2200 -> "2 200 ֏".

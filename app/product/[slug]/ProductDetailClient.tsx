@@ -82,7 +82,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               </span>
               <div className="flex items-center gap-1.5 text-xs font-semibold text-success bg-success/10 px-2.5 py-1 rounded-control border border-success">
                 <span className="w-2 h-2 rounded-full bg-success "></span>
-                Առկա է սրահում ({product.stockQuantity} հատ)
+                Առկա է սրահում 
               </div>
             </div>
 

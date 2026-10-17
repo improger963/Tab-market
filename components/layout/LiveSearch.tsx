@@ -441,10 +441,10 @@ export default function LiveSearch({
                           <span className="font-mono text-xs font-bold text-accent bg-accent/5 px-1.5 py-0.2 rounded border border-accent/15">
                             Կոդ: {highlightMatch(product.code, debouncedQuery)}
                           </span>
-                          {product.inStock && product.stockQuantity > 0 ? (
+                          {product.inStock ? (
                             <span className="inline-flex items-center gap-1 text-xs font-semibold text-success bg-success/10 px-1.5 py-0.2 rounded border border-success">
                               <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
-                              Առկա է սրահում ({product.stockQuantity})
+                              Առկա է սրահում 
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs font-semibold text-warning bg-warning/10 px-1.5 py-0.2 rounded border border-warning/25">

@@ -5,35 +5,69 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import {
-  ChevronRight,
-  Award,
-  ArrowRight,
-  ShieldCheck,
-  PackageX,
-  MapPin,
-  Star,
-  Truck,
-} from 'lucide-react';
+import { ChevronRight, PackageX, ArrowRight, MapPin, Truck } from 'lucide-react';
 import { products } from '@/data/products';
-import { BRANDS } from '@/components/home/BrandsCarousel';
+import { brandBySlug } from '@/data/brands';
 import ProductCard from '@/components/product/ProductCard';
+import ProductImage from '@/components/ui/ProductImage';
+import Pagination from '@/components/ui/Pagination';
+import { DELIVERY_CONFIG, SHOWROOM_INFO, resolveImageUrl } from '@/lib/config';
+import { HY } from '@/lib/copy/hy';
 
 interface BrandPageClientProps {
   slug: string;
 }
 
+const PAGE_SIZE = 24;
+
 /**
- * Dedicated Brand Landing Page view.
- * Renders an authoritative brand header (origin, official warranty badge,
- * quality statement) followed by the filtered product grid for that brand.
- * Shared by the App Router route and the SPA router so there is a single
- * source of truth for the brand ecosystem.
+ * Dedicated brand landing page, shared by the App Router route and the SPA
+ * router so there is a single source of truth.
+ *
+ * Only facts the price list really carries are shown: the brand's own spelling,
+ * its photograph, and the listings attributed to it. Origin, ratings, award
+ * badges and blanket warranty promises were removed - the price list has no such
+ * columns, so any such statement on this page would have been invented.
  */
 export default function BrandPageClient({ slug }: BrandPageClientProps) {
-  const brand = BRANDS.find((b) => b.slug === slug);
+  const brand = brandBySlug.get(slug);
+
+  const brandProducts = useMemo(
+    () =>
+      brand
+        ? products
+            .filter((p) => p.brand === brand.name)
+            .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }))
+        : [],
+    [brand],
+  );
+
+  const [page, setPage] = useState(1);
+  const resultsTopRef = useRef<HTMLDivElement | null>(null);
+
+  // A different brand means a different result set: start over on page 1.
+  useEffect(() => {
+    setPage(1);
+  }, [slug]);
+
+  const totalPages = Math.max(1, Math.ceil(brandProducts.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageProducts = useMemo(
+    () => brandProducts.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [brandProducts, safePage],
+  );
+
+  const handlePageChange = (next: number) => {
+    setPage(next);
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const top = resultsTopRef.current?.getBoundingClientRect().top ?? 0;
+    window.scrollTo({
+      top: top + window.scrollY - 96,
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    });
+  };
 
   if (!brand) {
     return (
@@ -43,30 +77,22 @@ export default function BrandPageClient({ slug }: BrandPageClientProps) {
         </div>
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-ink tracking-tight">
-            Բրենդը չի գտնվել
+            {HY.BRAND_NOT_FOUND}
           </h1>
           <p className="text-xs sm:text-sm text-muted max-w-sm mx-auto leading-relaxed">
-            Հնարավոր է բրենդի հասցեն սխալ է մուտքագրվել կամ այն դեռևս չի ներկայացվում
-            Մելքումովի 40/1 սրահում:
+            {HY.BRAND_ABSENT}
           </p>
         </div>
         <Link
           href="/catalog"
           className="min-h-[48px] inline-flex items-center gap-2 px-8 py-3 rounded-panel bg-ink hover:bg-accent text-white font-bold text-xs transition-all shadow-e1 active:scale-98"
         >
-          <span>Վերադառնալ Կատալոգ</span>
+          <span>{HY.BACK_TO_CATALOG}</span>
           <ArrowRight className="w-4 h-4 text-accent" />
         </Link>
       </div>
     );
   }
-
-  // Filter products belonging to this brand (case-insensitive by name or slug)
-  const brandProducts = products.filter(
-    (p) =>
-      p.brand.toLowerCase() === brand.name.toLowerCase() ||
-      p.brand.toLowerCase().includes(brand.slug),
-  );
 
   return (
     <div className="container-lux py-8 space-y-10">
@@ -76,115 +102,88 @@ export default function BrandPageClient({ slug }: BrandPageClientProps) {
         className="flex items-center gap-2 text-xs text-muted overflow-x-auto no-scrollbar whitespace-nowrap"
       >
         <Link href="/" className="hover:text-accent transition-colors">
-          Գլխավոր
+          {HY.HOME}
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-muted" />
         <Link href="/catalog" className="hover:text-accent transition-colors">
-          Կատալոգ
+          {HY.CATALOG}
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-muted" />
         <span className="text-ink font-bold">{brand.name}</span>
       </nav>
 
-      {/* Brand Hero Header */}
+      {/* Brand Header - name, its own photography and its real listing count */}
       <div className="bg-ink text-white rounded-panel p-8 sm:p-12 border border-ink shadow-e2 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-4 max-w-2xl">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-accent border border-accent/30 text-xs font-bold">
-              <Award className="w-4 h-4 text-accent" />
-              <span>Պաշտոնական Արտադրող • {brand.country}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/15 text-success border border-success/30 text-xs font-bold">
-              <Star className="w-3.5 h-3.5 fill-success text-success" />
-              <span>{brand.rating}</span>
-            </span>
-          </div>
-
-          {/* Brand Logo Monogram + Name */}
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-panel bg-ice-chrome border-ice-chrome text-ink font-bold text-2xl tracking-wider flex items-center justify-center shrink-0">
-              {brand.name.slice(0, 3)}
-            </div>
+            {resolveImageUrl(brand.image) ? (
+              <ProductImage
+                src={brand.image}
+                alt={brand.name}
+                className="w-16 h-16 rounded-control shrink-0 bg-white"
+                imgClassName="object-contain p-1.5"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-panel bg-ice-chrome border-ice-chrome text-ink font-bold text-2xl tracking-wider flex items-center justify-center shrink-0">
+                {brand.name.slice(0, 3)}
+              </div>
+            )}
             <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white uppercase">
               {brand.name}
             </h1>
           </div>
 
-          <p className="text-on-dark text-xs sm:text-sm leading-relaxed">
-            {brand.desc}։ Բոլոր մոդելներն անցել են գործարանային հիդրավլիկ փորձարկում և
-            ունեն պաշտոնական երաշխիքային սպասարկում tab.am-ում (Մելքումովի 40/1):
+          <p className="text-on-dark text-xs sm:text-sm leading-relaxed tabular-nums">
+            {brand.count} {HY.APRANQ}
           </p>
         </div>
 
-        {/* Official Warranty Badge */}
+        {/* Verified showroom facts only */}
         <div className="w-full md:w-auto bg-ink/90 border border-body/80 p-5 rounded-panel flex items-center gap-4 shrink-0 shadow-e1">
-          <div className="w-12 h-12 rounded-control bg-accent text-white flex items-center justify-center font-bold text-lg shrink-0">
-            5տ
+          <div className="w-12 h-12 rounded-control bg-accent text-white flex items-center justify-center shrink-0">
+            <MapPin className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="text-xs">
-            <span className="font-bold text-white block">5 տարվա գործարանային երաշխիք</span>
-            <span className="text-muted">Անվճար փոխարինում սրահից</span>
+            <span className="font-bold text-white block">{HY.OUR_SHOWROOM}</span>
+            <span className="text-muted">{SHOWROOM_INFO.address}</span>
           </div>
         </div>
       </div>
 
-      {/* Showroom Availability Strip */}
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-body bg-canvas border border-line rounded-panel px-5 py-3.5">
-        <span className="inline-flex items-center gap-1.5">
-          <MapPin className="w-4 h-4 text-accent" />
-          Առկա է Մելքումովի 40/1 սրահում
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <ShieldCheck className="w-4 h-4 text-accent" />
-          {brand.badge} • Պաշտոնական ներկրում
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <TruckFreeBadge />
-        </span>
-      </div>
+      {/* Delivery fact, only when the delivery config really guarantees it */}
+      {DELIVERY_CONFIG.yerevanFreeAlways ? (
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-body bg-canvas border border-line rounded-panel px-5 py-3.5">
+          <span className="inline-flex items-center gap-1.5 text-success">
+            <span className="w-4 h-4 rounded-full bg-success/10 text-success flex items-center justify-center text-xs font-bold">
+              <Truck className="w-3 h-3" />
+            </span>
+            {HY.FREE_DELIVERY_YEREVAN}
+          </span>
+        </div>
+      ) : null}
 
-      {/* Product Catalog Grid for this Brand */}
-      <div className="space-y-6">
+      {/* Product listings for this brand */}
+      <div className="space-y-6" ref={resultsTopRef}>
         <div className="flex items-center justify-between">
-          <h2 className="text-xl sm:text-2xl font-bold text-ink tracking-tight">
-            {brand.name} Տեսականի ({brandProducts.length} ապրանք)
+          <h2 className="text-xl sm:text-2xl font-bold text-ink tracking-tight tabular-nums">
+            {brand.name} {HY.ASSORTMENT} ({brandProducts.length} {HY.APRANQ})
           </h2>
         </div>
 
-        {brandProducts.length === 0 ? (
-          <div className="bg-white rounded-panel border border-line p-12 text-center space-y-4">
-            <p className="text-sm text-muted">
-              Այս պահին {brand.name} բրենդի առանձնացված մոդելները համալրվում են ընդհանուր
-              պահեստից:
-            </p>
-            <Link
-              href="/catalog"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-control bg-ink text-white text-xs font-bold hover:bg-accent transition-all"
-            >
-              <span>Դիտել Ամբողջ Կատալոգը</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-            {brandProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
+          {pageProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+
+        <Pagination
+          page={safePage}
+          pageSize={PAGE_SIZE}
+          total={brandProducts.length}
+          onChange={handlePageChange}
+          className="pt-4"
+        />
       </div>
     </div>
-  );
-}
-
-/** Compact free-delivery chip used in the brand availability strip. */
-function TruckFreeBadge() {
-  return (
-    <span className="inline-flex items-center gap-1.5 text-success">
-      <span className="w-4 h-4 rounded-full bg-success/10 text-success flex items-center justify-center text-xs font-bold">
-        <Truck className="w-3 h-3" />
-      </span>
-      Անվճար առաքում Երևանում
-    </span>
   );
 }

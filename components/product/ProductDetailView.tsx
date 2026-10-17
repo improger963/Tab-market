@@ -28,7 +28,7 @@ import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { useWishlist } from '@/store/useWishlist';
 import { useRecentlyViewed } from '@/store/useRecentlyViewed';
-import { formatAMD, displayTitle } from '@/lib/utils';
+import { formatAMD, displayTitle, stockCap, stockUnits } from '@/lib/utils';
 import { DELIVERY_CONFIG, SHOWROOM_INFO } from '@/lib/config';
 import { HY } from '@/lib/copy/hy';
 import QuickOrderModal from './QuickOrderModal';
@@ -80,6 +80,11 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
     product.oldPrice && product.oldPrice > product.price
       ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
       : null;
+
+  // The imported price list publishes no per-unit counts, so a number is shown
+  // and a stepper ceiling enforced only when the data really carries one.
+  const units = stockUnits(product.stockQuantity);
+  const cap = stockCap(product.stockQuantity);
 
   const handleCopyCode = () => {
     navigator.clipboard?.writeText(product.code);
@@ -147,18 +152,28 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             {product.categoryName}
           </Link>
 
-          <span className="inline-flex items-center gap-1.5 text-xs text-body">
-            <Star className="h-3.5 w-3.5 fill-ink text-ink" aria-hidden="true" />
-            <span className="font-semibold text-ink tabular-nums">{product.rating}</span>
-            <span className="text-muted">
-              ({product.reviewsCount} {HY.REVIEWS})
+          {/* Rating only when reviews really exist - none are published yet. */}
+          {typeof product.rating === 'number' && typeof product.reviewsCount === 'number' ? (
+            <span className="inline-flex items-center gap-1.5 text-xs text-body">
+              <Star className="h-3.5 w-3.5 fill-ink text-ink" aria-hidden="true" />
+              <span className="font-semibold text-ink tabular-nums">{product.rating}</span>
+              <span className="text-muted">
+                ({product.reviewsCount} {HY.REVIEWS})
+              </span>
             </span>
-          </span>
+          ) : null}
         </div>
 
         {/* Brand + title */}
         <div className="space-y-1">
-          <p className="text-xs font-medium text-muted">{product.brand}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {product.brand ? (
+              <p className="text-xs font-medium text-muted">{product.brand}</p>
+            ) : null}
+            {product.clearance ? (
+              <p className="text-xs font-semibold text-danger">{HY.CLEARANCE}</p>
+            ) : null}
+          </div>
           <h1 className="text-2xl font-bold leading-snug tracking-tight text-ink sm:text-3xl">
             {displayTitle(product.title)}
           </h1>
@@ -217,7 +232,8 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               <span className="h-2 w-2 shrink-0 rounded-full bg-success" aria-hidden="true" />
               <span className="font-semibold text-ink">{HY.IN_STOCK_SHOWROOM}</span>
               <span className="text-muted tabular-nums">
-                {DELIVERY_CONFIG.pickupAddress} · {product.stockQuantity} {HY.HAT}
+                {DELIVERY_CONFIG.pickupAddress}
+                {units !== null ? ` \u00B7 ${units} ${HY.HAT}` : ''}
               </span>
             </>
           ) : (
@@ -268,8 +284,8 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
 
               <button
                 type="button"
-                onClick={() => setQuantity((q) => Math.min(product.stockQuantity, q + 1))}
-                disabled={quantity >= product.stockQuantity}
+                onClick={() => setQuantity((q) => Math.min(cap, q + 1))}
+                disabled={quantity >= cap}
                 aria-label={HY.QTY_INCREASE}
                 className="btn-tactile flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control text-body transition-colors duration-hover ease-precision hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
               >
