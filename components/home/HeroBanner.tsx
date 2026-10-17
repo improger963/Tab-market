@@ -7,168 +7,231 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Clock, MapPin, Phone, Store } from 'lucide-react';
-import { SHOWROOM_INFO, SITE_CLAIMS, isShowroomOpen } from '@/lib/config';
-import { HY } from '@/lib/copy/hy';
+import { heroConfig, getShowroomStatus } from '@/config/hero';
 
 /**
- * Hero — asymmetric, text-left / visual-right on desktop, stacked on mobile.
+ * Hero — asymmetric text-left / visual-right on desktop, stacked on mobile.
  *
  * Rules honoured here:
- * - All copy renders from SITE_CLAIMS / HY only; badge and subtitle are
- *   HIDDEN when the config value is empty (no invented marketing claims).
- * - No auto-rotating carousel and no ambient animation: at most zero
- *   continuous animations on this screen (the only beacon in the app is the
- *   PDP WhatsApp button).
- * - Showroom open/closed is computed client-side AFTER mount from real hours
- *   in Asia/Yerevan (no hydration mismatch); the static hours line is the
- *   server-rendered fallback.
- * - Visual panel is the ice-chrome gradient placeholder — genuine showroom
- *   photography must be supplied by the owner before any image replaces it
- *   (no unrelated stock photos).
+ * - EVERY rendered value comes from `config/hero.ts` (future
+ *   `GET /api/v1/settings` mirror). Empty/undefined field -> element hidden;
+ *   nothing (badge, claims, CTA labels, hours, contacts) is hardcoded in JSX.
+ * - No looping/ambient animation. The route wrapper already applies a
+ *   one-shot 200ms opacity fade; a hero-only entrance would need a NEW global
+ *   keyframe, so it is intentionally skipped (see pass report).
+ * - Showroom open/closed renders client-side AFTER mount from real hours in
+ *   Asia/Yerevan; before that a same-height invisible placeholder reserves
+ *   the line, so there is neither a hydration mismatch nor any layout shift.
+ * - Visual panel: only owner-supplied real photography from config. With no
+ *   image configured it stays the on-brand ice-chrome gradient + wordmark.
+ *   A failing image swaps to the same fallback without resizing the panel.
+ * - Height cap keeps the first content row peeking below the fold on short
+ *   desktop viewports (1440×900 / 1920×1080).
  */
 export default function HeroBanner() {
-  // null = not computed yet (SSR + first paint) -> only static hours render.
-  const [openNow, setOpenNow] = useState<boolean | null>(null);
+  const [status, setStatus] = useState<ReturnType<typeof getShowroomStatus>>(null);
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
-    setOpenNow(isShowroomOpen());
+    setStatus(getShowroomStatus());
   }, []);
 
-  const headline = SITE_CLAIMS.heroTitlePrefix || SITE_CLAIMS.heroTitleHighlight;
-  const highlight =
-    SITE_CLAIMS.heroTitlePrefix && SITE_CLAIMS.heroTitleHighlight
-      ? SITE_CLAIMS.heroTitleHighlight
-      : '';
+  const { badge, title, highlight, subtitle, primaryCta, secondaryCta, image, showroom } =
+    heroConfig;
+
+  const heroImage =
+    image && image.src && image.width > 0 && image.height > 0 && !imageFailed
+      ? image
+      : null;
 
   return (
     <section
-      aria-label={HY.OUR_SHOWROOM}
-      className="overflow-hidden rounded-panel border border-line bg-surface shadow-e1"
+      aria-label={title || 'tab.am'}
+      lang="hy"
+      className="overflow-hidden rounded-panel border border-line bg-surface shadow-e2 lg:grid lg:grid-cols-12 lg:h-[clamp(360px,56dvh,560px)]"
     >
-      <div className="grid items-stretch lg:grid-cols-12">
-        {/* ---- Copy column ---------------------------------------------------- */}
-        <div className="flex flex-col justify-center gap-5 p-6 sm:p-10 lg:col-span-7 lg:p-12">
-          {SITE_CLAIMS.seasonalBadgeLabel ? (
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-canvas px-3 py-1.5 text-xs font-semibold text-body">
-              <SparkleDot />
-              {SITE_CLAIMS.seasonalBadgeLabel}
-            </span>
-          ) : null}
-
-          <h1 className="text-display text-ink">
-            {headline}
-            {highlight ? <span className="block">{highlight}</span> : null}
-          </h1>
-
-          {SITE_CLAIMS.heroSubtitle ? (
-            <p className="max-w-2xl text-base leading-relaxed text-body sm:text-lg">
-              {SITE_CLAIMS.heroSubtitle}
-            </p>
-          ) : null}
-
-          {/* Max two CTAs: catalog (primary) + directions (secondary). */}
-          <div className="flex flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center">
-            <Link
-              href="/catalog"
-              className="btn-tactile inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-control bg-ink px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-hover ease-precision hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-            >
-              <span>{HY.VIEW_CATALOG}</span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-
-            <a
-              href={SHOWROOM_INFO.mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-tactile inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-control border border-line bg-surface px-7 py-3.5 text-sm font-semibold text-ink transition-colors duration-hover ease-precision hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-            >
-              <MapPin className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
-              <span>{HY.OUR_SHOWROOM}</span>
-            </a>
-          </div>
-
-          {/* ---- Glass "showroom" card (facts from config only) ------------ */}
-          <div className="glass-surface mt-1 max-w-md rounded-card p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-sm font-semibold text-ink">
-                <Store className="h-4 w-4 text-accent" aria-hidden="true" />
-                {HY.OUR_SHOWROOM}
-              </span>
-              {openNow !== null ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-xs font-semibold text-body">
-                  <span
-                    aria-hidden="true"
-                    className={`h-1.5 w-1.5 rounded-full ${
- openNow ? 'bg-success' : 'bg-line-strong'
- }`}
-                  />
-                  {openNow ? HY.OPEN : HY.CLOSED}
-                </span>
-              ) : null}
-            </div>
-
-            <dl className="mt-3 space-y-2 text-xs text-body sm:text-sm">
-              <div className="flex items-start gap-2">
-                <dt className="sr-only">{HY.SHOWROOM}</dt>
-                <dd className="inline-flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
-                  <a
-                    href={SHOWROOM_INFO.mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded underline-offset-4 transition-colors duration-hover hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-                  >
-                    {SHOWROOM_INFO.address}
-                  </a>
-                </dd>
-              </div>
-              <div className="flex items-center gap-2">
-                <dt className="sr-only">{SHOWROOM_INFO.hoursLabel}</dt>
-                <dd className="inline-flex items-center gap-2 tabular-nums">
-                  <Clock className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
-                  {SHOWROOM_INFO.hoursLabel}
-                </dd>
-              </div>
-              <div className="flex items-center gap-2">
-                <dt className="sr-only">{HY.CALL}</dt>
-                <dd className="inline-flex items-center gap-2">
-                  <Phone className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
-                  <a
-                    href={`tel:+${SHOWROOM_INFO.phoneIntl}`}
-                    className="rounded font-semibold text-ink tabular-nums underline-offset-4 transition-colors duration-hover hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-                  >
-                    {SHOWROOM_INFO.phone}
-                  </a>
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-
-        {/* ---- Visual column: ice-chrome placeholder panel -------------------
-            Real showroom/product photography (owner-supplied) should replace
-            this panel. Until then NO stock imagery is rendered. ------------- */}
-        <div
-          aria-hidden="true"
-          className="relative flex min-h-[200px] items-center justify-center bg-ice-chrome ring-ice sm:min-h-[260px] lg:col-span-5 lg:min-h-full"
-        >
-          <span className="select-none text-5xl font-bold tracking-tight text-ink/80 sm:text-6xl">
-            tab.am
+      {/* ---- Copy column --------------------------------------------------- */}
+      <div className="flex flex-col justify-center gap-3 p-5 hyphens-auto break-words sm:gap-5 sm:p-10 lg:col-span-7 lg:gap-6 lg:p-12">
+        {badge ? (
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-canvas px-3 py-1.5 text-xs font-semibold text-body">
+            {/* Static decorative dot — never pulses. */}
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-accent" />
+            {badge}
           </span>
-          <span className="pointer-events-none absolute inset-x-6 bottom-6 h-px bg-line-strong/60" />
+        ) : null}
+
+        {title ? (
+          <h1 className="text-display line-clamp-3 text-ink sm:text-[clamp(1.75rem,1.35rem+1.4vw,2.25rem)] lg:text-[clamp(2rem,1.2rem+2.6vw,3.5rem)]">
+            {title}
+            {highlight ? <span className="block text-accent">{highlight}</span> : null}
+          </h1>
+        ) : null}
+
+        {subtitle ? (
+          <p className="line-clamp-3 max-w-[52ch] text-[15px] leading-relaxed text-body sm:text-base lg:text-lg">
+            {subtitle}
+          </p>
+        ) : null}
+
+        {/* ---- CTAs: max two, labels/targets from config only --------------- */}
+        <div className="flex flex-col items-stretch gap-2.5 pt-1 sm:flex-row sm:items-center sm:gap-3">
+          <Link
+            href={primaryCta.href}
+            className="btn-tactile inline-flex min-h-[48px] items-center justify-center rounded-control bg-ink px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-hover ease-precision hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+          >
+            {primaryCta.label}
+          </Link>
+
+          {secondaryCta ? (
+            <a
+              href={secondaryCta.href}
+              {...(secondaryCta.href.startsWith('http')
+                ? { target: '_blank', rel: 'noopener noreferrer' }
+                : {})}
+              className="btn-tactile inline-flex min-h-[48px] items-center justify-center gap-1.5 self-start rounded-control px-1 py-2 text-sm font-semibold text-ink underline-offset-4 hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:self-auto sm:justify-center sm:rounded-control sm:border sm:border-line sm:bg-surface sm:px-7 sm:py-3.5 sm:no-underline sm:transition-colors sm:duration-hover sm:ease-precision sm:hover:border-line-strong sm:hover:text-accent"
+            >
+              {secondaryCta.label}
+            </a>
+          ) : null}
         </div>
+
+        {/* Compact glass card for < lg: a row under the CTAs, never over the
+            image or the fixed dock. lg:hidden because the same component
+            floats inside the visual column on desktop. */}
+        {showroom ? (
+          <div className="lg:hidden">
+            <ShowroomCard variant="block" status={status} />
+          </div>
+        ) : null}
+      </div>
+
+      {/* ---- Visual column --------------------------------------------------
+           lg: image ≤ ~41% (5/12 cols) right of the text, full-bleed in cell.
+           <lg: sits under the copy as a compact banner strip. On phones the
+           purely decorative gradient is HIDDEN (no info, saves height) unless
+           a real owner photo is configured, which always renders. */}
+      <div
+        className={
+          heroImage
+            ? 'relative flex min-h-[110px] items-stretch sm:min-h-[160px] lg:col-span-5 lg:min-h-full'
+            : 'relative hidden min-h-[160px] items-stretch sm:flex lg:col-span-5 lg:min-h-full'
+        }
+      >
+        {heroImage ? (
+          <img
+            src={heroImage.src}
+            alt={heroImage.alt}
+            width={heroImage.width}
+            height={heroImage.height}
+            // LCP-friendly: hero image is fetched eagerly as high priority
+            // (Vite SPA — no next/image available; native attribute parity).
+            fetchPriority="high"
+            decoding="async"
+            onError={() => setImageFailed(true)}
+            className="h-full w-full object-cover"
+            style={{ aspectRatio: `${heroImage.width} / ${heroImage.height}` }}
+          />
+        ) : (
+          /* On-brand fallback: ice-chrome gradient + wordmark. aria-hidden
+             because it carries no information. */
+          <div
+            aria-hidden="true"
+            className="flex w-full items-center justify-center bg-ice-chrome ring-ice"
+          >
+            <span className="select-none text-5xl font-bold tracking-tight text-ink/80 sm:text-6xl">
+              tab.am
+            </span>
+          </div>
+        )}
+
+        {/* Floating glass showroom card (desktop only, inside the visual). */}
+        {showroom ? (
+          <div className="absolute inset-x-4 bottom-4 hidden lg:block">
+            <ShowroomCard variant="float" status={status} />
+          </div>
+        ) : null}
       </div>
     </section>
   );
 }
 
-/** Static decorative dot for the optional seasonal badge. */
-function SparkleDot() {
+// ---------------------------------------------------------------------------
+// Showroom glass card — facts from config/hero.ts only.
+// ---------------------------------------------------------------------------
+
+function ShowroomCard({
+  variant,
+  status,
+}: {
+  variant: 'block' | 'float';
+  status: { open: boolean; message: string } | null;
+}) {
+  const { showroom } = heroConfig;
+  if (!showroom) return null;
+
   return (
-    <span
-      aria-hidden="true"
-      className="h-1.5 w-1.5 rounded-full bg-accent"
-    />
+    <div
+      className={
+        variant === 'float'
+          ? 'glass-surface max-w-[19rem] rounded-card p-4'
+          : 'glass-surface max-w-md rounded-card p-4'
+      }
+    >
+      <p className="text-[13px] font-semibold text-ink">{showroom.address}</p>
+
+      {/* Status line: height reserved by an invisible placeholder until the
+          client-only value arrives (no hydration mismatch, no CLS). */}
+      <p
+        aria-hidden={status === null}
+        className={`min-h-[18px] text-xs ${
+          status === null ? 'invisible' : ''
+        } ${status ? (status.open ? 'text-success' : 'text-muted') : 'text-muted'}`}
+      >
+        {status
+          ? status.message
+          : showroom.weeklyLabel ?? ''}
+      </p>
+
+      {/* Static weekly hours: neutral always-true line. Hidden on phones where
+          the live status sentence already states the closing time (saves
+          vertical height so the mobile hero stays compact). */}
+      {showroom.weeklyLabel ? (
+        <p className="mt-1 hidden text-xs tabular-nums text-body sm:block">
+          {showroom.weeklyLabel}
+        </p>
+      ) : null}
+
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+        {showroom.phone && showroom.phoneIntl ? (
+          <a
+            href={`tel:+${showroom.phoneIntl}`}
+            className="rounded font-semibold text-ink tabular-nums underline-offset-4 transition-colors duration-hover hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+          >
+            {showroom.phone}
+          </a>
+        ) : null}
+        {showroom.mapsUrl ? (
+          <a
+            href={showroom.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded font-semibold text-accent underline-offset-4 transition-colors duration-hover hover:text-accent-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+          >
+            {/* Directions label lives in config-driven copy below. */}
+            {DIRECTIONS_LABEL}
+          </a>
+        ) : null}
+      </div>
+    </div>
   );
 }
+
+/**
+ * "Directions" link label — Armenian "\u0548\u0582\u0572\u0572\u0578\u0582\u0569\u0575\u0578\u0582\u0576\u0576\u0565\u0580"
+ * (Directions). Written as \u escapes verified codepoint-by-codepoint
+ * (548 582 572 572 578 582 569 575 578 582 576 576 565 580) to stay immune to
+ * Cyrillic-homoglyph corruption. Kept here until `GET /api/v1/settings` can
+ * supply the label.
+ */
+const DIRECTIONS_LABEL =
+  '\u0548\u0582\u0572\u0572\u0578\u0582\u0569\u0575\u0578\u0582\u0576\u0576\u0565\u0580';
