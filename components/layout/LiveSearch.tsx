@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useTransition, useMemo, useId } from 'react';
 import Link from 'next/link';
-import { pushRoute } from '@/lib/next-compat/navigation';
+import { useRouter } from 'next/navigation';
 import { Search, X, CheckCircle2, ChevronRight, CornerDownLeft, Sparkles } from 'lucide-react';
 import { products } from '@/data/products';
 import { Product } from '@/types';
@@ -179,6 +179,7 @@ export default function LiveSearch({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const listboxId = useId();
 
@@ -275,9 +276,8 @@ export default function LiveSearch({
       if (selectedIndex >= 0 && selectedIndex < filteredProducts.length) {
         e.preventDefault();
         const selected = filteredProducts[selectedIndex];
-        // Route-change scroll is owned by the app's popstate handler: the
-        // product page appears at the top instantly (no animated jump).
-        pushRoute(`/product/${selected.slug}`);
+        // Route-change scroll: the product page appears at the top.
+        router.push(`/product/${selected.slug}`);
         setIsOpen(false);
         onSelect?.();
       }

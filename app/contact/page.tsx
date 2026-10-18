@@ -28,6 +28,9 @@ import { cn } from '@/lib/utils';
 
 const CARD_CLASS = 'rounded-2xl border border-line bg-surface p-5 sm:p-6';
 
+/** Absolute site origin, safe on server and client (no render-time `window`). */
+const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://tab.am';
+
 /**
  * ContactPage graph node — the LocalBusiness node is shared with /showroom so
  * the two pages describe the same facts. No email/social is emitted unless it
@@ -38,7 +41,7 @@ function buildContactPageJsonLd(): Record<string, unknown> {
     '@context': 'https://schema.org',
     '@type': 'ContactPage',
     name: PAGES_HY.CONTACT_H1,
-    url: `${window.location.origin}/contact`,
+    url: `${SITE_ORIGIN}/contact`,
     description: `${business.address.line} · ${SHOWROOM_INFO.hoursLabel}`,
   };
 }

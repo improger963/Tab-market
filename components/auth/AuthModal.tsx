@@ -11,7 +11,7 @@ import { useAuth } from '@/store/useAuth';
 import { AUTH_HY } from '@/lib/copy/authHy';
 import { LIMITS, passwordStrength, toE164 } from '@/lib/auth/schema';
 import { getDevDemoCredentials, requestPasswordReset } from '@/services/api';
-import { pushRoute, useSearchParams } from '@/lib/next-compat/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { cn, formatArPhone, maskPhone } from '@/lib/utils';
 
 /**
@@ -68,6 +68,7 @@ export default function AuthModal({ className }: AuthModalProps) {
   const [devCredentials, setDevCredentials] = useState<{ phone: string; password: string } | null>(null);
 
   const params = useSearchParams();
+  const router = useRouter();
   const authParam = params.get('auth');
   const nextParam = params.get('next');
 
@@ -90,16 +91,15 @@ export default function AuthModal({ className }: AuthModalProps) {
       rest.delete('auth');
       rest.delete('next');
       const query = rest.toString();
-      pushRoute(query ? `${window.location.pathname}?${query}` : window.location.pathname, {
-        replace: true,
+      router.replace(query ? `${window.location.pathname}?${query}` : window.location.pathname, {
         scroll: false,
       });
     }
-  }, [isAuthModalOpen, authParam, nextParam]);
+  }, [isAuthModalOpen, authParam, nextParam, router]);
 
   /** Dev-only quick-login source; the credentials are never in the bundle. */
   useEffect(() => {
-    if (!import.meta.env.DEV || !isAuthModalOpen || devCredentials) return;
+    if (process.env.NODE_ENV === 'production' || !isAuthModalOpen || devCredentials) return;
     let active = true;
     getDevDemoCredentials()
       .then((value) => {
@@ -173,9 +173,9 @@ export default function AuthModal({ className }: AuthModalProps) {
       if (!ok) return;
       const target = next;
       closeAuthModal();
-      if (target) pushRoute(target, { replace: true, scroll: true });
+      if (target) router.replace(target, { scroll: true });
     },
-    [closeAuthModal, next]
+    [closeAuthModal, next, router]
   );
 
   const handleLogin = async (event: React.FormEvent) => {
@@ -444,7 +444,7 @@ export default function AuthModal({ className }: AuthModalProps) {
             {AUTH_HY.GUEST_CONTINUE}
           </button>
 
-          {import.meta.env.DEV && devCredentials ? (
+          {process.env.NODE_ENV !== 'production' && devCredentials ? (
             <div className="mt-4 rounded-control border border-dashed border-line-strong bg-canvas p-3">
               <p className="text-[11px] text-muted mb-2">
                 {AUTH_HY.DEV_QUICK_LOGIN} · {maskPhone(devCredentials.phone)}
