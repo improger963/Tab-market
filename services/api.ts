@@ -33,6 +33,7 @@ import {
   asAddressesPayload,
   asOrderPayload,
   asOrdersPayload,
+  asUser,
   asUserPayload,
 } from '@/lib/auth/guards';
 
@@ -322,6 +323,93 @@ async function accountRequest<T>(
   return value;
 }
 
+// ---------------------------------------------------------------------------
+// Static-hosting fallback (no backend on this origin)
+// ---------------------------------------------------------------------------
+//
+// When the SPA is deployed to a purely static host (a Vercel front that serves
+// only `index.html`), the `/api/v1/*` handlers do not exist: they answer 404 or,
+// with an SPA rewrite, the served HTML document. The account flow is a
+// first-class part of the demo, so rather than dead-end the customer every auth
+// call below mirrors `trackOrder` and simulates the equivalent result on the
+// client the moment the real API is absent.
+//
+// The trigger is deliberately narrow — a missing route (404) or a body that is
+// not the documented JSON (`response_shape`). A genuine backend verdict (401 /
+// 409 / 422 / 429) is still surfaced unchanged and is never masked by a fake
+// success, so this path can only activate where there is no backend at all.
+
+const CLIENT_SESSION_KEY = 'tab_client_user';
+const CLIENT_ADDRESSES_KEY = 'tab_client_addresses';
+
+/** Neutral "customer" label for a login that predates any registration. It is a
+ *  bare Armenian-block word (U+0530-U+058F), so no homoglyph can enter it. */
+const FALLBACK_CUSTOMER_NAME = 'Օգտատեր';
+
+function isStaticDeploymentError(error: unknown): boolean {
+  return (
+    error instanceof AccountApiError &&
+    (error.status === 404 || error.code === ACCOUNT_ERROR.shape)
+  );
+}
+
+function hasClientStorage(): boolean {
+  return typeof window !== 'undefined' && !!window.localStorage;
+}
+
+function readClientJson(key: string): unknown {
+  if (!hasClientStorage()) return null;
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw === null ? null : JSON.parse(raw);
+  } catch {
+    // A hand-edited or truncated record is treated as absent, never trusted.
+    return null;
+  }
+}
+
+function writeClientJson(key: string, value: unknown): void {
+  if (!hasClientStorage()) return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Storage disabled or full: the in-memory result still stands for this session.
+  }
+}
+
+/** The stored mock identity is re-narrowed through the same guard the real
+ *  `/me` response uses, so a corrupt record can never reach a component. */
+function readClientUser(): User | null {
+  return asUser(readClientJson(CLIENT_SESSION_KEY));
+}
+
+function writeClientUser(user: User): void {
+  writeClientJson(CLIENT_SESSION_KEY, user);
+}
+
+function clearClientSession(): void {
+  if (!hasClientStorage()) return;
+  try {
+    window.localStorage.removeItem(CLIENT_SESSION_KEY);
+    window.localStorage.removeItem(CLIENT_ADDRESSES_KEY);
+  } catch {
+    // Nothing to retry — logout reports success either way.
+  }
+}
+
+function readClientAddresses(): UserAddress[] {
+  return asAddresses(readClientJson(CLIENT_ADDRESSES_KEY)) ?? [];
+}
+
+function writeClientAddresses(addresses: UserAddress[]): void {
+  writeClientJson(CLIENT_ADDRESSES_KEY, addresses);
+}
+
+/** Stand-in for a database id; shaped so `identifier()` in the guards accepts it. */
+function clientEntityId(prefix: string): string {
+  return `${prefix}_${Date.now().toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`;
+}
+
 /**
  * `GET /me`. Returns `null` for a guest (401) instead of throwing: being signed
  * out is a normal state, and the header must render it without an error path.
@@ -331,56 +419,156 @@ export async function getMe(): Promise<User | null> {
     return await accountRequest('GET', '/me', asUserPayload);
   } catch (error) {
     if (error instanceof AccountApiError && error.isUnauthenticated) return null;
+    if (isStaticDeploymentError(error)) return readClientUser();
     throw error;
   }
 }
 
-export function login(input: LoginPayload): Promise<User> {
-  return accountRequest('POST', '/auth/login', asUserPayload, {
-    phone: input.phone,
-    password: input.password,
-  });
+export async function login(input: LoginPayload): Promise<User> {
+  try {
+    return await accountRequest('POST', '/auth/login', asUserPayload, {
+      phone: input.phone,
+      password: input.password,
+    });
+  } catch (error) {
+    if (!isStaticDeploymentError(error)) throw error;
+    // Reuse a previously simulated identity for this number, or mint one so the
+    // demo can proceed without a backend.
+    const existing = readClientUser();
+    const mockUser: User = {
+      id: existing && existing.phone === input.phone ? existing.id : clientEntityId('usr'),
+      fullName: existing ? existing.fullName : FALLBACK_CUSTOMER_NAME,
+      phone: input.phone,
+      createdAt: existing && existing.phone === input.phone ? existing.createdAt : new Date().toISOString(),
+      ...(existing && existing.email ? { email: existing.email } : {}),
+    };
+    writeClientUser(mockUser);
+    return mockUser;
+  }
 }
 
-export function register(input: RegisterPayload): Promise<User> {
-  return accountRequest('POST', '/auth/register', asUserPayload, {
-    fullName: input.fullName,
-    phone: input.phone,
-    password: input.password,
-    acceptTerms: input.acceptTerms,
-  });
+export async function register(input: RegisterPayload): Promise<User> {
+  try {
+    return await accountRequest('POST', '/auth/register', asUserPayload, {
+      fullName: input.fullName,
+      phone: input.phone,
+      password: input.password,
+      acceptTerms: input.acceptTerms,
+    });
+  } catch (error) {
+    if (!isStaticDeploymentError(error)) throw error;
+    // Registration signs the customer in, so the mock mirrors the same payload
+    // the server would return. `RegisterPayload` carries no email field.
+    const mockUser: User = {
+      id: clientEntityId('usr'),
+      fullName: input.fullName.trim(),
+      phone: input.phone,
+      createdAt: new Date().toISOString(),
+    };
+    writeClientUser(mockUser);
+    return mockUser;
+  }
 }
 
 /** Logout always clears the local state; the server answers 200 even on an expired session. */
 export async function logout(): Promise<void> {
-  await accountRequest('POST', '/auth/logout', (data) => (typeof data === 'object' && data !== null ? true : null), {});
+  // Clear the client session first so a static host leaves the tab signed out
+  // even though there is no cookie to destroy.
+  clearClientSession();
+  try {
+    await accountRequest('POST', '/auth/logout', (data) => (typeof data === 'object' && data !== null ? true : null), {});
+  } catch (error) {
+    // Only an absent backend is swallowed; a real failure still surfaces.
+    if (!isStaticDeploymentError(error)) throw error;
+  }
 }
 
-export function updateProfile(input: UpdateProfilePayload): Promise<User> {
-  return accountRequest('PATCH', '/me', asUserPayload, {
-    ...(input.fullName !== undefined ? { fullName: input.fullName } : {}),
-    ...(input.email !== undefined ? { email: input.email } : {}),
-  });
+export async function updateProfile(input: UpdateProfilePayload): Promise<User> {
+  try {
+    return await accountRequest('PATCH', '/me', asUserPayload, {
+      ...(input.fullName !== undefined ? { fullName: input.fullName } : {}),
+      ...(input.email !== undefined ? { email: input.email } : {}),
+    });
+  } catch (error) {
+    if (!isStaticDeploymentError(error)) throw error;
+    const current = readClientUser();
+    if (!current) {
+      throw new AccountApiError({
+        status: 401,
+        code: ACCOUNT_ERROR.unauthenticated,
+        message: AUTH_HY.ERR_SESSION_EXPIRED,
+      });
+    }
+    const email = input.email !== undefined ? input.email.trim() : current.email;
+    const updated: User = {
+      id: current.id,
+      fullName: input.fullName !== undefined ? input.fullName.trim() : current.fullName,
+      phone: current.phone,
+      createdAt: current.createdAt,
+      ...(email ? { email } : {}),
+    };
+    writeClientUser(updated);
+    return updated;
+  }
 }
 
-export function listAddresses(): Promise<UserAddress[]> {
-  return accountRequest('GET', '/me/addresses', asAddressesPayload);
+export async function listAddresses(): Promise<UserAddress[]> {
+  try {
+    return await accountRequest('GET', '/me/addresses', asAddressesPayload);
+  } catch (error) {
+    if (!isStaticDeploymentError(error)) throw error;
+    // A guest on a static host has no addresses; a simulated session reads them back.
+    return readClientUser() ? readClientAddresses() : [];
+  }
 }
 
-export function createAddress(input: AddressInput): Promise<UserAddress> {
-  return accountRequest('POST', '/me/addresses', asAddressPayload, { ...input });
+export async function createAddress(input: AddressInput): Promise<UserAddress> {
+  try {
+    return await accountRequest('POST', '/me/addresses', asAddressPayload, { ...input });
+  } catch (error) {
+    if (!isStaticDeploymentError(error)) throw error;
+    const list = readClientAddresses();
+    // Mirrors the server rule: the first saved address is always the default.
+    const makeDefault = list.length === 0 || input.isDefault === true;
+    if (makeDefault) for (const a of list) a.isDefault = false;
+    const created: UserAddress = { ...input, id: clientEntityId('adr'), isDefault: makeDefault };
+    list.push(created);
+    writeClientAddresses(list);
+    return created;
+  }
 }
 
-export function updateAddress(id: string, patch: Partial<AddressInput>): Promise<UserAddress> {
-  return accountRequest('PATCH', `/me/addresses/${encodeURIComponent(id)}`, asAddressPayload, { ...patch });
+export async function updateAddress(id: string, patch: Partial<AddressInput>): Promise<UserAddress> {
+  try {
+    return await accountRequest('PATCH', `/me/addresses/${encodeURIComponent(id)}`, asAddressPayload, { ...patch });
+  } catch (error) {
+    if (!isStaticDeploymentError(error)) throw error;
+    const list = readClientAddresses();
+    const index = list.findIndex((a) => a.id === id);
+    if (index === -1) {
+      throw new AccountApiError({ status: 404, code: ACCOUNT_ERROR.notFound, message: AUTH_HY.ERR_UNKNOWN });
+    }
+    const merged: UserAddress = { ...list[index], ...patch, id };
+    if (merged.isDefault) for (const a of list) if (a.id !== id) a.isDefault = false;
+    list[index] = merged;
+    writeClientAddresses(list);
+    return merged;
+  }
 }
 
 /** Resolves with the remaining list, so a delete never needs a second round trip. */
-export function deleteAddress(id: string): Promise<UserAddress[]> {
-  return accountRequest('DELETE', `/me/addresses/${encodeURIComponent(id)}`, (data) => {
-    if (typeof data !== 'object' || data === null) return null;
-    return asAddresses((data as { addresses?: unknown }).addresses);
-  }, {});
+export async function deleteAddress(id: string): Promise<UserAddress[]> {
+  try {
+    return await accountRequest('DELETE', `/me/addresses/${encodeURIComponent(id)}`, (data) => {
+      if (typeof data !== 'object' || data === null) return null;
+      return asAddresses((data as { addresses?: unknown }).addresses);
+    }, {});
+  } catch (error) {
+    if (!isStaticDeploymentError(error)) throw error;
+    const remaining = readClientAddresses().filter((a) => a.id !== id);
+    writeClientAddresses(remaining);
+    return remaining;
+  }
 }
 
 export function listOrders(): Promise<UserOrderSummary[]> {
