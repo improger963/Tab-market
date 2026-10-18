@@ -127,10 +127,10 @@ export default function CartDrawer() {
     })
     .slice(0, 2);
 
-  const handleApplyPromo = (e: React.FormEvent) => {
+  const handleApplyPromo = async (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError(null);
-    const res = applyCoupon(couponInput);
+    const res = await applyCoupon(couponInput);
     if (res.success) {
       showToast(res.message, 'Պրոմոկոդ');
       setCouponInput('');

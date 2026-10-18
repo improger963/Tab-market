@@ -168,4 +168,34 @@ Legend: **SC** = Server Component, **CC** = Client Component (`'use client'`),
 - **Node tests act as the server runtime**: vitest aliases `server-only` to
   `tests/helpers/server-only-stub.ts` so the gateway itself is contract-testable.
 
+## 8. Phase 4 — server-authoritative pricing & coupons
+
+- **One coupon registry**: `server/coupons.ts` replaces the three duplicated
+  tables (client store, validate route, order route). Enabling/tuning/disabling
+  a code is now a single server edit — the browser ships zero coupon logic.
+- **Copy preserved mechanically**: every Armenian string in the registry (and
+  the fallbacks in the store/services) was extracted from the shipped client
+  table by `scripts/_gen_coupon_registry.mjs` and written as `\uXXXX` escapes —
+  nothing hand-typed, homoglyph audit clean. The validate route's old inline
+  strings were never rendered by the UI; the user-visible wording is the
+  store's, which the registry now carries verbatim.
+- **UI truth unchanged**: `useCart.applyCoupon` became async and mirrors the
+  API verdict (empty-code check still local for instant feedback). Cart/checkout
+  toasts show byte-identical messages to before. A rejection leaves an applied
+  coupon untouched, exactly like the old table.
+- **Prices are server truth**: `POST /api/v1/orders` ignores client-sent
+  `unitPrice`, re-prices from `server/catalog.ts`, clamps quantities to the same
+  `stockCap` the cart uses, and computes shipping/totals in `server/pricing.ts`
+  (Yerevan 1 500 / free ≥ 30 000, regional 3 000, pickup free — the shipped
+  rules). Discount rounding matches the cart display (`Math.round`), so the
+  confirmation numbers equal what the customer saw. Unknown product ids fail
+  into the shipped generic error (no invented copy).
+- **Owner decision 4 still open**: VARPET/FREE remain live (behavior
+  preservation); removing one is now a one-line registry edit + redeploy.
+- **Locked by `tests/server/pricing-contract.test.ts`** (14 tests: registry
+  economics, Armenian-copy assertions, normalization, rounding, shipping
+  thresholds, and both routes driven via real `NextRequest` handlers —
+  including the tampered-`unitPrice` and stock-clamp cases).
+
+
 

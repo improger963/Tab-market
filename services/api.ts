@@ -120,19 +120,48 @@ export async function submitOrder(payload: CreateOrderPayload): Promise<OrderCon
   return json.data;
 }
 
-export async function validateCoupon(
-  code: string
-): Promise<{ valid: boolean; discountPercent: number; message: string }> {
-  const res = await fetch(`${API_BASE}/coupons/validate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code }),
+const CLIENT_COUPON_UNAVAILABLE = '\u0531\u0576\u057e\u0561\u057e\u0565\u0580 \u057a\u0580\u0578\u0574\u0578\u056f\u0578\u0564: \u0553\u0578\u0580\u0571\u0565\u0584 \u054a\u0580\u0578\u0574\u0578\u056f\u0578\u0564';
+
+export interface CouponValidation {
+  valid: boolean;
+  code: string;
+  discountPercent: number;
+  freeShipping: boolean;
+  description: string;
+  message: string;
+}
+
+/**
+ * Phase 4: coupon verdicts are server-authoritative. Business rejections are
+ * returned (never thrown) with the server's localized message; a network
+ * failure falls back to the shipped "invalid code" line so the UI copy stays
+ * Armenian in every path.
+ */
+export async function validateCoupon(code: string): Promise<CouponValidation> {
+  const reject = (message?: string): CouponValidation => ({
+    valid: false,
+    code: '',
+    discountPercent: 0,
+    freeShipping: false,
+    description: '',
+    message: message || CLIENT_COUPON_UNAVAILABLE,
   });
-  const json = await res.json();
-  if (!res.ok || !json.success) {
-    throw new Error(json.message || 'Անվավեր պրոմոկոդ');
+  try {
+    const res = await fetch(`${API_BASE}/coupons/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    const json = await res.json().catch(() => null);
+    const data = json?.data as CouponValidation | undefined;
+    if (res.ok && json?.success && data?.valid) {
+      return data;
+    }
+    const serverMsg = typeof json?.message === 'string' && json.message ? json.message : '';
+    return reject(serverMsg);
+  } catch {
+    return reject();
   }
-  return json.data;
 }
 
 /**
