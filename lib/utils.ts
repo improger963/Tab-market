@@ -58,11 +58,16 @@ export function formatAMD(price: number): string {
  * Extracts the 8 Armenian national digits from any raw input, robustly
  * stripping the international prefix (`+374`/`374`) and the common trunk
  * leading zero. Examples: "095530435" and "+37495530435" → "95530435".
+ *
+ * The trunk zero is dropped only when nine digits are left: `0` + 8 national
+ * digits is how a number is written from inside the country. An eight-digit
+ * national number keeps its own digits, even when the first happens to be a 0 —
+ * otherwise the value the app formatted could never be re-read by the validator.
  */
 function arNationalDigits(raw: string): string {
   let d = raw.replace(/\D/g, '');
   if (d.startsWith('374')) d = d.slice(3); // international country code
-  if (d.startsWith('0')) d = d.slice(1); // national trunk prefix
+  if (d.length === 9 && d.startsWith('0')) d = d.slice(1); // national trunk prefix
   return d.slice(0, 8);
 }
 
@@ -95,3 +100,29 @@ export function normalizeArPhone(input: string): string | null {
   if (d.length !== 8) return null;
   return `+374 (${d.slice(0, 2)}) ${d.slice(2, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
 }
+
+/**
+ * Masks an E.164 Armenian number for display in shared UI (header, dropdowns,
+ * any text that is rendered before the customer asked to see their own number).
+ * Only the last 4 local digits survive; anything unrecognized degrades to a
+ * fully masked token rather than leaking a partial string.
+ *   '+37495530435' -> '+374 (**) **-04-35'
+ */
+export function maskPhone(e164: string | null | undefined): string {
+  const d = (e164 ?? '').replace(/\D/g, '').replace(/^374/, '');
+  if (d.length !== 8) return '+374 (**) **-**-**';
+  return `+374 (**) **-${d.slice(4, 6)}-${d.slice(6, 8)}`;
+}
+
+/**
+ * Fixed `dd.MM.yyyy` for order dates. Deliberately not `toLocaleString`: a
+ * locale-dependent date changes between the server-rendered snapshot and the
+ * client, and a customer comparing two orders should never see two formats.
+ */
+export function formatDateDDMMYYYY(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`;
+}
+

@@ -8,3 +8,5 @@ coverage/
 !.env.example
 products.xlsx
 scripts
+# Server-only account store: holds password hashes and session ids, never commit.
+server/data/

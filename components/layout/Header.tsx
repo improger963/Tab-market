@@ -33,6 +33,7 @@ import { useCompare } from '@/store/useCompare';
 import { categories } from '@/data/categories';
 import { formatAMD } from '@/lib/utils';
 import LiveSearch from './LiveSearch';
+import AccountTrigger from '@/components/auth/AccountTrigger';
 
 export default function Header() {
   const { openDrawer, totalCount, totalPrice } = useCart();
@@ -258,6 +259,11 @@ export default function Header() {
           </Link>
 
           {/* Showroom phone lives in TopBar; duplicate removed here */}
+
+          {/* Account trigger: opens the auth dialog, or the account menu when a
+              session exists. On mobile this is the account entry — the bottom
+              dock keeps its five items. */}
+          <AccountTrigger />
 
           {/* Cart Trigger Button with Bouncy Badge */}
           <button

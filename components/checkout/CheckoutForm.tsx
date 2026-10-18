@@ -7,7 +7,13 @@
 
 import React from 'react';
 import { User, Phone, Mail, MapPin, Truck, CreditCard, Banknote, ShieldCheck } from 'lucide-react';
+import type { UserAddress } from '@/types/api';
 import { formatAMD, formatArPhone } from '@/lib/utils';
+import {
+  CheckoutGuestHint,
+  SaveAddressToggle,
+  SavedAddressPicker,
+} from '@/components/checkout/CheckoutAccountControls';
 
 export type DeliveryType = 'yerevan' | 'pickup';
 export type PaymentType = 'cash' | 'card' | 'idram';
@@ -23,13 +29,39 @@ export interface CheckoutFormData {
   orderNotes: string;
 }
 
+/**
+ * The optional account layer rendered over the delivery fields. It is passed in
+ * whole or not at all: no `account` prop means this is a guest, and the form
+ * behaves exactly as it did before accounts existed.
+ */
+export interface CheckoutAccountUi {
+  addresses: UserAddress[];
+  /** Account read still in flight: the picker holds its height. */
+  loading: boolean;
+  /** `null` = «other address», i.e. what is typed stays untouched. */
+  selectedAddressId: string | null;
+  onSelectAddress: (id: string | null) => void;
+  saveAddress: boolean;
+  onToggleSaveAddress: (value: boolean) => void;
+  saveNote: string | null;
+}
+
 interface CheckoutFormProps {
   data: CheckoutFormData;
   onChange: (updater: (prev: CheckoutFormData) => CheckoutFormData) => void;
   shippingCost: number;
+  account?: CheckoutAccountUi | null;
+  /** Offered to guests only. Non-blocking: it never opens by itself. */
+  onOpenAuth?: (() => void) | null;
 }
 
-export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutFormProps) {
+export default function CheckoutForm({
+  data,
+  onChange,
+  shippingCost,
+  account = null,
+  onOpenAuth = null,
+}: CheckoutFormProps) {
   const updateField = <K extends keyof CheckoutFormData>(field: K, value: CheckoutFormData[K]) => {
     onChange((prev) => ({ ...prev, [field]: value }));
   };
@@ -66,6 +98,10 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
             Գնորդի Տվյալներ
           </h2>
         </div>
+
+        {/* Guests only, and only a suggestion: signing in is a shortcut, never a
+            requirement, so the line lives outside the field grid. */}
+        {onOpenAuth && <CheckoutGuestHint onSignIn={onOpenAuth} />}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
@@ -211,6 +247,18 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 Առաքման արժեք՝ {formatAMD(shippingCost)}
               </span>
             </div>
+
+            {/* Saved addresses above the fields: choosing one fills them, and the
+                customer can still edit every line afterwards. */}
+            {account && (
+              <SavedAddressPicker
+                addresses={account.addresses}
+                loading={account.loading}
+                value={account.selectedAddressId}
+                onSelect={account.onSelectAddress}
+              />
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-body mb-1">
@@ -239,6 +287,16 @@ export default function CheckoutForm({ data, onChange, shippingCost }: CheckoutF
                 />
               </div>
             </div>
+
+            {/* Logged-in only, and optional: ticking it saves what is in the
+                fields as a NEW address. Leaving it unticked changes nothing. */}
+            {account && (
+              <SaveAddressToggle
+                checked={account.saveAddress}
+                onChange={account.onToggleSaveAddress}
+                note={account.saveNote}
+              />
+            )}
           </div>
         )}
       </div>

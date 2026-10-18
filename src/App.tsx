@@ -23,6 +23,12 @@ import CheckoutPage from '@/app/checkout/page';
 import WishlistPage from '@/app/wishlist/page';
 import ComparePage from '@/app/compare/page';
 import TrackOrderPage from '@/app/track-order/page';
+import AccountPage from '@/app/account/page';
+import AccountOrdersPage from '@/app/account/orders/page';
+import AccountProfilePage from '@/app/account/profile/page';
+import AccountAddressesPage from '@/app/account/addresses/page';
+import { isAccountSection } from '@/components/account/AccountShell';
+import AuthModal from '@/components/auth/AuthModal';
 import RecentlyViewed from '@/components/product/RecentlyViewed';
 import { Product } from '@/types';
 import { products } from '@/data/products';
@@ -127,6 +133,16 @@ export default function App() {
     }
     if (currentPath === '/track-order') {
       return { page: 'track-order' };
+    }
+    // `/account` and its three sections. `page.tsx` covers the bare path; any
+    // unknown sub-path lands on orders rather than a dead screen, because the
+    // section tabs are the navigation.
+    if (currentPath === '/account') {
+      return { page: 'account', section: 'index' as const };
+    }
+    if (currentPath.startsWith('/account/')) {
+      const raw = currentPath.slice('/account/'.length).split('/')[0];
+      return { page: 'account', section: isAccountSection(raw) ? raw : ('orders' as const) };
     }
     return { page: 'home' };
   }, [currentPath]);
@@ -311,6 +327,21 @@ export default function App() {
         </main>
       )}
 
+      {/* VIEW 9: CUSTOMER ACCOUNT (orders / profile / addresses) */}
+      {route.page === 'account' && (
+        <main className="flex-1 w-full animate-in fade-in-50 duration-200">
+          {route.section === 'index' ? (
+            <AccountPage />
+          ) : route.section === 'profile' ? (
+            <AccountProfilePage />
+          ) : route.section === 'addresses' ? (
+            <AccountAddressesPage />
+          ) : (
+            <AccountOrdersPage />
+          )}
+        </main>
+      )}
+
       {/* CAD Blueprint Zoom Modal */}
       {activeCadProduct && (
         <div className="fixed inset-0 z-overlay flex items-center justify-center p-4 bg-ink/70 backdrop-blur-sm">
@@ -372,6 +403,10 @@ export default function App() {
 
       {/* 3. Global Shell: Slide-Over Cart Drawer */}
       <CartDrawer />
+
+      {/* Global Shell: Sign-in / registration sheet (opens from the header, the
+          account guard and the ?auth= URL parameter). */}
+      <AuthModal />
 
       {/* Global Shell: Toast Notifications */}
       <ToastContainer />

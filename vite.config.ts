@@ -2,10 +2,14 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
+import { tabMarketAuthServer } from './server/dev.ts';
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss()],
+    // `tabMarketAuthServer` mounts the mock customer-account API (/api/v1/auth,
+    // /api/v1/me/*) into this dev server and inlines the server-side session
+    // snapshot into the served document. See server/dev.ts.
+    plugins: [tabMarketAuthServer(), react(), tailwindcss()],
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, '.'),

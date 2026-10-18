@@ -10,10 +10,14 @@ import Link from 'next/link';
 import { Home, LayoutGrid, Package, Heart, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/store/useCart';
 import { useWishlist } from '@/store/useWishlist';
+import { useAuth } from '@/store/useAuth';
 
 export default function MobileNav() {
   const { openDrawer, totalCount, isDrawerOpen } = useCart();
   const { totalCount: wishlistCount } = useWishlist();
+  // The auth sheet is a bottom sheet: two fixed bottom layers would fight for
+  // the same space, so the dock steps aside while it is open.
+  const isAuthModalOpen = useAuth((state) => state.isAuthModalOpen);
   const [isMounted, setIsMounted] = useState(false);
   const [currentPath, setCurrentPath] = useState('/');
 
@@ -38,10 +42,11 @@ export default function MobileNav() {
   const isWishlist = currentPath.startsWith('/wishlist');
 
   // Stacking rule: never two fixed bottom bars at once. On the PDP the sticky buy
-  // bar replaces the dock; on checkout and while the cart sheet is open the dock hides.
+  // bar replaces the dock; on checkout, while the cart sheet is open and while the
+  // auth sheet is open the dock hides.
   const isProduct = currentPath.startsWith('/product/');
   const isCheckout = currentPath.startsWith('/checkout');
-  if (isMounted && (isProduct || isCheckout || isDrawerOpen)) return null;
+  if (isMounted && (isProduct || isCheckout || isDrawerOpen || isAuthModalOpen)) return null;
 
   return (
     <nav
