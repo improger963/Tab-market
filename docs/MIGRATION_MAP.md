@@ -122,3 +122,23 @@ Legend: **SC** = Server Component, **CC** = Client Component (`'use client'`),
 4. **Coupons `VARPET`/`FREE`** (Phase 4): contractor/free-shipping style → default **disabled**; confirm.
 5. **Legal pages** (Privacy/Terms/Returns), showroom **geo/coordinates/parking** claims, final
    **category count (12 present)**, regional `regionalCost` decision — all need owner input.
+
+## 6. Phase 2 — routing parity notes
+
+- **No `catalog/[slug]` overlap exists.** The brief assumed two rival category routes; in the
+  repo `/catalog` (all products) and `/category/[slug]` (pre-filtered) are **one engine** — both
+  render `CatalogView`, the latter with `initialCategorySlug`. Both are canonical; nothing to
+  redirect. Unknown category slugs already `notFound()`. Locked by `tests/routes/route-contract.test.ts`.
+- **Route manifest locked** (15 public routes incl. `/account/{orders,addresses,profile}`);
+  legacy `/account?tab=X` still redirects onto the sub-route (AccountShell), `?auth=` still
+  opens AuthModal — unchanged behavior, now covered by the contract test.
+- **Boundaries added**: root `not-found.tsx` (404 + noindex, corpus-safe Armenian via generated
+  `lib/copy/routeHy.ts`), root `error.tsx` (never renders `error.message`, mirrors `/account`),
+  `global-error.tsx` (self-contained `<html>`, inline styles, no Tailwind dependency).
+- **Scroll policy owned by the Next router**: removed the mount-time `scrollTo(0,0)` from
+  `app/template.tsx` (it remounts on popstate and would flatten Back/Forward restore). No global
+  `scroll-behavior: smooth`; catalog filters stay on debounced `history.replaceState` (no scroll,
+  no RSC refetch); pagination scrolls to the results container with `scroll-mt` from
+  `--topbar-h`/`--header-h` and honors `prefers-reduced-motion`.
+- **Vitest introduced** (`npm test`, node env, `@` alias) with the route contract as its first asset.
+
