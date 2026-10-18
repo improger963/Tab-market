@@ -46,6 +46,8 @@ export const LIMITS = {
   recipientNameMax: 100,
   commentMax: 240,
   addressesPerUser: 20,
+  messageMin: 10,
+  messageMax: 1000,
 } as const;
 
 /**
@@ -366,4 +368,78 @@ export function passwordStrength(password: string): 0 | 1 | 2 | 3 {
   if (score <= 1) return 1;
   if (score === 2) return 2;
   return 3;
+}
+
+// --- Contact form ----------------------------------------------------------
+
+/** The four allowed inquiry topics. No wholesale/B2B option by design. */
+export const CONTACT_TOPICS = ['consultation', 'product', 'delivery', 'other'] as const;
+export type ContactTopic = (typeof CONTACT_TOPICS)[number];
+
+export function isContactTopic(value: string): value is ContactTopic {
+  return (CONTACT_TOPICS as readonly string[]).includes(value);
+}
+
+export interface ContactInput {
+  name: string;
+  phone: string;
+  topic: string;
+  message: string;
+  consent: boolean;
+}
+
+export interface ValidatedContact {
+  name: string;
+  phone: string; // E.164
+  topic: ContactTopic;
+  message: string;
+  consent: true;
+}
+
+/**
+ * Contact-inquiry rules, shared verbatim by the browser form and the mock API
+ * (and the future Laravel validator) so the two can never drift: name and phone
+ * reuse the account rules, the message has a bounded length, the topic must be
+ * one of the four options, and consent is mandatory.
+ */
+export function validateContact(input: ContactInput): ValidationResult<ValidatedContact> {
+  const errors: FieldErrors = {};
+
+  const name = checkFullName(input.name ?? '', errors);
+  const phone = checkPhone(input.phone ?? '', errors);
+
+  const topic = (input.topic ?? '').trim();
+  if (!isContactTopic(topic)) {
+    errors.topic = AUTH_HY.ERR_TOPIC_REQUIRED;
+  }
+
+  const message = sanitizeText(input.message ?? '');
+  if (!message) {
+    errors.message = AUTH_HY.ERR_MESSAGE_REQUIRED;
+  } else if (message.length < LIMITS.messageMin) {
+    errors.message = AUTH_HY.ERR_MESSAGE_SHORT.replace(
+      '{min}',
+      String(LIMITS.messageMin),
+    );
+  } else if (message.length > LIMITS.messageMax) {
+    errors.message = AUTH_HY.ERR_MESSAGE_LONG.replace(
+      '{max}',
+      String(LIMITS.messageMax),
+    );
+  }
+
+  if (input.consent !== true) {
+    errors.consent = AUTH_HY.ERR_CONSENT;
+  }
+
+  if (
+    Object.keys(errors).length > 0 ||
+    name === null ||
+    phone === null ||
+    !isContactTopic(topic)
+  ) {
+    return { ok: false, errors };
+  }
+
+  return { ok: true, value: { name, phone, topic, message, consent: true } };
 }

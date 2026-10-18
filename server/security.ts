@@ -204,3 +204,33 @@ export function sendRateLimited(res: ServerResponse, retryAfterSeconds: number):
     AUTH_HY.ERR_RATE_LIMIT.replace('{seconds}', String(retryAfterSeconds)),
   );
 }
+
+// --- Contact throttle ------------------------------------------------------
+// A public (unauthenticated) inquiry form is a spam magnet, so it gets its own
+// fixed window keyed purely on IP, independent of the login/register buckets.
+// Three submissions per ten minutes is generous for a real question and cheap
+// to enforce in memory for the mock.
+
+export const CONTACT_WINDOW_MS = 10 * 60 * 1000;
+export const CONTACT_MAX = 3;
+
+const contactBuckets = new Map<string, { count: number; expiresAt: number }>();
+
+export function consumeContactAttempt(ip: string): AttemptDecision {
+  const now = Date.now();
+  if (contactBuckets.size >= 512) {
+    for (const [key, bucket] of contactBuckets) {
+      if (bucket.expiresAt <= now) contactBuckets.delete(key);
+    }
+  }
+  const bucket = contactBuckets.get(ip);
+  if (!bucket || bucket.expiresAt <= now) {
+    contactBuckets.set(ip, { count: 1, expiresAt: now + CONTACT_WINDOW_MS });
+    return { allowed: true, remaining: CONTACT_MAX - 1 };
+  }
+  if (bucket.count >= CONTACT_MAX) {
+    return { allowed: false, retryAfterSeconds: Math.ceil((bucket.expiresAt - now) / 1000) };
+  }
+  bucket.count += 1;
+  return { allowed: true, remaining: CONTACT_MAX - bucket.count };
+}

@@ -54,16 +54,37 @@ export interface StoredOrder extends UserOrderSummary {
   userId: string;
 }
 
+/**
+ * A public contact-form submission. Kept minimal and PII-aware: only what the
+ * inquiry needs. `id` is the only thing echoed back to the browser.
+ */
+export interface StoredContactMessage {
+  id: string;
+  name: string;
+  /** E.164, already normalized by the shared validator. */
+  phone: string;
+  topic: string;
+  message: string;
+  createdAt: string;
+}
+
 interface DbShape {
   users: StoredUser[];
   sessions: StoredSession[];
   addresses: StoredAddress[];
   orders: StoredOrder[];
+  contactMessages: StoredContactMessage[];
 }
 
 const DB_PATH = fileURLToPath(new URL('./data/db.json', import.meta.url));
 
-const emptyDb = (): DbShape => ({ users: [], sessions: [], addresses: [], orders: [] });
+const emptyDb = (): DbShape => ({
+  users: [],
+  sessions: [],
+  addresses: [],
+  orders: [],
+  contactMessages: [],
+});
 
 function loadFromDisk(): DbShape | null {
   try {
@@ -78,6 +99,7 @@ function loadFromDisk(): DbShape | null {
       sessions: Array.isArray(db.sessions) ? db.sessions : [],
       addresses: Array.isArray(db.addresses) ? db.addresses : [],
       orders: Array.isArray(db.orders) ? db.orders : [],
+      contactMessages: Array.isArray(db.contactMessages) ? db.contactMessages : [],
     };
   } catch {
     return null;
@@ -389,6 +411,21 @@ export function attachOrder(
   scheduleSave();
   const { userId: _userId, ...rest } = order;
   return rest;
+}
+
+// --- Contact messages ------------------------------------------------------
+/**
+ * Stores a public inquiry and returns its row. The caller has already run the
+ * shared validator (name/phone/topic/message normalized and length-checked) and
+ * the honeypot + throttle checks, so nothing here re-parses the request.
+ */
+export function createContactMessage(
+  input: Omit<StoredContactMessage, 'id' | 'createdAt'>,
+): StoredContactMessage {
+  const record: StoredContactMessage = { ...input, id: randomUUID(), createdAt: new Date().toISOString() };
+  db.contactMessages.push(record);
+  scheduleSave();
+  return record;
 }
 
 // --- Dev-only seed -------------------------------------------------------

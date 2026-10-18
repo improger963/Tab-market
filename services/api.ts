@@ -619,3 +619,42 @@ export async function getDevDemoCredentials(): Promise<{ phone: string; password
   }
 }
 
+// ---------------------------------------------------------------------------
+// Contact inquiry (public, unauthenticated)
+// ---------------------------------------------------------------------------
+
+export interface ContactMessagePayload {
+  name: string;
+  phone: string;
+  topic: string;
+  message: string;
+  consent: boolean;
+  /** Honeypot: must be left empty by humans; a filled value is silently dropped. */
+  website?: string;
+}
+
+/**
+ * `POST /contact-messages`. Field validation mirrors `validateContact` (shared
+ * with the browser and the future Laravel validator), so the request that
+ * reaches here has already passed the same rules. The double-submit guard is
+ * owned by the form: it disables the button while pending and reuses a single
+ * idempotency key per composed message, so a second click never re-posts.
+ */
+export async function createContactMessage(payload: ContactMessagePayload): Promise<{ id: string }> {
+  try {
+    return await accountRequest('POST', '/contact-messages', (data) => {
+      if (typeof data !== 'object' || data === null) return null;
+      const id = (data as Record<string, unknown>).id;
+      return typeof id === 'string' && id ? { id } : null;
+    }, { ...payload });
+  } catch (error) {
+    // Same narrow static-host fallback the account endpoints use: a missing
+    // route (404) or an HTML body (`response_shape`) means there is no backend
+    // on this origin at all, so the demo flow simulates the 201 locally. A
+    // genuine verdict (422 / 429 / network) always surfaces unchanged.
+    if (!isStaticDeploymentError(error)) throw error;
+    return { id: clientEntityId('contact') };
+  }
+}
+
+

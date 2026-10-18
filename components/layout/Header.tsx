@@ -7,6 +7,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   ShoppingBag,
   LayoutGrid,
@@ -26,12 +27,16 @@ import {
   Package,
   Search,
   X,
+  Store,
+  MessageSquare,
 } from 'lucide-react';
 import { useCart } from '@/store/useCart';
 import { useWishlist } from '@/store/useWishlist';
 import { useCompare } from '@/store/useCompare';
 import { categories } from '@/data/categories';
 import { formatAMD } from '@/lib/utils';
+import { HY } from '@/lib/copy/hy';
+import { PAGES_HY } from '@/lib/copy/pagesHy';
 import LiveSearch from './LiveSearch';
 import AccountTrigger from '@/components/auth/AccountTrigger';
 
@@ -39,6 +44,7 @@ export default function Header() {
   const { openDrawer, totalCount, totalPrice } = useCart();
   const { totalCount: wishlistCount } = useWishlist();
   const { totalCount: compareCount } = useCompare();
+  const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -246,6 +252,34 @@ export default function Header() {
                 {wishCount}
               </span>
             )}
+          </Link>
+
+          {/* Showroom shortcut (tablet+) — the physical-store page. */}
+          <Link
+            href="/showroom"
+            title={HY.OUR_SHOWROOM}
+            aria-current={pathname === '/showroom' ? 'page' : undefined}
+            className={`hidden sm:flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control border bg-surface transition-colors duration-hover cursor-pointer btn-tactile ${
+ pathname === '/showroom'
+ ? 'border-accent text-accent'
+ : 'border-line text-body hover:text-ink hover:bg-canvas'
+}`}
+          >
+            <Store className="w-4 h-4" />
+          </Link>
+
+          {/* Contact shortcut (tablet+) */}
+          <Link
+            href="/contact"
+            title={PAGES_HY.CONTACT_H1}
+            aria-current={pathname === '/contact' ? 'page' : undefined}
+            className={`hidden sm:flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control border bg-surface transition-colors duration-hover cursor-pointer btn-tactile ${
+ pathname === '/contact'
+ ? 'border-accent text-accent'
+ : 'border-line text-body hover:text-ink hover:bg-canvas'
+}`}
+          >
+            <MessageSquare className="w-4 h-4" />
           </Link>
 
           {/* Track Order Shortcut (Desktop) — light text link */}

@@ -30,6 +30,7 @@ import {
   validateLogin,
   validateProfile,
   validateRegister,
+  validateContact,
   type AddressFormInput,
   type FieldErrors,
 } from '../lib/auth/schema.ts';
@@ -39,6 +40,7 @@ import {
   attachOrder,
   countAddresses,
   createAddress,
+  createContactMessage,
   createUser,
   deleteAddress,
   destroySession,
@@ -61,6 +63,7 @@ import {
 } from './session.ts';
 import {
   consumeAttempt,
+  consumeContactAttempt,
   hasJsonBody,
   isSameOriginRequest,
   noStore,
@@ -556,6 +559,44 @@ function handleDevDemo(ctx: Ctx): void {
   sendOk(ctx.res, { phone: DEV_DEMO_PHONE, password: DEV_DEMO_PASSWORD });
 }
 
+/**
+ * `POST /contact-messages` — the public inquiry form. Unauthenticated, so it is
+ * guarded by the honeypot, a per-IP throttle, and the SAME `validateContact`
+ * rules the browser runs. A filled honeypot is accepted with a silent 201 (the
+ * bot learns nothing); a genuine submission is normalized, stored, echoed to
+ * the server console (no PII in logs), and answered with only its id.
+ */
+function handleContactMessage(ctx: Ctx): void {
+  const { req, res, body } = ctx;
+
+  // Hidden field: real customers never set it. Pretend success, store nothing.
+  if (str(body, 'website').trim() !== '') {
+    noStore(res);
+    sendCreated(res, { id: 'ignored' });
+    return;
+  }
+
+  const ip = requestIp(req);
+  const decision = consumeContactAttempt(ip);
+  if (!decision.allowed) return sendRateLimited(res, decision.retryAfterSeconds);
+
+  const checked = validateContact({
+    name: str(body, 'name'),
+    phone: str(body, 'phone'),
+    topic: str(body, 'topic'),
+    message: str(body, 'message'),
+    consent: bool(body, 'consent'),
+  });
+  if (!checked.ok) return invalid(res, checked.errors);
+
+  const created = createContactMessage(checked.value);
+  // Operator notification target for the Laravel swap: log the id only so the
+  // console stays free of personal data the way a queue job dispatch would be.
+  process.stdout.write(`[contact] stored message ${created.id}\n`);
+  noStore(res);
+  sendCreated(res, { id: created.id });
+}
+
 // --- Route table -----------------------------------------------------------
 
 const ROUTES: Route[] = [
@@ -575,6 +616,7 @@ const ROUTES: Route[] = [
   route('GET', '/me/orders', handleListOrders),
   route('POST', '/me/orders', handleAttachOrder),
   route('GET', '/me/orders/:id', handleShowOrder),
+  route('POST', '/contact-messages', handleContactMessage),
 ];
 
 const MUTATING = new Set(['POST', 'PATCH', 'DELETE']);

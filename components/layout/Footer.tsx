@@ -10,6 +10,9 @@ import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, FileCheck2, Banknote } from 'lucide-react';
 import { categories } from '@/data/categories';
 import { SHOWROOM_INFO } from '@/lib/config';
+import { business } from '@/config/site';
+import { HY } from '@/lib/copy/hy';
+import { PAGES_HY } from '@/lib/copy/pagesHy';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -102,11 +105,29 @@ export default function Footer() {
                 էլեկտրոնային հաշիվ-ապրանքագրեր շինարարական կազմակերպություններին (ՀՎՀՀ / TIN)
               </span>
             </li>
+            {business.email ? (
             <li className="flex items-start gap-2">
               <Mail className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-              <a href="mailto:info@tab.am" className="hover:text-white transition-colors">
-                info@tab.am (նախահաշիվների սպասարկում)
+              <a href={`mailto:${business.email}`} className="hover:text-white transition-colors">
+                {business.email} (նախահաշիվների սպասարկում)
               </a>
+            </li>
+            ) : null}
+            <li className="pt-1">
+              <Link
+                href="/showroom"
+                className="text-accent hover:text-accent-hover font-bold flex items-center gap-1.5 min-h-[44px]"
+              >
+                <span>{HY.OUR_SHOWROOM} →</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/contact"
+                className="text-accent hover:text-accent-hover font-bold flex items-center gap-1.5 min-h-[44px]"
+              >
+                <span>{PAGES_HY.CONTACT_H1} →</span>
+              </Link>
             </li>
             <li className="pt-1">
               <Link

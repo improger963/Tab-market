@@ -23,6 +23,8 @@ import CheckoutPage from '@/app/checkout/page';
 import WishlistPage from '@/app/wishlist/page';
 import ComparePage from '@/app/compare/page';
 import TrackOrderPage from '@/app/track-order/page';
+import ShowroomPage from '@/app/showroom/page';
+import ContactPage from '@/app/contact/page';
 import AccountPage from '@/app/account/page';
 import AccountOrdersPage from '@/app/account/orders/page';
 import AccountProfilePage from '@/app/account/profile/page';
@@ -133,6 +135,13 @@ export default function App() {
     }
     if (currentPath === '/track-order') {
       return { page: 'track-order' };
+    }
+    // Static single pages: matched before the wildcard account branch below.
+    if (currentPath === '/showroom') {
+      return { page: 'showroom' };
+    }
+    if (currentPath === '/contact') {
+      return { page: 'contact' };
     }
     // `/account` and its three sections. `page.tsx` covers the bare path; any
     // unknown sub-path lands on orders rather than a dead screen, because the
@@ -317,6 +326,20 @@ export default function App() {
       {route.page === 'track-order' && (
         <main className="flex-1 w-full animate-in fade-in-50 duration-200">
           <TrackOrderPage />
+        </main>
+      )}
+
+      {/* VIEW 7b: SHOWROOM PAGE (physical store: facts from config/site.ts) */}
+      {route.page === 'showroom' && (
+        <main className="flex-1 w-full animate-in fade-in-50 duration-200">
+          <ShowroomPage />
+        </main>
+      )}
+
+      {/* VIEW 7c: CONTACT PAGE (channels + inquiry form) */}
+      {route.page === 'contact' && (
+        <main className="flex-1 w-full animate-in fade-in-50 duration-200">
+          <ContactPage />
         </main>
       )}
 
