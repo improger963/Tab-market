@@ -6,7 +6,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, Product } from '../types';
-import { products } from '../data/products';
+import { loadFullCatalog } from '../lib/clientCatalog';
 import { stockCap } from '../lib/utils';
 
 // Persisted schema version. Bump when the stored shape changes and add a
@@ -14,14 +14,18 @@ import { stockCap } from '../lib/utils';
 const CART_SCHEMA_VERSION = 1;
 
 /**
- * Re-validates persisted cart lines against the live catalog on rehydration:
+ * Re-validates persisted cart lines against the live catalog:
  *  - drops items that no longer exist in the catalog,
  *  - refreshes price/availability truth from the catalog,
  *  - clamps quantity to the current min/max (1..stock).
+ * Phase 3: the catalog arrives through the shared once-per-session loader
+ * instead of a static import, so the 2.2 MB price list never enters the
+ * client bundle. Until it resolves, stored lines render from their snapshot
+ * (prices were persisted from the same source, so drift is transient).
  */
-function revalidateCartItems(items: CartItem[]): CartItem[] {
+function revalidateCartItems(items: CartItem[], catalog: Product[]): CartItem[] {
   return items.reduce<CartItem[]>((acc, item) => {
-    const fresh = products.find((p) => p.id === item.product.id);
+    const fresh = catalog.find((p) => p.id === item.product.id);
     if (!fresh) return acc; // product removed from catalog
     const merged: Product = {
       ...item.product,
@@ -228,7 +232,13 @@ export const useCart = create<CartState>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state && Array.isArray(state.items) && state.items.length > 0) {
-          useCart.setState({ items: revalidateCartItems(state.items) });
+          // Validate against the live catalog once the shared loader resolves;
+          // if it fails, keep the persisted snapshot (least destructive choice).
+          loadFullCatalog()
+            .then((catalog) => {
+              useCart.setState({ items: revalidateCartItems(state.items, catalog) });
+            })
+            .catch(() => {});
         }
       },
     }

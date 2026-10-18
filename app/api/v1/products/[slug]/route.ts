@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { products } from '@/data/products';
+import { findProductByKey } from '@/server/catalog';
 import { ApiResponse } from '@/types/api';
 import { Product } from '@/types';
 
@@ -17,9 +17,7 @@ export async function GET(
   const resolvedParams = await params;
   const slugOrCode = resolvedParams.slug;
 
-  const product = products.find(
-    (p) => p.slug === slugOrCode || p.code === slugOrCode
-  );
+  const product = findProductByKey(slugOrCode);
 
   if (!product) {
     return NextResponse.json(

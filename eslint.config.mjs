@@ -45,4 +45,27 @@ export default tseslint.config(
       'react-hooks/exhaustive-deps': 'warn',
     },
   },
+  {
+    // Phase 3 data/server boundary: the 2.2 MB price list is server-only.
+    // Server code reads it through `server/catalog.ts`; browser islands get
+    // rows via `lib/clientCatalog.ts` (API-backed). The dataset import is
+    // therefore only allowed in the gateway, the data layer itself, API
+    // route handlers, and tests.
+    files: ['**/*.{ts,tsx}'],
+    ignores: ['server/**', 'data/**', 'app/api/**', 'tests/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/data/products', '@/data/products.json', '**/data/products', '**/data/products.json'],
+              message:
+                'data/products is server-only (Phase 3). Use server/catalog.ts (RSC/API) or lib/clientCatalog.ts (browser loader).',
+            },
+          ],
+        },
+      ],
+    },
+  },
 );

@@ -142,3 +142,30 @@ Legend: **SC** = Server Component, **CC** = Client Component (`'use client'`),
   `--topbar-h`/`--header-h` and honors `prefers-reduced-motion`.
 - **Vitest introduced** (`npm test`, node env, `@` alias) with the route contract as its first asset.
 
+## 7. Phase 3 — data/server boundary notes
+
+- **Root cause of the 2.9 MB bundle confirmed**: `data/categories.ts` and `data/brands.ts` both
+  imported the full `products` dataset just to recompute counts at module load — so every importer
+  of the taxonomy dragged 2.2 MB of price-list JSON into the client graph.
+- **Baked counts == live counts** (12 categories / 61 brands / 1647 SKUs) — verified at import time
+  and locked by `tests/routes/catalog-contract.test.ts`, which fails on any future drift.
+- **Gateway**: `server/catalog.ts` (`import 'server-only'`) is now the only module allowed to touch
+  `@/data/products`. It preserves the shipped lookup semantics exactly: pages are slug-exact
+  (`findProductBySlug`), the product API stays dual-mode slug-or-code (`findProductByKey`), and
+  `categoriesWithCounts()` recomputes live counts once per server process.
+- **Browser path**: `lib/clientCatalog.ts` fetches `/api/v1/products?limit=100000` **once per
+  session** (shared module promise, resets on failure so the next caller retries). Islands that
+  genuinely need the assortment — `CatalogView`, `LiveSearch`, `TabbedProductShowcase`,
+  `BrandPageClient`, `CartDrawer` cross-sell, and `useCart` rehydration revalidation — consume the
+  hook/loader; `CatalogView` re-seeds its price bounds when data lands while honoring explicit
+  `?min/?max` deep links, and its URL sync waits for that seed.
+- **ESLint guard**: `no-restricted-imports` blocks `data/products(.json)` everywhere except
+  `server/**`, `data/**`, `app/api/**`, `tests/**` — CI-enforced, not convention.
+- **Bundle effect** (measured on `.next/static`, whole-client-JS): raw **2,841.85 kB → 1,210.99 kB
+  (−57%)**; per-chunk gzip 366.08 kB vs the Vite single-chunk 341.85 kB baseline (chunk-split
+  dictionaries cost ~7% gzip parity while halving raw bytes). No dataset row markers survive in
+  any client chunk.
+- **Node tests act as the server runtime**: vitest aliases `server-only` to
+  `tests/helpers/server-only-stub.ts` so the gateway itself is contract-testable.
+
+

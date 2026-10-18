@@ -27,11 +27,13 @@ import { useToast } from '@/store/useToast';
 import { formatAMD, stockCap } from '@/lib/utils';
 import { DELIVERY_CONFIG, SHOWROOM_INFO } from '@/lib/config';
 import { HY } from '@/lib/copy/hy';
-import { products } from '@/data/products';
+import { useFullCatalog } from '@/lib/clientCatalog';
 import ProductImage from '@/components/ui/ProductImage';
 import type { Product } from '@/types';
 
 export default function CartDrawer() {
+  // Cross-sell reads the shared once-per-session catalog copy (Phase 3).
+  const catalog = useFullCatalog();
   const {
     items,
     addItem,
@@ -116,7 +118,7 @@ export default function CartDrawer() {
   // products", so that is what the heading says.
   const cartProductIds = new Set(items.map((i) => i.product.id));
   const cartCategories = new Set(items.map((i) => i.product.categorySlug));
-  const crossSellProducts = products
+  const crossSellProducts = (catalog ?? [])
     .filter((p) => !cartProductIds.has(p.id) && p.inStock && cartCategories.has(p.categorySlug))
     .sort((a, b) => {
       const cut = (p: Product) =>
