@@ -6,7 +6,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, Product } from '../types';
-import { products } from '../data/products';
+import { loadFullCatalog } from '../lib/clientCatalog';
+import { validateCoupon } from '../services/api';
 import { stockCap } from '../lib/utils';
 
 // Persisted schema version. Bump when the stored shape changes and add a
@@ -14,14 +15,24 @@ import { stockCap } from '../lib/utils';
 const CART_SCHEMA_VERSION = 1;
 
 /**
- * Re-validates persisted cart lines against the live catalog on rehydration:
+ * Shipped localized rejection for an empty submission (escaped from the
+ * pre-Phase-4 client coupon table). Every other verdict comes from the API.
+ */
+const EMPTY_COUPON_MESSAGE = '\u053d\u0576\u0564\u0580\u0578\u0582\u0574 \u0565\u0576\u0584 \u0574\u0578\u0582\u057f\u0584\u0561\u0563\u0580\u0565\u056c \u057a\u0580\u0578\u0574\u0578\u056f\u0578\u0564';
+
+/**
+ * Re-validates persisted cart lines against the live catalog:
  *  - drops items that no longer exist in the catalog,
  *  - refreshes price/availability truth from the catalog,
  *  - clamps quantity to the current min/max (1..stock).
+ * Phase 3: the catalog arrives through the shared once-per-session loader
+ * instead of a static import, so the 2.2 MB price list never enters the
+ * client bundle. Until it resolves, stored lines render from their snapshot
+ * (prices were persisted from the same source, so drift is transient).
  */
-function revalidateCartItems(items: CartItem[]): CartItem[] {
+function revalidateCartItems(items: CartItem[], catalog: Product[]): CartItem[] {
   return items.reduce<CartItem[]>((acc, item) => {
-    const fresh = products.find((p) => p.id === item.product.id);
+    const fresh = catalog.find((p) => p.id === item.product.id);
     if (!fresh) return acc; // product removed from catalog
     const merged: Product = {
       ...item.product,
@@ -59,7 +70,7 @@ export interface CartState {
   openDrawer: () => void;
   closeDrawer: () => void;
   toggleDrawer: () => void;
-  applyCoupon: (code: string) => { success: boolean; message: string };
+  applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
   removeCoupon: () => void;
 
   // Computed getters
@@ -139,46 +150,26 @@ export const useCart = create<CartState>()(
         set({ isDrawerOpen: !get().isDrawerOpen });
       },
 
-      applyCoupon: (codeRaw: string) => {
+      applyCoupon: async (codeRaw: string) => {
         const code = codeRaw.trim().toUpperCase();
         if (!code) {
-          return { success: false, message: 'Խնդրում ենք մուտքագրել պրոմոկոդ' };
+          return { success: false, message: EMPTY_COUPON_MESSAGE };
         }
-
-        if (code === 'TAB10') {
-          const coupon: CouponData = {
-            code: 'TAB10',
-            discountPercent: 10,
-            freeShipping: false,
-            description: '10% զեղչ պատվերի ամբողջ արժեքից',
-          };
-          set({ appliedCoupon: coupon });
-          return { success: true, message: 'կիրառված է: 10% զեղչ ամբողջ զամբյուղի համար!' };
+        // Phase 4: the server owns coupon truth; this mirrors its verdict and
+        // only stores what it confirmed. A rejection leaves any currently
+        // applied coupon untouched, exactly like the old client table did.
+        const result = await validateCoupon(code);
+        if (result.valid) {
+          set({
+            appliedCoupon: {
+              code: result.code,
+              discountPercent: result.discountPercent,
+              freeShipping: result.freeShipping,
+              description: result.description,
+            },
+          });
         }
-
-        if (code === 'VARPET') {
-          const coupon: CouponData = {
-            code: 'VARPET',
-            discountPercent: 15,
-            freeShipping: false,
-            description: '15% հատուկ վարպետական զեղչ',
-          };
-          set({ appliedCoupon: coupon });
-          return { success: true, message: 'կիրառված է: 15% մասնագիտական զեղչ!' };
-        }
-
-        if (code === 'FREE') {
-          const coupon: CouponData = {
-            code: 'FREE',
-            discountPercent: 0,
-            freeShipping: true,
-            description: 'Անվճար առաքում ամբողջ ՀՀ տարածքում',
-          };
-          set({ appliedCoupon: coupon });
-          return { success: true, message: 'կիրառված է: Անվճար առաքում ՀՀ բոլոր մարզեր!' };
-        }
-
-        return { success: false, message: 'Անվավեր պրոմոկոդ: Փորձեք Պրոմոկոդ' };
+        return { success: result.valid, message: result.message };
       },
 
       removeCoupon: () => {
@@ -228,7 +219,13 @@ export const useCart = create<CartState>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state && Array.isArray(state.items) && state.items.length > 0) {
-          useCart.setState({ items: revalidateCartItems(state.items) });
+          // Validate against the live catalog once the shared loader resolves;
+          // if it fails, keep the persisted snapshot (least destructive choice).
+          loadFullCatalog()
+            .then((catalog) => {
+              useCart.setState({ items: revalidateCartItems(state.items, catalog) });
+            })
+            .catch(() => {});
         }
       },
     }

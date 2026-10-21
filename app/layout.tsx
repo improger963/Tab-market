@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
+import { Suspense } from 'react';
+import { Inter, Noto_Sans_Armenian } from 'next/font/google';
+import './globals.css';
+import { business } from '@/config/site';
 import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import MobileNav from '@/components/layout/MobileNav';
 import CartDrawer from '@/components/cart/CartDrawer';
+import AuthModal from '@/components/auth/AuthModal';
 import ToastContainer from '@/components/ui/ToastContainer';
-import '@/src/index.css';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,36 +17,38 @@ const inter = Inter({
   display: 'swap',
 });
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-jakarta',
+const hy = Noto_Sans_Armenian({
+  subsets: ['armenian'],
+  variable: '--font-hy',
   display: 'swap',
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://tab.am';
+
 export const metadata: Metadata = {
-  title: 'tab.am | Ջրամատակարարման և Սանտեխնիկայի Խանութ-Սրահ Երևանում',
-  description:
-    'tab.am - Ժամանակակից սանտեխնիկայի և ջրամատակարարման առաջատար խանութ-սրահ Երևանում (Մելքումովի 40/1): Ծորակներ, կաթսաներ, սանկերամիկա  արտիկուլներով:',
-  keywords: [
-    'սանտեխնիկա',
-    'ծորակներ',
-    'կաթսաներ',
-    'խողովակներ',
-    'սանկերամիկա',
-    '',
-    '',
-    'Երևան',
-    'Մելքումովի 40/1',
-    'tab.am',
-  ],
-  authors: [{ name: 'tab.am Plumbing & Heating Store' }],
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'tab.am | Ջրամատակարարման և Սանտեխնիկայի Խանութ-Սրահ Երևանում',
+    template: '%s | tab.am',
+  },
+  description: `Ժամանակակից սանտեխնիկա և ջրամատակարարման ապրանքներ Երևանում՝ ${business.address.line}։ Ծորակներ, խողովակներ, սանկերամիկա և միացումներ՝ առկայությամբ և գներով։`,
+  authors: [{ name: 'tab.am' }],
   openGraph: {
-    title: 'tab.am | Ջրամատակարարման և Սանտեխնիկայի Խանութ-Սրահ Երևան',
-    description:
-      'tab.am - Ժամանակակից սանտեխնիկա Երևանում, Մելքումովի 40/1:  կոդերով որոնում և պահեստի առկայություն:',
     type: 'website',
     locale: 'hy_AM',
     siteName: 'tab.am',
+    url: SITE_URL,
+    title: 'tab.am | Ջրամատակարարման և Սանտեխնիկայի Խանութ-Սրահ Երևանում',
+    description: `Ժամանակակից սանտեխնիկա և ջրամատակարարման ապրանքներ Երևանում՝ ${business.address.line}։`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'tab.am | Խանութ-Սրահ Երևանում',
+    description: 'Սանտեխնիկա և ջրամատակարարում՝ առկայությամբ և գներով։',
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 };
 
@@ -61,14 +66,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="hy" className={`${inter.variable} ${jakarta.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen bg-white text-slate-800 antialiased flex flex-col font-sans selection:bg-[#2563EB] selection:text-white w-full pb-shell">
+    <html lang="hy" className={`${inter.variable} ${hy.variable}`}>
+      <body className="flex min-h-screen flex-col bg-surface font-sans text-body antialiased selection:bg-accent selection:text-white pb-shell">
         <TopBar />
         <Header />
-        <main className="flex-1 w-full bg-white">{children}</main>
+        <main className="flex-1 w-full">{children}</main>
         <Footer />
         <MobileNav />
         <CartDrawer />
+        <Suspense fallback={null}>
+          <AuthModal />
+        </Suspense>
         <ToastContainer />
       </body>
     </html>

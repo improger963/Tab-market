@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Flame, Tag, ArrowRight } from 'lucide-react';
-import { products } from '@/data/products';
+import { useFullCatalog } from '@/lib/clientCatalog';
 import ProductCard from '@/components/product/ProductCard';
 import { HY } from '@/lib/copy/hy';
 
@@ -24,19 +24,22 @@ const SHOWCASE_LIMIT = 8;
 
 export default function TabbedProductShowcase() {
   const [activeSegment, setActiveSegment] = useState<Segment>('discount');
+  // Phase 3: the assortment comes from the shared once-per-session loader.
+  const catalog = useFullCatalog();
 
-  // Both segments come straight from the imported price list. The old "bestsellers"
+  // Both segments come straight from the live price list. The old "bestsellers"
   // and "new arrivals" tabs ranked on isFeatured/isNew flags the sheet does not
   // carry (and on `id % 3`, i.e. noise), so they are gone.
   const segmentProducts = React.useMemo(() => {
+    if (!catalog) return [];
     if (activeSegment === 'clearance') {
       // The price list's own liquidation lot, in catalogue order.
-      return products
+      return catalog
         .filter((p) => p.clearance)
         .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }))
         .slice(0, SHOWCASE_LIMIT);
     }
-    return products
+    return catalog
       .filter((p) => discountFraction(p.oldPrice, p.price) > 0)
       .sort(
         (a, b) =>
@@ -44,7 +47,7 @@ export default function TabbedProductShowcase() {
           a.code.localeCompare(b.code, undefined, { numeric: true }),
       )
       .slice(0, SHOWCASE_LIMIT);
-  }, [activeSegment]);
+  }, [activeSegment, catalog]);
 
   return (
     <section className="space-y-8">

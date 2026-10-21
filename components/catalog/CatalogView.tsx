@@ -18,8 +18,6 @@ import {
   Rows,
   ShoppingCart,
 } from 'lucide-react';
-import { products } from '@/data/products';
-import { categories } from '@/data/categories';
 import ProductCard from '@/components/product/ProductCard';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import CatalogFilterSkeleton from '@/components/ui/CatalogFilterSkeleton';
@@ -29,11 +27,18 @@ import { useCart } from '@/store/useCart';
 import { useToast } from '@/store/useToast';
 import { formatAMD } from '@/lib/utils';
 import { HY } from '@/lib/copy/hy';
+import { useFullCatalog } from '@/lib/clientCatalog';
+import type { Category } from '@/types';
 import ProductImage from '@/components/ui/ProductImage';
 import Pagination from '@/components/ui/Pagination';
 
 interface CatalogViewProps {
   initialCategorySlug?: string;
+  /**
+   * Category taxonomy with live server-side counts (`server/catalog.ts`),
+   * passed by the server page so this client island never imports the data.
+   */
+  categories: Category[];
 }
 
 // One page of listings. The imported price list carries ~1.6k rows, so the
@@ -42,6 +47,9 @@ const PAGE_SIZE = 24;
 
 const VALID_SORTS = ['catalogue', 'price-asc', 'price-desc'] as const;
 type SortKey = (typeof VALID_SORTS)[number];
+
+// Stable identity for "catalog not loaded yet" so memo deps don't churn.
+const NEUTRAL_BOUNDS = { min: 0, max: 0 };
 
 /**
  * Builds the initial filter state from the shareable URL query string, so a
@@ -102,19 +110,28 @@ function readPageFromUrl(): number {
   }
 }
 
-export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
-  // Price bounds come from the imported list itself. Hard-coding a ceiling used
-  // to hide every listing above it: the real range tops out at 650 000.
-  const priceBounds = useMemo(() => {
+export default function CatalogView({ initialCategorySlug, categories }: CatalogViewProps) {
+  // Phase 3: the assortment arrives from `/api/v1/products` (shared module
+  // promise), never from the bundle. `null` means "still loading".
+  const catalog = useFullCatalog();
+
+  // Price bounds come from the loaded list itself. Hard-coding a ceiling used
+  // to hide every listing above it: the real range tops out at 650 000. Until
+  // the catalog resolves the bounds are neutral ({0,0}) and the grid shows
+  // skeletons; they are seeded into the filters exactly once on arrival.
+  const resolvedPriceBounds = useMemo(() => {
+    if (!catalog) return null;
     let min = Infinity;
     let max = 0;
-    for (const p of products) {
+    for (const p of catalog) {
       const value = Number(p.price) || 0;
       if (value < min) min = value;
       if (value > max) max = value;
     }
     return { min: Number.isFinite(min) ? min : 0, max };
-  }, []);
+  }, [catalog]);
+
+  const priceBounds = resolvedPriceBounds ?? NEUTRAL_BOUNDS;
 
   // Filter state (seeded from the URL query for shareable / reloadable views)
   const [filters, setFilters] = useState<FilterState>(() =>
@@ -129,9 +146,12 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   // Skeletons are only for the first mount. Filter/sort/page updates keep the
   // previous results mounted and merely dim the grid while pending, so the
   // document height never collapses (a collapsing grid was throwing the
-  // viewport around on every filter change).
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  // viewport around on every filter change). Phase 3: the fake 1s timer is
+  // gone — the skeleton window is exactly "catalog not fetched yet".
+  const isInitialLoading = catalog === null;
   const [isGridPending, startGridTransition] = useTransition();
+  // True once the real price bounds have been applied to the filter state.
+  const [isPriceSeeded, setIsPriceSeeded] = useState(false);
   // Scroll target for page changes: the results column, not the document top,
   // so the filter sidebar stays where the user left it.
   const resultsTopRef = useRef<HTMLDivElement | null>(null);
@@ -143,11 +163,30 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
   useEffect(() => {
     setIsMounted(true);
-    const initialTimer = setTimeout(() => {
-      setIsInitialLoading(false);
-    }, 1000);
-    return () => clearTimeout(initialTimer);
   }, []);
+
+  // When the catalog lands, re-seed the price window to the real range —
+  // exactly once. Explicit `?min`/`?max` deep links win over the defaults.
+  useEffect(() => {
+    if (!resolvedPriceBounds || isPriceSeeded) return;
+    let keepMin = true;
+    let keepMax = true;
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      keepMin = sp.has('min');
+      keepMax = sp.has('max');
+    } catch {
+      // Unreadable URL: fall back to the seeded defaults below.
+    }
+    startGridTransition(() => {
+      setFilters((f) => ({
+        ...f,
+        minPrice: keepMin ? f.minPrice : resolvedPriceBounds.min,
+        maxPrice: keepMax ? f.maxPrice : resolvedPriceBounds.max,
+      }));
+      setIsPriceSeeded(true);
+    });
+  }, [resolvedPriceBounds, isPriceSeeded]);
 
   // All filter/sort/page mutations run inside a transition: React exposes
   // isGridPending (wired to opacity + aria-busy below) while the update is
@@ -192,7 +231,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   // and reloadable (BUG-03). Debounced so slider drags and rapid toggles don't
   // thrash the History API.
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || !isPriceSeeded) return;
     const timer = setTimeout(() => {
       const params = new URLSearchParams();
       if (filters.category) params.set('category', filters.category);
@@ -208,7 +247,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
       window.history.replaceState({}, '', nextUrl);
     }, 300);
     return () => clearTimeout(timer);
-  }, [filters, sortBy, isMounted, page, priceBounds]);
+  }, [filters, sortBy, isMounted, isPriceSeeded, page, priceBounds]);
 
   // Lock body scroll and allow Escape to dismiss the mobile filter sheet (no layout jump).
   useEffect(() => {
@@ -248,7 +287,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   const activeCategory = useMemo(() => {
     if (!filters.category) return null;
     return categories.find((c) => c.slug === filters.category) || null;
-  }, [filters.category]);
+  }, [filters.category, categories]);
 
   // Count active filters (excluding defaults)
   const activeFilterCount = useMemo(() => {
@@ -265,7 +304,8 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
   // Filter logic
   const filteredProducts = useMemo(() => {
-    let list = products.filter((p) => {
+    if (!catalog) return [];
+    let list = catalog.filter((p) => {
       // Category filter
       if (filters.category && p.categorySlug !== filters.category) {
         return false;
@@ -329,7 +369,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
     }
 
     return list;
-  }, [filters, sortBy]);
+  }, [catalog, filters, sortBy]);
 
   // One page of the result set. With ~1.6k listings, rendering everything would
   // build ~1.6k product cards at once.
@@ -371,8 +411,8 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
   // Fallback alternatives for zero-state
   const fallbackAlternatives = useMemo(() => {
-    return products.slice(0, 4);
-  }, []);
+    return catalog ? catalog.slice(0, 4) : [];
+  }, [catalog]);
 
   return (
     <div className="space-y-8 pb-16">

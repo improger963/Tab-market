@@ -12,11 +12,13 @@
  * when backed by data.
  * ========================================================================= */
 
-/* Armenian-capable font stack (Noto Sans Armenian + Inter), loaded via
-   <link> in index.html with display=swap; Tailwind v4 overrides font-sans. */
+/* Armenian-capable font stack (Noto Sans Armenian + Inter), self-hosted via
+   next/font in app/layout.tsx (CSS vars --font-inter / --font-hy); Tailwind v4
+   maps them into --font-sans below. */
 @theme {
-  --font-sans: "Inter", "Noto Sans Armenian", ui-sans-serif, system-ui,
-    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-inter), var(--font-hy), "Inter", "Noto Sans Armenian",
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 
   /* ---- Color tokens ------------------------------------------------------
      surface/canvas/ink/body/muted/accent/border + status. Slate ramp exists
