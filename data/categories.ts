@@ -7,14 +7,11 @@
 // Do not hand-edit: the taxonomy, order and counts mirror the price list.
 
 import { Category } from '../types';
+import { products } from './products';
 
 /**
- * Sheet taxonomy. `itemCount` is baked from the same price-list import that
- * produces `products.json`, so the two files cannot disagree while they ship
- * together; `tests/routes/catalog-contract.test.ts` fails the build if their
- * counts ever drift. The server runtime recomputes live counts through
- * `server/catalog.ts#categoriesWithCounts` for anything network-served.
- * This module must never import the product dataset (client bundle size).
+ * Sheet taxonomy. `itemCount` is recomputed from the live catalog below, so a
+ * customer-facing count can never drift away from the real assortment.
  */
 const RAW_CATEGORIES: Category[] = [
   {
@@ -116,7 +113,10 @@ const RAW_CATEGORIES: Category[] = [
 ];
 
 /**
- * Static taxonomy export. Zero-product categories simply carry a 0 count so
- * consumers can hide the badge.
+ * Truthful per-category counts derived directly from the live products array.
+ * Zero-product categories simply resolve to 0 so consumers can hide the badge.
  */
-export const categories: Category[] = RAW_CATEGORIES.map((cat) => ({ ...cat }));
+export const categories: Category[] = RAW_CATEGORIES.map((cat) => ({
+  ...cat,
+  itemCount: products.filter((p) => p.categorySlug === cat.slug).length,
+}));

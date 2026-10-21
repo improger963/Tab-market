@@ -8,8 +8,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, PackageX, ArrowRight, MapPin, Truck } from 'lucide-react';
+import { products } from '@/data/products';
 import { brandBySlug } from '@/data/brands';
-import { useFullCatalog } from '@/lib/clientCatalog';
 import ProductCard from '@/components/product/ProductCard';
 import ProductImage from '@/components/ui/ProductImage';
 import Pagination from '@/components/ui/Pagination';
@@ -33,17 +33,15 @@ const PAGE_SIZE = 24;
  */
 export default function BrandPageClient({ slug }: BrandPageClientProps) {
   const brand = brandBySlug.get(slug);
-  // Phase 3: listings arrive through the shared once-per-session loader.
-  const catalog = useFullCatalog();
 
   const brandProducts = useMemo(
     () =>
-      brand && catalog
-        ? catalog
+      brand
+        ? products
             .filter((p) => p.brand === brand.name)
             .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }))
         : [],
-    [brand, catalog],
+    [brand],
   );
 
   const [page, setPage] = useState(1);

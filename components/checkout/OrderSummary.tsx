@@ -51,10 +51,10 @@ export default function OrderSummary({
   const effectiveShipping = getEffectiveShippingCost(shippingCost);
   const finalTotal = getFinalTotal(shippingCost);
 
-  const handleApplyPromo = async (e: React.FormEvent) => {
+  const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError(null);
-    const res = await applyCoupon(couponInput);
+    const res = applyCoupon(couponInput);
     if (res.success) {
       showToast(res.message, 'Պրոմոկոդ');
       setCouponInput('');

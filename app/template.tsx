@@ -1,19 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
 
 /**
  * Route Transition Shell (Quiet Luxury 60fps):
- * Fluid 200ms ease-out opacity/slide on every route mount.
- *
- * Scroll position is owned by the Next router and nothing else: it scrolls to
- * the top on forward navigation and restores the saved offset on Back/Forward.
- * The mount-time scrollTo(0,0) the Vite shell needed is deliberately gone —
- * this template remounts on popstate too, so keeping it would flatten every
- * Back/Forward restore to the document top.
+ * Fluid 200ms ease-out opacity/slide on every route mount, plus a scroll
+ * reset to eliminate white flashes and violent scroll snaps between pages.
  */
 export default function Template({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // Snap back to top smoothly on mount so incoming routes never inherit stale offsets.
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}

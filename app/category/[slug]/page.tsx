@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import CatalogView from '@/components/catalog/CatalogView';
-import { categoriesWithCounts, findCategoryBySlug } from '@/server/catalog';
+import { categories } from '@/data/categories';
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -10,7 +10,7 @@ interface CategoryPageProps {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = findCategoryBySlug(slug);
+  const category = categories.find((c) => c.slug === slug);
 
   if (!category) {
     return {
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const category = findCategoryBySlug(slug);
+  const category = categories.find((c) => c.slug === slug);
 
   if (!category) {
     notFound();
@@ -34,7 +34,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <div className="container-lux py-8">
-      <CatalogView initialCategorySlug={slug} categories={categoriesWithCounts()} />
+      <CatalogView initialCategorySlug={slug} />
     </div>
   );
 }

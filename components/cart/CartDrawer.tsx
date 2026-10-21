@@ -27,13 +27,11 @@ import { useToast } from '@/store/useToast';
 import { formatAMD, stockCap } from '@/lib/utils';
 import { DELIVERY_CONFIG, SHOWROOM_INFO } from '@/lib/config';
 import { HY } from '@/lib/copy/hy';
-import { useFullCatalog } from '@/lib/clientCatalog';
+import { products } from '@/data/products';
 import ProductImage from '@/components/ui/ProductImage';
 import type { Product } from '@/types';
 
 export default function CartDrawer() {
-  // Cross-sell reads the shared once-per-session catalog copy (Phase 3).
-  const catalog = useFullCatalog();
   const {
     items,
     addItem,
@@ -118,7 +116,7 @@ export default function CartDrawer() {
   // products", so that is what the heading says.
   const cartProductIds = new Set(items.map((i) => i.product.id));
   const cartCategories = new Set(items.map((i) => i.product.categorySlug));
-  const crossSellProducts = (catalog ?? [])
+  const crossSellProducts = products
     .filter((p) => !cartProductIds.has(p.id) && p.inStock && cartCategories.has(p.categorySlug))
     .sort((a, b) => {
       const cut = (p: Product) =>
@@ -127,10 +125,10 @@ export default function CartDrawer() {
     })
     .slice(0, 2);
 
-  const handleApplyPromo = async (e: React.FormEvent) => {
+  const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError(null);
-    const res = await applyCoupon(couponInput);
+    const res = applyCoupon(couponInput);
     if (res.success) {
       showToast(res.message, 'Պրոմոկոդ');
       setCouponInput('');

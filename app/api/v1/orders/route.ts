@@ -5,10 +5,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { CreateOrderPayload, OrderConfirmation, ApiResponse } from '@/types/api';
-import { allProducts } from '@/server/catalog';
-import { couponDiscountFor, lookupCoupon } from '@/server/coupons';
-import { finalOrderTotals } from '@/server/pricing';
-import { stockCap } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   await new Promise((resolve) => setTimeout(resolve, 300));
@@ -30,41 +26,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Phase 4: prices are server truth. The client-sent unitPrice is ignored
-    // entirely; quantities are clamped to the same stock cap the cart uses.
-    // An unknown product id is a broken/tampered payload: it fails into the
-    // shipped generic error below (no invented copy).
-    const byId = new Map(allProducts().map((p) => [p.id, p]));
-    let subtotal = 0;
-    for (const item of payload.items) {
-      const product = byId.get(item.productId);
-      if (!product) throw new Error(`unknown product id ${item.productId}`);
-      const qty = Math.max(
-        1,
-        Math.min(Math.floor(item.quantity) || 1, stockCap(product.stockQuantity))
-      );
-      subtotal += product.price * qty;
+    // Calculate subtotal
+    const subtotal = payload.items.reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0
+    );
+
+    // Compute shipping cost
+    let shippingCost = 0;
+    if (payload.delivery.method === 'yerevan_delivery') {
+      shippingCost = subtotal >= 30000 ? 0 : 1500;
+    } else if (payload.delivery.method === 'regional_delivery') {
+      shippingCost = 3000;
     }
 
-    // Same registry and rounding the coupon endpoint and the cart display use.
-    const coupon = lookupCoupon(payload.couponCode ?? '');
-    const totals = finalOrderTotals({
-      subtotal,
-      method: payload.delivery.method,
-      discount: couponDiscountFor(subtotal, coupon),
-      freeShipping: Boolean(coupon?.freeShipping),
-    });
+    // Apply coupon discount if any
+    let discount = 0;
+    if (payload.couponCode) {
+      const coupon = payload.couponCode.toUpperCase().trim();
+      if (coupon === 'TAB10') {
+        discount = subtotal * 0.10;
+      } else if (coupon === 'VARPET') {
+        discount = subtotal * 0.15;
+      } else if (coupon === 'FREE') {
+        shippingCost = 0;
+      }
+    }
 
+    const total = Math.max(0, subtotal - discount + shippingCost);
     const randomId = Math.floor(10000 + Math.random() * 90000);
     const orderId = `TAB-${randomId}`;
 
     const confirmation: OrderConfirmation = {
       orderId,
       status: 'reserved_in_armsoft',
-      subtotal: totals.subtotal,
-      discount: totals.discount,
-      shippingCost: totals.shippingCost,
-      total: totals.total,
+      subtotal,
+      discount,
+      shippingCost,
+      total,
       createdAt: new Date().toISOString(),
     };
 
