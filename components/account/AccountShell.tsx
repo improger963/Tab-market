@@ -24,7 +24,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { MapPin, ReceiptText, UserCog } from 'lucide-react';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { usePathname, useSearchParams, pushRoute } from '@/lib/next-compat/navigation';
 import { authEntryPath } from '@/lib/auth/session';
 import { AUTH_HY } from '@/lib/copy/authHy';
 import { cn } from '@/lib/utils';
@@ -66,7 +66,6 @@ export default function AccountShell({ section }: { section: AccountSection }) {
   const hydrated = useAuth((state) => state.hydrated);
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const authorized = hydrated && user !== null;
 
@@ -75,8 +74,8 @@ export default function AccountShell({ section }: { section: AccountSection }) {
   useEffect(() => {
     if (!hydrated) return;
     if (user) return;
-    router.replace(authEntryPath('login', pathname), { scroll: false });
-  }, [hydrated, user, pathname, router]);
+    pushRoute(authEntryPath('login', pathname), { replace: true, scroll: false });
+  }, [hydrated, user, pathname]);
 
   // 2. Legacy `?tab=` entry points: send them to the route they mean, and drop
   //    the parameter either way so the address bar stays honest about the tab.
@@ -84,7 +83,7 @@ export default function AccountShell({ section }: { section: AccountSection }) {
     const tab = searchParams.get('tab');
     if (!tab && !searchParams.toString()) return;
     const target = isAccountSection(tab) ? SECTIONS.find((item) => item.key === tab) : undefined;
-    router.replace(target ? target.href : pathname, { scroll: false });
+    pushRoute(target ? target.href : pathname, { replace: true, scroll: false });
     // Once per mount: the redirect itself changes the URL, and re-running on the
     // cleaned search string would only repeat a no-op.
     // eslint-disable-next-line react-hooks/exhaustive-deps

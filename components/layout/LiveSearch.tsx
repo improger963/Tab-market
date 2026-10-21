@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useRef, useTransition, useMemo, useId } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { pushRoute } from '@/lib/next-compat/navigation';
 import { Search, X, CheckCircle2, ChevronRight, CornerDownLeft, Sparkles } from 'lucide-react';
-import { useFullCatalog } from '@/lib/clientCatalog';
+import { products } from '@/data/products';
 import { Product } from '@/types';
 import { formatAMD } from '@/lib/utils';
 import ProductImage from '@/components/ui/ProductImage';
@@ -179,7 +179,6 @@ export default function LiveSearch({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const listboxId = useId();
 
@@ -225,21 +224,17 @@ export default function LiveSearch({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Spotlight results: translit/typo tolerant matching, relevance ranked.
-  // The assortment is fetched once per session (shared loader); a query typed
-  // before it resolves simply yields no dropdown yet — the debounce covers
-  // the gap on any realistic connection.
-  const catalog = useFullCatalog();
+  // Spotlight results: translit/typo tolerant matching, relevance ranked
   const filteredProducts: Product[] = useMemo(() => {
-    if (!debouncedQuery || !catalog) return [];
+    if (!debouncedQuery) return [];
     const variants = getQueryVariants(debouncedQuery);
-    return catalog
+    return products
       .map((p) => ({ p, score: scoreMatch(p, debouncedQuery, variants) }))
       .filter((entry) => entry.score > 0)
       .sort((a, b) => b.score - a.score || a.p.code.localeCompare(b.p.code))
       .slice(0, 8)
       .map((entry) => entry.p);
-  }, [catalog, debouncedQuery]);
+  }, [debouncedQuery]);
 
   // Keep keyboard selection visible inside the spotlight dropdown
   useEffect(() => {
@@ -280,8 +275,9 @@ export default function LiveSearch({
       if (selectedIndex >= 0 && selectedIndex < filteredProducts.length) {
         e.preventDefault();
         const selected = filteredProducts[selectedIndex];
-        // Route-change scroll: the product page appears at the top.
-        router.push(`/product/${selected.slug}`);
+        // Route-change scroll is owned by the app's popstate handler: the
+        // product page appears at the top instantly (no animated jump).
+        pushRoute(`/product/${selected.slug}`);
         setIsOpen(false);
         onSelect?.();
       }

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronRight, ShieldCheck } from 'lucide-react';
-import { allProducts, findProductBySlug } from '@/server/catalog';
+import { products } from '@/data/products';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductDetailView from '@/components/product/ProductDetailView';
 import ProductDossierTabs from '@/components/product/ProductDossierTabs';
@@ -16,7 +16,7 @@ interface ProductPageProps {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = findProductBySlug(slug);
+  const product = products.find((p) => p.slug === slug);
 
   if (!product) {
     return {
@@ -37,14 +37,14 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = findProductBySlug(slug);
+  const product = products.find((p) => p.slug === slug);
 
   if (!product) {
     notFound();
   }
 
   // Related products from the same category
-  const relatedProducts = allProducts()
+  const relatedProducts = products
     .filter((p) => p.categorySlug === product.categorySlug && p.id !== product.id)
     .slice(0, 4);
 

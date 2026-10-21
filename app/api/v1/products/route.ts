@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { allProducts } from '@/server/catalog';
+import { products } from '@/data/products';
 import { Product } from '@/types';
 import { PaginatedResponse } from '@/types/api';
 
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   const page = searchParams.get('page') ? Number(searchParams.get('page')) : 1;
   const limit = searchParams.get('limit') ? Number(searchParams.get('limit')) : 12;
 
-  let filtered: Product[] = [...allProducts()];
+  let filtered: Product[] = [...products];
 
   // Category filter
   if (category && category !== 'all') {

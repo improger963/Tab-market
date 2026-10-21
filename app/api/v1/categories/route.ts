@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { categoriesWithCounts } from '@/server/catalog';
+import { categories } from '@/data/categories';
 import { ApiResponse } from '@/types/api';
 import { Category } from '@/types';
 
@@ -13,7 +13,7 @@ export async function GET() {
 
   const response: ApiResponse<Category[]> = {
     success: true,
-    data: categoriesWithCounts(),
+    data: categories,
   };
 
   return NextResponse.json(response);

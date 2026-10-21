@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { allProducts } from '@/server/catalog';
+import { products } from '@/data/products';
 import { ApiResponse } from '@/types/api';
 import { Product } from '@/types';
 
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(res);
   }
 
-  const matched = allProducts()
+  const matched = products
     .filter(
       (p) =>
         p.title.toLowerCase().includes(q) ||
