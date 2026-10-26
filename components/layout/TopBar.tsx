@@ -22,7 +22,7 @@ export default function TopBar() {
   const pathname = usePathname();
   const isShowroomActive = pathname === '/showroom';
   return (
-    <div className="flex h-[var(--topbar-h)] select-none items-center border-b border-white/10 bg-ink text-on-dark transition-colors">
+    <div className="flex h-[var(--topbar-h)] select-none items-center border-b border-white/10 bg-ink-deep text-on-dark transition-colors">
       {/* Fixed-height, single line. Left group truncates, right group is shrink-proof. */}
       <div className="container-lux flex min-w-0 items-center justify-between gap-3">
         {/* Left: showroom address (always) + delivery/hours (secondary, hidden on small) */}
@@ -41,7 +41,7 @@ export default function TopBar() {
           </Link>
 
           {DELIVERY_CONFIG.yerevanFreeAlways ? (
-            <span className="hidden shrink-0 items-center gap-1.5 rounded-control border border-white/15 bg-white/10 px-2.5 py-0.5 text-xs font-semibold text-white md:inline-flex">
+            <span className="hidden shrink-0 items-center gap-1.5 rounded-full border border-accent/40 bg-accent/15 px-3 py-0.5 text-xs font-bold tracking-wide text-white md:inline-flex">
               <Truck className="h-3.5 w-3.5 shrink-0 text-accent" aria-hidden="true" />
               <span>{HY.FREE_DELIVERY_YEREVAN}</span>
             </span>

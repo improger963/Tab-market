@@ -6,6 +6,7 @@ import { pushRoute } from '@/lib/next-compat/navigation';
 import { Search, X, CheckCircle2, ChevronRight, CornerDownLeft, Sparkles } from 'lucide-react';
 import { products } from '@/data/products';
 import { Product } from '@/types';
+import { getQueryVariants, scoreMatch } from '@/lib/search/translit';
 import { formatAMD } from '@/lib/utils';
 import ProductImage from '@/components/ui/ProductImage';
 
@@ -17,156 +18,10 @@ interface LiveSearchProps {
 }
 
 /* ---------------------------------------------------------------------------
- * SMART SPOTLIGHT: Armenian ↔ Latin translit normalization engine.
- * Typing "corak"/"tsorak" matches "ծորակ", "ganzer" matches "GANZER",
- * exact SKU "11463" matches instantly, and Armenian glyphs match Latin brands.
+ * SMART SPOTLIGHT: the Armenian ↔ Latin translit normalization engine lives
+ * in `lib/search/translit.ts` (pure, smoke-testable). "corak"/"tsorak"/"vorak"
+ * match "ծորակ", "ganzer" matches "GANZER", exact SKU "5932" wins instantly.
  * ------------------------------------------------------------------------- */
-
-/* Canonical Armenian glyph → Latin approximation pairs (used for both directions). */
-const ARM_LATIN_PAIRS: [string, string][] = [
-  ['ա', 'a'], ['բ', 'p'], ['գ', 'g'], ['դ', 't'], ['ե', 'ye'], ['զ', 'z'],
-  ['է', 'e'], ['ը', 'e'], ['թ', 'd'], ['ժ', 'zh'], ['ի', 'i'], ['լ', 'l'],
-  ['խ', 'kh'], ['ծ', 'ts'], ['կ', 'k'], ['հ', 'h'], ['ձ', 'dz'], ['ղ', 'gh'],
-  ['ճ', 'ch'], ['մ', 'm'], ['յ', 'y'], ['ն', 'n'], ['շ', 'sh'], ['ո', 'o'],
-  ['չ', 'ch'], ['պ', 'b'], ['ջ', 'j'], ['ր', 'r'], ['ռ', 'rr'], ['ս', 's'], ['վ', 'v'],
-  ['տ', 't'], ['ց', 'ts'], ['ւ', 'w'], ['փ', 'p'], ['ք', 'k'], ['օ', 'o'],
-  ['ֆ', 'f'],
-];
-
-// Digraph-first ordered Latin → Armenian map ('ev' and 'ou' must beat single letters)
-const ARM_DIGRAPHS: [string, string][] = ([
-  ['ev', 'էվ'],
-  ['ou', 'ու'],
-  ...ARM_LATIN_PAIRS.map(([arm, latin]) => [latin, arm] as [string, string]),
-  // Forward-only correction: customers type "corak" for the Armenian faucet
-  // word, but 'c' has no canonical pair. Map it to 'ծ' so the greedy
-  // translit reaches the correct glyph instead of a literal 'c'.
-  ['c', 'ծ'],
-] as [string, string][])
-  // Longest latin key first so digraphs ('ts', 'ch', 'sh', 'rr', …) always beat
-  // their single-letter prefixes ('t', 'c', 's', 'r', …) in the greedy pass.
-  .sort((a, b) => b[0].length - a[0].length);
-
-const ARM_SINGLE: Record<string, string> = Object.fromEntries(ARM_DIGRAPHS);
-
-const ARMENIAN_TO_LATIN: Record<string, string[]> = {
-  ...ARM_LATIN_PAIRS.reduce<Record<string, string[]>>((acc, [arm, latin]) => {
-    acc[arm] = acc[arm] ? [...new Set([...acc[arm], latin])] : [latin];
-    return acc;
-  }, {}),
-  // Extra accepted spellings for common typos / alternate translit conventions
-  'ա': ['a', 'ah'],
-  'բ': ['p', 'b'],
-  'գ': ['g', 'k', 'c'],
-  'դ': ['t', 'd'],
-  'ե': ['ye', 'e', 'yev'],
-  'զ': ['z', 'dz'],
-  'է': ['e', 'eh'],
-  'ը': ['e', 'y', 'u'],
-  'թ': ['t', 'd', 'th'],
-  'խ': ['kh', 'x'],
-  'ծ': ['ts', 'c', 'dz', 'j'],
-  'կ': ['k', 'g', 'c', 'q'],
-  'ձ': ['dz', 't', 'd'],
-  'ղ': ['gh', 'g', 'w'],
-  'ճ': ['ch', 'j', 'ts'],
-  'շ': ['sh', 's', 'ch'],
-  'ո': ['o', 'vo', 'u'],
-  'չ': ['ch', 'c', 'ts'],
-  'ջ': ['j', 'ch', 'dz'],
-  'ռ': ['r', 'rr'],
-  'վ': ['v', 'w'],
-  'տ': ['t', 'd'],
-  'ց': ['ts', 'c', 'j', 's'],
-  'ւ': ['w', 'u', 'v', 'ww'],
-  'փ': ['p', 'b'],
-  'ք': ['k', 'q', 'x', 'c'],
-  'օ': ['o', 'oh'],
-  'ֆ': ['f', 'ph'],
-  'ի': ['i', 'ih', 'ee'],
-  'լ': ['l', 'll'],
-  'հ': ['h', 'hh'],
-  'մ': ['m', 'mm'],
-  'յ': ['y', 'i'],
-  'ն': ['n', 'nn'],
-  'ս': ['s', 'ss'],
-};
-
-/** Converts a single Latin translit token into Armenian glyphs (digraph-first greedy pass). */
-function translitTokenToArmenian(token: string): string {
-  let out = '';
-  let i = 0;
-  while (i < token.length) {
-    let matched = false;
-    for (const [latin, arm] of ARM_DIGRAPHS) {
-      if (token.startsWith(latin, i)) {
-        out += arm;
-        i += latin.length;
-        matched = true;
-        break;
-      }
-    }
-    if (!matched) {
-      const ch = token[i];
-      out += ARM_SINGLE[ch] ?? ch;
-      i += 1;
-    }
-  }
-  return out;
-}
-
-/** Expands a raw query into Latin + Armenian translit token variants. */
-function getQueryVariants(rawQuery: string): string[] {
-  const q = rawQuery.toLowerCase().trim();
-  if (!q) return [];
-  const tokens = q.split(/\s+/);
-  const variants = new Set<string>(tokens);
-  const latinReversed = new Set<string>(tokens);
-
-  for (const token of tokens) {
-    if (/^[a-z'"]+$/.test(token)) {
-      const arm = translitTokenToArmenian(token);
-      variants.add(arm);
-      // Typo tolerance: single trailing/leading apostrophe or doubled letters
-      variants.add(token.replace(/['"]/g, ''));
-    }
-    // Armenian glyphs → latin approximations so "ծորակ" also matches "GANZER"-style latin haystacks
-    for (const char of token) {
-      const latinOpts = ARMENIAN_TO_LATIN[char];
-      if (latinOpts) latinOpts.forEach((l) => latinReversed.add(l));
-    }
-  }
-
-  return [...variants, ...latinReversed];
-}
-
-function buildHaystack(p: Product): string {
-  return `${p.title} ${p.brand} ${p.code} ${p.categoryName} ${p.slug} ${Object.values(p.specs).join(' ')}`.toLowerCase();
-}
-
-function scoreMatch(p: Product, rawQuery: string, variants: string[]): number {
-  const q = rawQuery.toLowerCase().trim();
-  const haystack = buildHaystack(p);
-  const code = p.code.toLowerCase();
-  const brand = p.brand.toLowerCase();
-  const title = p.title.toLowerCase();
-
-  // Exact SKU wins instantly
-  if (code === q) return 100;
-  if (code.startsWith(q)) return 90;
-  // Exact translit brand match
-  if (brand === q || variants.includes(brand)) return 80;
-  if (title.startsWith(q)) return 70;
-
-  // Any variant token present in the haystack
-  if (variants.some((v) => v.length >= 2 && haystack.includes(v))) return 60;
-  // Armenian → Latin reverse tolerance (Armenian query vs latin brand/spec text)
-  if (/[\u0530-\u058F]/.test(q)) {
-    const armNorm = [...q].map((c) => (ARMENIAN_TO_LATIN[c] ? `[${ARMENIAN_TO_LATIN[c].join('')}]` : c)).join('');
-    if (new RegExp(armNorm.replace(/\s+/g, '.*'), 'i').test(haystack)) return 50;
-  }
-  return 0;
-}
 
 export default function LiveSearch({
   autoFocus = false,
@@ -339,7 +194,7 @@ export default function LiveSearch({
             if (query.trim()) setIsOpen(true);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Որոնել՝ Կոդ, անուն կամ translit (օր. 11463, corak, ganzer)..."
+          placeholder="Որոնել՝ Կոդ, անուն կամ translit (օր. 5932, corak, ganzer)..."
           aria-label="Որոնել սանտեխնիկա"
           role="combobox"
           aria-expanded={isOpen && debouncedQuery.length > 0}
@@ -389,7 +244,7 @@ export default function LiveSearch({
               <h4 className="text-sm font-bold text-ink">Արդյունք չի գտնվել</h4>
               <p className="text-xs text-muted max-w-xs mx-auto">
                 «<span className="font-semibold text-body">{debouncedQuery}</span>» հարցմամբ
-                Կոդ կամ ապրանք չկա: Փորձեք <b>11463</b>, <b>corak</b> կամ <b>ganzer</b>:
+                Կոդ կամ ապրանք չկա: Փորձեք <b>5932</b>, <b>corak</b> կամ <b>ganzer</b>:
               </p>
             </div>
           ) : (

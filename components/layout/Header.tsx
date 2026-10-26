@@ -121,7 +121,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-header bg-surface/90 backdrop-blur-sm border-b border-line shadow-e1">
+    <header className="sticky top-0 z-header bg-surface/95 backdrop-blur-md border-b border-line/80 shadow-e1">
       <div className="container-lux h-[var(--header-h)] flex items-center justify-between gap-3 sm:gap-6">
         {/* Brand Logo & Catalog Mega-Menu Dropdown */}
         <div className="flex items-center gap-3 md:gap-4 shrink-0" ref={menuRef}>
@@ -131,11 +131,11 @@ export default function Header() {
             aria-label="tab.am Գլխավոր էջ"
           >
             <div className="flex items-center gap-1">
-              <span className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-ink group-hover:text-accent transition-colors">
+              <span className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tighter text-ink group-hover:text-accent transition-colors duration-hover">
                 TAB<span className="text-accent">.AM</span>
               </span>
             </div>
-            <span className="text-xs font-semibold text-muted -mt-1 group-hover:text-ink transition-colors hidden sm:block">
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted -mt-0.5 group-hover:text-ink transition-colors duration-hover hidden sm:block">
               ՍԱՆՏԵԽՆԻԿԱՅԻ ԽԱՆՈՒԹ-ՍՐԱՀ
             </span>
           </Link>
@@ -158,7 +158,7 @@ export default function Header() {
 
             {/* Mega Menu Dropdown */}
             {isMegaMenuOpen && (
-              <div className="absolute top-full left-0 mt-2 w-[90vw] max-w-[700px] bg-surface/95 backdrop-blur-sm rounded-panel shadow-e2 border border-line p-6 z-overlay animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute top-full left-0 mt-2 w-[90vw] max-w-[700px] bg-surface/95 backdrop-blur-xl rounded-panel shadow-e2 border border-line/80 p-6 z-overlay animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center justify-between pb-4 mb-4 border-b border-line">
                   <div>
                     <h3 className="text-sm font-bold text-ink">
@@ -234,7 +234,7 @@ export default function Header() {
           >
             <ArrowLeftRight className="w-4 h-4" />
             {compCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1">
+              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 ring-2 ring-surface">
                 {compCount}
               </span>
             )}
@@ -248,7 +248,7 @@ export default function Header() {
           >
             <Heart className="w-4 h-4 text-accent" />
             {wishCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 animate-heart-pop">
+              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 ring-2 ring-surface animate-heart-pop">
                 {wishCount}
               </span>
             )}
@@ -304,7 +304,7 @@ export default function Header() {
             type="button"
             onClick={openDrawer}
             aria-label={`Գնումների զամբյուղ, ${count} ապրանք`}
-            className={`min-h-[44px] min-w-[44px] relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-control bg-ink hover:bg-accent text-white font-medium text-xs transition-colors shadow-e1 cursor-pointer btn-tactile ${
+            className={`min-h-[44px] min-w-[44px] relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-control bg-ink hover:bg-accent text-white font-medium text-xs transition-all duration-hover ease-precision shadow-e1 hover:shadow-e2 cursor-pointer btn-tactile ${
  isCartBumping ? 'scale-105' : ''
  }`}
           >
@@ -312,7 +312,7 @@ export default function Header() {
               <ShoppingBag className="w-4 h-4 text-white" />
               {count > 0 && (
                 <span
-                  className={`absolute -top-2 -right-2 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 transition-transform duration-300 ${
+                  className={`absolute -top-2 -right-2 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 ring-2 ring-surface transition-transform duration-300 ${
  isCartBumping ? 'scale-125' : 'scale-100'
  }`}
                 >

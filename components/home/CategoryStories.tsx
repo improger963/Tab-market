@@ -26,9 +26,10 @@ import { HY } from '@/lib/copy/hy';
 
 /**
  * Category stories rail — built from the category data (any count).
- * Anatomy per spec: 64–72px circle with real image or neutral icon
+ * Anatomy per spec: 64–80px circle with real image or neutral icon
  * placeholder, 1–2 line label below, scroll-snap momentum rail with hidden
  * scrollbar and edge fade, >=44px touch targets, focus-visible ring.
+ * Hover = Royal-Blue ring glow + elevation bloom (editorial flagship style).
  * No rainbow gradients, no rotate/tilt decoration, no invented counts.
  */
 
@@ -50,7 +51,9 @@ export default function CategoryStories() {
     <section aria-label={HY.FAST_SEARCH} className="space-y-4">
       <div className="flex items-end justify-between gap-4 px-1">
         <div>
-          <span className="text-xs font-semibold text-accent">{HY.FAST_SEARCH}</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-accent">
+            {HY.FAST_SEARCH}
+          </span>
           <h2 className="mt-1 text-xl font-bold tracking-tight text-ink sm:text-2xl">
             {categories.length} {HY.MAIN_CATEGORIES}
           </h2>
@@ -66,7 +69,7 @@ export default function CategoryStories() {
 
       {/* Momentum-scrollable rail: snap, hidden scrollbar, edge fade. */}
       <div className="edge-fade no-scrollbar -mx-1 snap-x overflow-x-auto overscroll-x-contain px-1 py-2">
-        <ul className="flex items-start gap-3 sm:gap-4">
+        <ul className="flex items-start gap-3 sm:gap-5">
           {categories.map((cat) => {
             const img = resolveImageUrl(cat.image);
             const Icon = ICONS[cat.icon] ?? Droplets;
@@ -74,19 +77,21 @@ export default function CategoryStories() {
               <li key={cat.id} className="snap-center shrink-0">
                 <Link
                   href={`/category/${cat.slug}`}
-                  className="group btn-tactile flex w-20 flex-col items-center gap-2 rounded-card px-1 py-1 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 sm:w-[76px]"
+                  className="group btn-tactile flex w-20 flex-col items-center gap-2 rounded-card px-1 py-1 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 sm:w-[84px]"
                 >
-                  {/* Pedestal circle: real image or neutral icon placeholder. */}
-                  <span className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-line bg-canvas ring-1 ring-inset ring-white/70 transition-[transform,border-color] duration-hover ease-precision group-hover:border-line-strong group-hover:scale-[1.04] sm:h-[72px] sm:w-[72px]">
+                  {/* Pedestal circle: real image or neutral icon placeholder.
+                      On hover it ignites: Royal-Blue border, ambient ring
+                      glow and a soft elevated bloom. */}
+                  <span className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-line bg-canvas transition-all duration-300 ease-out ring-2 ring-transparent ring-offset-2 ring-offset-surface group-hover:border-accent group-hover:shadow-e2 group-hover:ring-accent/20 group-hover:scale-[1.04] sm:h-20 sm:w-20">
                     {img ? (
                       <img
                         src={img}
                         alt=""
                         loading="lazy"
-                        className="absolute inset-0 h-full w-full object-cover"
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                       />
                     ) : (
-                      <Icon className="h-6 w-6 text-accent" aria-hidden="true" />
+                      <Icon className="h-7 w-7 text-accent transition-transform duration-300 ease-out group-hover:scale-110" aria-hidden="true" />
                     )}
                   </span>
                   <span className="line-clamp-2 min-h-[2rem] text-xs font-medium leading-tight text-body transition-colors duration-hover group-hover:text-ink">

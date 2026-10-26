@@ -7,7 +7,9 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { MapPin, Phone } from 'lucide-react';
 import { heroConfig, getShowroomStatus } from '@/config/hero';
+import { HY } from '@/lib/copy/hy';
 
 /**
  * Hero — asymmetric text-left / visual-right on desktop, stacked on mobile.
@@ -50,10 +52,10 @@ export default function HeroBanner() {
       lang="hy"
       className="overflow-hidden rounded-panel border border-line bg-surface shadow-e2 lg:grid lg:grid-cols-12 lg:h-[clamp(360px,56dvh,560px)]"
     >
-      {/* ---- Copy column --------------------------------------------------- */}
-      <div className="flex flex-col justify-center gap-3 p-5 hyphens-auto break-words sm:gap-5 sm:p-10 lg:col-span-7 lg:gap-6 lg:p-12">
+      {/* ---- Copy column: editorial morning-light wash behind the headline -- */}
+      <div className="flex flex-col justify-center gap-3 bg-hero-ambient p-5 hyphens-auto break-words sm:gap-5 sm:p-10 lg:col-span-7 lg:gap-6 lg:p-12">
         {badge ? (
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-canvas px-3 py-1.5 text-xs font-semibold text-body">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-accent/20 bg-accent/5 px-3 py-1.5 text-xs font-semibold tracking-wide text-body shadow-e0">
             {/* Static decorative dot — never pulses. */}
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-accent" />
             {badge}
@@ -61,14 +63,18 @@ export default function HeroBanner() {
         ) : null}
 
         {title ? (
-          <h1 className="text-display line-clamp-3 text-ink sm:text-[clamp(1.75rem,1.35rem+1.4vw,2.25rem)] lg:text-[clamp(2rem,1.2rem+2.6vw,3.5rem)]">
+          <h1 className="text-display line-clamp-3 font-bold tracking-tight text-ink sm:text-[clamp(1.75rem,1.35rem+1.4vw,2.25rem)] lg:text-[clamp(2rem,1.2rem+2.6vw,3.5rem)]">
             {title}
-            {highlight ? <span className="block text-accent">{highlight}</span> : null}
+            {highlight ? (
+              <span className="block bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent">
+                {highlight}
+              </span>
+            ) : null}
           </h1>
         ) : null}
 
         {subtitle ? (
-          <p className="line-clamp-3 max-w-[52ch] text-[15px] leading-relaxed text-body sm:text-base lg:text-lg">
+          <p className="line-clamp-3 max-w-[52ch] text-[15px] leading-relaxed text-body sm:text-base sm:leading-relaxed lg:text-lg lg:leading-relaxed">
             {subtitle}
           </p>
         ) : null}
@@ -77,7 +83,7 @@ export default function HeroBanner() {
         <div className="flex flex-col items-stretch gap-2.5 pt-1 sm:flex-row sm:items-center sm:gap-3">
           <Link
             href={primaryCta.href}
-            className="btn-tactile inline-flex min-h-[48px] items-center justify-center rounded-control bg-ink px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-hover ease-precision hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            className="btn-tactile inline-flex min-h-[48px] items-center justify-center rounded-control bg-ink px-8 py-3.5 text-sm font-semibold text-white shadow-e1 transition-all duration-hover ease-precision hover:bg-accent hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
             {primaryCta.label}
           </Link>
@@ -88,7 +94,7 @@ export default function HeroBanner() {
               {...(secondaryCta.href.startsWith('http')
                 ? { target: '_blank', rel: 'noopener noreferrer' }
                 : {})}
-              className="btn-tactile inline-flex min-h-[48px] items-center justify-center gap-1.5 self-start rounded-control px-1 py-2 text-sm font-semibold text-ink underline-offset-4 hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:self-auto sm:justify-center sm:rounded-control sm:border sm:border-line sm:bg-surface sm:px-7 sm:py-3.5 sm:no-underline sm:transition-colors sm:duration-hover sm:ease-precision sm:hover:border-line-strong sm:hover:text-accent"
+              className="btn-tactile inline-flex min-h-[48px] items-center justify-center gap-1.5 self-start rounded-control px-1 py-2 text-sm font-semibold text-ink underline-offset-4 hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:self-auto sm:justify-center sm:rounded-control sm:border sm:border-line sm:bg-surface sm:px-8 sm:py-3.5 sm:shadow-e0 sm:no-underline sm:transition-all sm:duration-hover sm:ease-precision sm:hover:border-accent/40 sm:hover:text-accent sm:hover:shadow-e1"
             >
               {secondaryCta.label}
             </a>
@@ -132,13 +138,16 @@ export default function HeroBanner() {
             style={{ aspectRatio: `${heroImage.width} / ${heroImage.height}` }}
           />
         ) : (
-          /* On-brand fallback: ice-chrome gradient + wordmark. aria-hidden
-             because it carries no information. */
+          /* On-brand fallback: ice-chrome pedestal with soft overhead light +
+             wordmark. aria-hidden because it carries no information. */
           <div
             aria-hidden="true"
-            className="flex w-full items-center justify-center bg-ice-chrome ring-ice"
+            className="relative flex w-full items-center justify-center overflow-hidden bg-ice-chrome ring-ice"
           >
-            <span className="select-none text-5xl font-bold tracking-tight text-ink/80 sm:text-6xl">
+            {/* Ambient spotlight: a cool morning glow falling from top-right */}
+            <span className="pointer-events-none absolute -top-16 right-4 h-56 w-56 rounded-full bg-accent/10 blur-3xl" />
+            <span className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-surface/70 to-transparent" />
+            <span className="select-none bg-gradient-to-b from-ink/80 to-ink/50 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-6xl">
               tab.am
             </span>
           </div>
@@ -173,17 +182,24 @@ function ShowroomCard({
     <div
       className={
         variant === 'float'
-          ? 'glass-surface max-w-[19rem] rounded-card p-4'
-          : 'glass-surface max-w-md rounded-card p-4'
+          ? 'glass-surface max-w-[19rem] rounded-card p-4 shadow-e2'
+          : 'glass-surface max-w-md rounded-card p-4 shadow-e2'
       }
     >
-      <p className="text-[13px] font-semibold text-ink">{showroom.address}</p>
+      {/* Eyebrow: names the card so the address reads as a destination. */}
+      <p className="text-[10px] font-bold uppercase tracking-widest text-accent">
+        {HY.OUR_SHOWROOM}
+      </p>
+
+      <p className="mt-1 text-[13px] font-semibold leading-snug text-ink">
+        {showroom.address}
+      </p>
 
       {/* Status line: height reserved by an invisible placeholder until the
           client-only value arrives (no hydration mismatch, no CLS). */}
       <p
         aria-hidden={status === null}
-        className={`min-h-[18px] text-xs ${
+        className={`mt-1 min-h-[18px] text-xs ${
           status === null ? 'invisible' : ''
         } ${status ? (status.open ? 'text-success' : 'text-muted') : 'text-muted'}`}
       >
@@ -201,12 +217,13 @@ function ShowroomCard({
         </p>
       ) : null}
 
-      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line/60 pt-3 text-xs">
         {showroom.phone && showroom.phoneIntl ? (
           <a
             href={`tel:+${showroom.phoneIntl}`}
-            className="rounded font-semibold text-ink tabular-nums underline-offset-4 transition-colors duration-hover hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            className="btn-tactile inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 font-semibold tabular-nums text-white shadow-e1 transition-colors duration-hover hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
+            <Phone className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
             {showroom.phone}
           </a>
         ) : null}
@@ -215,9 +232,10 @@ function ShowroomCard({
             href={showroom.mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded font-semibold text-accent underline-offset-4 transition-colors duration-hover hover:text-accent-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            className="inline-flex items-center gap-1 rounded font-semibold text-accent underline-offset-4 transition-colors duration-hover hover:text-accent-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
             {/* Directions label lives in config-driven copy below. */}
+            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
             {DIRECTIONS_LABEL}
           </a>
         ) : null}

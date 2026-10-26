@@ -149,68 +149,86 @@ export default function ProductCard({ product }: ProductCardProps) {
   ].filter(Boolean) as string[]).slice(0, 2);
 
   return (
-    <div className="card-lux rounded-card flex flex-col h-full group relative overflow-hidden">
-      {/* 1. Pedestal image area: fixed square, contained product, zero crop */}
-      <div className="relative aspect-square bg-canvas overflow-hidden m-1.5 sm:m-2 rounded-control">
+    <div className="card-lux group relative flex h-full flex-col justify-between rounded-card p-3 sm:p-4">
+      {/* 1. Pedestal: ice-white canvas, product floats centered, zero crop.
+          Gentle 500ms scale on hover — the sculpture breathes with you. */}
+      <div className="relative m-0 aspect-square overflow-hidden rounded-card bg-canvas p-4 sm:m-0">
         <Link
           href={`/product/${product.slug}`}
-          className="block w-full h-full cursor-pointer focus:outline-hidden"
+          className="block h-full w-full cursor-pointer focus:outline-hidden"
           aria-label={product.title}
         >
           <ProductImage
             src={product.images[0]}
             alt={product.title}
-            className="w-full h-full bg-canvas"
-            imgClassName="object-contain p-3 group-hover:scale-[1.03] transition-transform duration-hover ease-precision"
+            className="h-full w-full bg-canvas"
+            imgClassName="object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         </Link>
 
-        {/* 2. Badges (max 2) + quick actions */}
-        <div className="absolute top-2 left-2 right-2 flex items-start justify-between pointer-events-none gap-1 z-10">
-          <div className="flex flex-col gap-1 items-start">
+        {/* 2. Floating layers over the pedestal: code pill + data badges (max 2)
+            on the left, quick actions on the right. */}
+        <div className="pointer-events-none absolute inset-x-2 top-2 z-10 flex items-start justify-between gap-1 sm:inset-x-3 sm:top-3">
+          <div className="flex flex-col items-start gap-1.5">
+            {/* Minimalist mono code pill — tap to copy, frosted over the canvas */}
+            <button
+              type="button"
+              onClick={handleCopyCode}
+              title={TEXT.T_COPY_CODE}
+              aria-label={`${TEXT.T_COPY_CODE} ${product.code}`}
+              className="pointer-events-auto inline-flex max-w-full items-center gap-1 rounded-control border border-line/60 bg-surface/90 px-2 py-0.5 font-mono text-[10px] tabular-nums text-body shadow-e1 backdrop-blur-md transition-colors duration-hover hover:border-accent/40 hover:text-ink cursor-pointer active:scale-[0.98]"
+            >
+              <span className="truncate font-bold text-ink">{product.code}</span>
+              {copied ? (
+                <Check className="h-3 w-3 shrink-0 text-accent" aria-hidden="true" />
+              ) : (
+                <Copy className="h-3 w-3 shrink-0 opacity-60" aria-hidden="true" />
+              )}
+            </button>
+
             {visibleBadges.includes('discount') ? (
-              <span className="px-2 py-0.5 rounded-full bg-danger text-white font-bold text-xs tabular-nums leading-tight">
+              <span className="rounded-full bg-danger px-2 py-0.5 text-xs font-bold leading-tight tabular-nums text-white shadow-e1">
                 -{discountPercent}%
               </span>
             ) : null}
 
             {visibleBadges.includes('clearance') ? (
-              <span className="px-2 py-0.5 rounded-full bg-ink text-white text-xs font-semibold leading-tight">
+              <span className="rounded-full bg-ink px-2 py-0.5 text-xs font-semibold leading-tight text-white shadow-e1">
                 {TEXT.L_CLEARANCE}
               </span>
             ) : null}
 
             {visibleBadges.includes('stock') ? (
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full glass-surface text-body text-xs font-semibold leading-tight">
-                {/* Static dot — no ambient pulse on cards */}
-                <span className="w-2 h-2 rounded-full bg-success shrink-0" aria-hidden="true"></span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-line/60 bg-surface/90 px-2 py-0.5 text-xs font-semibold leading-tight text-ink shadow-e1 backdrop-blur-md">
+                {/* Emerald breathing dot — live showroom stock beacon */}
+                <span className="breathe-dot h-2 w-2 shrink-0 rounded-full bg-success" aria-hidden="true"></span>
                 <span>{TEXT.L_IN_STOCK}</span>
               </span>
             ) : null}
 
             {visibleBadges.includes('cad') ? (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ink/90 text-white text-xs font-mono font-medium leading-tight">
-                <Layers className="w-3 h-3" aria-hidden="true" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-ink/90 px-2 py-0.5 font-mono text-xs font-medium leading-tight text-white shadow-e1 backdrop-blur-md">
+                <Layers className="h-3 w-3" aria-hidden="true" />
                 CAD
               </span>
             ) : null}
           </div>
 
-          {/* Wishlist & Compare (44px hit areas) */}
-          <div className="flex flex-col gap-1 pointer-events-auto">
+          {/* Wishlist & Compare (44px hit areas, frosted discs) */}
+          <div className="pointer-events-auto flex flex-col gap-1.5">
             <button
               type="button"
               onClick={handleToggleWishlist}
               title={isWishlisted ? TEXT.T_REMOVE_FAV : TEXT.T_ADD_FAV}
               aria-label={isWishlisted ? TEXT.T_REMOVE_FAV : TEXT.T_ADD_FAV}
-              className={`w-11 h-11 rounded-full flex items-center justify-center shadow-e1 glass-surface transition-colors duration-hover ease-precision cursor-pointer ${
+              className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-line/60 bg-surface/90 shadow-e1 backdrop-blur-md transition-colors duration-hover ease-precision ${
  isWishlisted
- ? 'bg-surface text-danger'
+ ? 'text-danger'
  : 'text-body hover:bg-surface hover:text-ink'
  } ${isHeartPopping ? 'animate-heart-pop' : ''}`}
             >
               <Heart
-                className={`w-4 h-4 ${isWishlisted ? 'fill-accent text-accent' : ''}`}
+                className={`h-4 w-4 ${isWishlisted ? 'fill-accent text-accent' : ''}`}
                 aria-hidden="true"
               />
             </button>
@@ -220,28 +238,28 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={handleToggleCompare}
               title={isCompared ? TEXT.T_REMOVE_CMP : TEXT.T_COMPARE}
               aria-label={isCompared ? TEXT.T_REMOVE_CMP : TEXT.T_COMPARE}
-              className={`w-11 h-11 rounded-full flex items-center justify-center shadow-e1 glass-surface transition-colors duration-hover ease-precision cursor-pointer ${
+              className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-line/60 bg-surface/90 shadow-e1 backdrop-blur-md transition-colors duration-hover ease-precision ${
  isCompared
- ? 'bg-surface text-accent'
+ ? 'text-accent'
  : 'text-body hover:bg-surface hover:text-ink'
  }`}
             >
-              <ArrowLeftRight className="w-4 h-4" aria-hidden="true" />
+              <ArrowLeftRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* 3. Info body: brand → title → code chip → price → CTA (equal heights) */}
-      <div className="p-3 sm:p-4 pt-0 sm:pt-1 flex-1 flex flex-col justify-between space-y-2">
+      {/* 3. Editorial body: brand → title → price anchor → full-width CTA */}
+      <div className="flex flex-1 flex-col justify-between gap-2 pt-3">
         <div className="space-y-1">
-          <div className="flex items-center justify-between text-xs min-h-[1rem]">
-            <span className="text-xs font-semibold text-muted truncate">
+          <div className="flex items-center justify-between gap-2 text-xs min-h-[1rem]">
+            <span className="truncate text-[11px] font-semibold uppercase tracking-wider text-muted">
               {product.brand}
             </span>
             {product.rating ? (
-              <div className="flex items-center gap-1 text-xs font-semibold text-body shrink-0 tabular-nums">
-                <Star className="w-3.5 h-3.5 fill-ink text-ink" aria-hidden="true" />
+              <div className="flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums text-body">
+                <Star className="h-3.5 w-3.5 fill-ink text-ink" aria-hidden="true" />
                 <span>{product.rating}</span>
               </div>
             ) : null}
@@ -249,51 +267,27 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           <Link
             href={`/product/${product.slug}`}
-            className="font-semibold text-ink text-sm sm:text-base leading-snug hover:text-accent transition-colors duration-hover ease-precision line-clamp-2 min-h-[2.5rem] block cursor-pointer"
+            className="block min-h-[2.5rem] cursor-pointer text-sm font-semibold leading-snug tracking-tight text-ink transition-colors duration-hover ease-precision line-clamp-2 hover:text-accent"
           >
             {displayTitle(product.title)}
           </Link>
-
-          {/* Code chip - customer-facing label is always "Kod" (TEXT.L_CODE) */}
-          <div className="pt-0.5 flex items-center justify-between gap-1.5">
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-control bg-canvas border border-line font-mono text-xs text-ink tabular-nums truncate">
-              <span className="text-muted">{TEXT.L_CODE}</span>
-              <span className="font-bold">{product.code}</span>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleCopyCode}
-              title={TEXT.T_COPY_CODE}
-              aria-label={`${TEXT.T_COPY_CODE} ${product.code}`}
-              className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center gap-1 text-xs font-semibold text-muted hover:text-accent rounded-control transition-colors duration-hover cursor-pointer active:scale-[0.98]"
-            >
-              {copied ? (
-                <Check className="w-4 h-4 text-accent" aria-hidden="true" />
-              ) : (
-                <Copy className="w-4 h-4" aria-hidden="true" />
-              )}
-              <span className="sr-only">{TEXT.T_COPY_CODE}</span>
-            </button>
-          </div>
         </div>
 
-        {/* 4. Price block (visual anchor) + CTA. Installments are only shown
-            when a real installment field exists in product data — currently
-            none does, so no financing claim is rendered. */}
-        <div className="pt-2 border-t border-line flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        {/* 4. Price anchor + tactile full-width CTA. Installments only render
+            if real installment data exists — currently none, so no claim. */}
+        <div className="flex flex-col gap-2.5">
           <div className="min-w-0">
             {product.price > 0 ? (
-              <>
-                <div className="text-lg font-bold text-ink tabular-nums tracking-tight">
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-bold tracking-tight text-ink tabular-nums">
                   {formatAMD(product.price)}
-                </div>
+                </span>
                 {product.oldPrice ? (
-                  <div className="text-sm text-muted line-through tabular-nums truncate">
+                  <span className="truncate text-xs font-medium text-muted line-through tabular-nums">
                     {formatAMD(product.oldPrice)}
-                  </div>
+                  </span>
                 ) : null}
-              </>
+              </div>
             ) : (
               <div className="text-sm font-semibold text-body">{TEXT.L_PRICE_ASK}</div>
             )}
@@ -304,18 +298,18 @@ export default function ProductCard({ product }: ProductCardProps) {
               type="button"
               onClick={handleAddToCart}
               aria-label={`${TEXT.L_ADD} ${product.title}` /* zambyugh */}
-              className={`w-full sm:w-auto min-h-[44px] sm:min-w-[120px] px-3 py-2 rounded-control text-white text-sm font-semibold transition-colors duration-hover ease-precision flex items-center justify-center gap-1.5 cursor-pointer shrink-0 active:scale-[0.98] ${
+              className={`btn-tactile flex min-h-[44px] w-full cursor-pointer items-center justify-center gap-1.5 rounded-control px-4 py-2.5 text-sm font-medium text-white shadow-e1 transition-colors duration-200 ease-precision ${
  addState === 'added'
  ? 'bg-success'
  : 'bg-ink hover:bg-accent'
  }`}
             >
               {addState === 'loading' ? (
-                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
               ) : addState === 'added' ? (
-                <Check className="w-4 h-4 animate-check-pop" aria-hidden="true" />
+                <Check className="h-4 w-4 animate-check-pop" aria-hidden="true" />
               ) : (
-                <ShoppingBag className="w-4 h-4" aria-hidden="true" />
+                <ShoppingBag className="h-4 w-4" aria-hidden="true" />
               )}
               <span className="whitespace-nowrap">
                 {addState === 'loading' ? TEXT.L_ADDING : addState === 'added' ? TEXT.L_ADDED : TEXT.L_ADD}
@@ -326,9 +320,9 @@ export default function ProductCard({ product }: ProductCardProps) {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto min-h-[44px] sm:min-w-[120px] px-3 py-2 rounded-control bg-surface border border-line text-body text-sm font-semibold hover:border-line-strong hover:text-ink transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+              className="btn-tactile flex min-h-[44px] w-full cursor-pointer items-center justify-center gap-1.5 rounded-control border border-line bg-canvas px-4 py-2.5 text-sm font-medium text-body transition-colors duration-200 hover:border-line-strong hover:text-ink"
             >
-              <MessageCircle className="w-4 h-4" aria-hidden="true" />
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
               <span className="whitespace-nowrap">{TEXT.L_ASK}</span>
             </a>
           )}

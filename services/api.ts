@@ -566,7 +566,7 @@ async function accountRequest<T>(
 // 409 / 422 / 429) is still surfaced unchanged and is never masked by a fake
 // success, so this path can only activate where there is no backend at all.
 
-const CLIENT_SESSION_KEY = 'tab_client_user';
+const CLIENT_SESSION_KEY = 'tab_auth_user';
 const CLIENT_ADDRESSES_KEY = 'tab_client_addresses';
 
 /** Neutral "customer" label for a login that predates any registration. It is a

@@ -43,8 +43,9 @@ interface ProductDetailViewProps {
  * code chip + copy -> availability -> price -> quantity + CTAs -> WhatsApp ->
  * data-gated highlight chips.
  *
- * - The ONLY ambient animation on this page is the WhatsApp beacon
- *   (pulse-beacon, reduced-motion disabled via the global CSS block).
+ * - Ambient motion on this page: the WhatsApp beacon (pulse-beacon) and the
+ *   slow breathing showroom-stock dot (breathe-dot); both are reduced-motion
+ *   disabled via the global CSS block.
  * - Every highlight chip renders only if its backing field exists. The
  *   delivery chip renders only when DELIVERY_CONFIG actually grants free
  *   Yerevan delivery. "What's in the box" was REMOVED: no product field backs
@@ -142,12 +143,12 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-5 rounded-panel border border-line bg-surface p-5 shadow-e1 sm:p-6">
+      <div className="space-y-6 rounded-panel border border-line/80 bg-surface p-5 shadow-e1 sm:p-8">
         {/* Category + rating */}
         <div className="flex items-center justify-between gap-2">
           <Link
             href={`/category/${product.categorySlug}`}
-            className="inline-flex min-h-[32px] items-center rounded-full border border-line bg-canvas px-3 py-1 text-xs font-semibold text-body transition-colors duration-hover ease-precision hover:border-line-strong hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            className="inline-flex min-h-[32px] items-center rounded-full border border-line bg-canvas px-3.5 py-1 text-xs font-semibold tracking-wide text-body transition-all duration-hover ease-precision hover:border-accent/40 hover:text-accent hover:shadow-e1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
             {product.categoryName}
           </Link>
@@ -164,24 +165,26 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           ) : null}
         </div>
 
-        {/* Brand + title */}
-        <div className="space-y-1">
+        {/* Brand + title: editorial hierarchy — quiet brand line, commanding headline */}
+        <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
             {product.brand ? (
-              <p className="text-xs font-medium text-muted">{product.brand}</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted">
+                {product.brand}
+              </p>
             ) : null}
             {product.clearance ? (
               <p className="text-xs font-semibold text-danger">{HY.CLEARANCE}</p>
             ) : null}
           </div>
-          <h1 className="text-2xl font-bold leading-snug tracking-tight text-ink sm:text-3xl">
+          <h1 className="text-2xl font-bold leading-[1.2] tracking-tight text-ink sm:text-[1.75rem] lg:text-4xl">
             {displayTitle(product.title)}
           </h1>
         </div>
 
         {/* Code chip + copy + wishlist */}
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="inline-flex items-center gap-2 rounded-full border border-line bg-canvas px-3 py-1.5 font-mono text-xs font-semibold text-body">
+          <div className="inline-flex items-center gap-2 rounded-full border border-line/60 bg-canvas px-3.5 py-1.5 font-mono text-xs font-semibold text-body shadow-e0">
             <span>{HY.CODE_COLON}</span>
             <span className="font-bold text-ink">{product.code}</span>
           </div>
@@ -212,7 +215,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               aria-pressed={isWishlisted}
               className={`btn-tactile inline-flex min-h-[44px] items-center gap-1.5 rounded-control border px-3 py-2 text-xs font-semibold transition-colors duration-hover ease-precision focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
  isWishlisted
- ? 'border-accent/40 bg-canvas text-accent'
+ ? 'border-accent/40 bg-accent/5 text-accent'
  : 'border-line bg-surface text-body hover:border-line-strong hover:text-ink'
  } ${isHeartPopping ? 'animate-heart-pop' : ''}`}
             >
@@ -225,11 +228,11 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           </div>
         </div>
 
-        {/* Availability — static dot, text label (never color alone; no pulse here) */}
+        {/* Availability — emerald breathing dot, text label (never color alone) */}
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
           {product.inStock ? (
             <>
-              <span className="h-2 w-2 shrink-0 rounded-full bg-success" aria-hidden="true" />
+              <span className="breathe-dot h-2 w-2 shrink-0 rounded-full bg-success" aria-hidden="true" />
               <span className="font-semibold text-ink">{HY.IN_STOCK_SHOWROOM}</span>
               <span className="text-muted tabular-nums">
                 {DELIVERY_CONFIG.pickupAddress}
@@ -245,8 +248,8 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           )}
         </div>
 
-        {/* Price block — the visual anchor */}
-        <div className="space-y-2 rounded-card border border-line bg-canvas p-4">
+        {/* Price block — the visual anchor: ice pedestal, midnight numerals */}
+        <div className="space-y-2 rounded-card border border-line/70 bg-canvas p-5">
           <div className="flex flex-wrap items-baseline gap-3">
             <span className="text-3xl font-bold tracking-tight text-ink tabular-nums sm:text-4xl">
               {formatAMD(product.price)}
@@ -257,7 +260,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               </span>
             ) : null}
             {discountPercent ? (
-              <span className="rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white tabular-nums">
+              <span className="rounded-full bg-danger px-2.5 py-0.5 text-xs font-bold text-white tabular-nums shadow-e1">
                 -{discountPercent}%
               </span>
             ) : null}
@@ -267,7 +270,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
         {/* Quantity + purchase actions */}
         <div className="space-y-3 pt-1">
           <div className="flex items-center gap-3">
-            <div className="flex items-center rounded-control border border-line bg-canvas p-1">
+            <div className="flex items-center rounded-control border border-line bg-canvas p-1 shadow-e0">
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -297,7 +300,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               id="main-add-to-cart-btn"
               type="button"
               onClick={handleAddToCart}
-              className={`btn-tactile flex min-h-[50px] flex-1 items-center justify-center gap-2 rounded-control px-6 py-3.5 text-sm font-semibold text-white transition-colors duration-hover ease-precision focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
+              className={`btn-tactile flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-control px-6 py-3.5 text-sm font-semibold text-white shadow-e1 transition-all duration-200 ease-precision hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
  addState === 'added' ? 'bg-success' : 'bg-ink hover:bg-accent'
  }`}
             >
@@ -316,7 +319,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           <button
             type="button"
             onClick={() => setIsQuickOrderOpen(true)}
-            className="btn-tactile flex min-h-[46px] w-full items-center justify-center gap-2 rounded-control border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-ink transition-colors duration-hover ease-precision hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            className="btn-tactile flex min-h-[46px] w-full items-center justify-center gap-2 rounded-control border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-ink transition-all duration-hover ease-precision hover:border-accent/40 hover:text-accent hover:shadow-e1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
             <Zap className="h-4 w-4 text-accent" aria-hidden="true" />
             <span>{HY.QUICK_ORDER}</span>
@@ -328,23 +331,25 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="pulse-beacon btn-tactile flex min-h-[48px] w-full items-center justify-center gap-2 rounded-control border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-ink transition-colors duration-hover ease-precision hover:border-success focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            className="pulse-beacon btn-tactile flex min-h-[48px] w-full items-center justify-center gap-2 rounded-control border border-success/40 bg-success/5 px-4 py-2.5 text-sm font-semibold text-ink transition-all duration-hover ease-precision hover:border-success hover:bg-success/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
             <MessageCircle className="h-4 w-4 text-success" aria-hidden="true" />
             <span>{HY.ASK_SPECIALIST}</span>
           </a>
         </div>
 
-        {/* Data-gated highlight chips: 2 columns, per-attribute cards. */}
+        {/* Data-gated highlight chips: consolidated spec grid, icon tiles. */}
         {highlights.length > 0 ? (
-          <div className="grid grid-cols-1 gap-2.5 border-t border-line pt-4 text-xs sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2.5 border-t border-line pt-5 text-xs sm:grid-cols-2">
             {highlights.map((chip) => (
               <div
                 key={chip.label}
-                className="flex items-start gap-2.5 rounded-card border border-line bg-canvas p-3"
+                className="flex items-start gap-3 rounded-card border border-line/80 bg-canvas p-3.5 shadow-e0 transition-all duration-hover ease-precision hover:border-accent/30 hover:bg-surface hover:shadow-e1"
               >
-                <chip.Icon className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
-                <p className="leading-snug text-body">
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-control border border-line/60 bg-surface shadow-e0">
+                  <chip.Icon className="h-4 w-4 text-accent" aria-hidden="true" />
+                </span>
+                <p className="leading-snug text-body pt-1">
                   <span className="font-semibold text-ink">{chip.label}</span> {chip.value}
                 </p>
               </div>
