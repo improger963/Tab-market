@@ -339,7 +339,7 @@ export default function LiveSearch({
             if (query.trim()) setIsOpen(true);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Որոնել՝ ԾԾ Կոդ, անուն կամ translit (օր. 11463, corak, ganzer)..."
+          placeholder="Որոնել՝ Կոդ, անուն կամ translit (օր. 11463, corak, ganzer)..."
           aria-label="Որոնել սանտեխնիկա"
           role="combobox"
           aria-expanded={isOpen && debouncedQuery.length > 0}
@@ -389,7 +389,7 @@ export default function LiveSearch({
               <h4 className="text-sm font-bold text-ink">Արդյունք չի գտնվել</h4>
               <p className="text-xs text-muted max-w-xs mx-auto">
                 «<span className="font-semibold text-body">{debouncedQuery}</span>» հարցմամբ
-                Կոդ Կոդ կամ ապրանք չկա: Փորձեք <b>11463</b>, <b>corak</b> կամ <b>ganzer</b>:
+                Կոդ կամ ապրանք չկա: Փորձեք <b>11463</b>, <b>corak</b> կամ <b>ganzer</b>:
               </p>
             </div>
           ) : (

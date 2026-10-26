@@ -9,7 +9,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronRight, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '@/store/useCart';
-import { AccountApiError, attachOrder, createAddress, generateOrderId } from '@/services/api';
+import { AccountApiError, attachOrder, createAddress, generateOrderId, recordClientOrder } from '@/services/api';
 import { formatArPhone, normalizeArPhone } from '@/lib/utils';
 import {
   addressMatchesCheckoutFields,
@@ -145,8 +145,25 @@ export default function CheckoutPage() {
   const finishOrder = async (
     number: string,
     orderItems: UserOrderItem[],
-    orderTotal: number
+    orderTotal: number,
+    customer: { fullName: string; phone: string },
+    delivery: { method: string },
+    payment: { method: string }
   ) => {
+    // File the order in the local ledger first (guest or signed-in): with no
+    // backend on this host this is what keeps /track-order and the account
+    // order list working for the number the customer just received.
+    recordClientOrder({
+      number,
+      status: ORDER_STATUS.RECEIVED,
+      total: orderTotal,
+      items: orderItems,
+      customerName: customer.fullName,
+      phone: customer.phone,
+      paymentMethod: payment.method,
+      deliveryMethod: delivery.method,
+    });
+
     if (useAuth.getState().user) {
       try {
         await attachOrder({
@@ -199,9 +216,18 @@ export default function CheckoutPage() {
     }));
     const orderTotal = getFinalTotal(shippingCost);
 
+    // Canonical values for the local ledger: the phone is stored in the same
+    // E.164 display form the session user uses, and the form's delivery token
+    // is mapped onto the API's `DeliveryMethod` enum.
+    const ledgerCustomer = { fullName: formData.fullName.trim(), phone: normalizedPhone };
+    const ledgerDelivery = {
+      method: formData.deliveryMethod === 'yerevan' ? 'yerevan_delivery' : 'showroom_pickup',
+    };
+    const ledgerPayment = { method: formData.paymentMethod };
+
     setIsSubmitting(true);
     setTimeout(() => {
-      void finishOrder(orderId, orderItems, orderTotal);
+      void finishOrder(orderId, orderItems, orderTotal, ledgerCustomer, ledgerDelivery, ledgerPayment);
     }, 900);
   };
 
@@ -224,7 +250,7 @@ export default function CheckoutPage() {
             Ձեր զամբյուղը դատարկ է
           </h1>
           <p className="text-xs sm:text-sm text-muted max-w-sm mx-auto leading-relaxed">
-            Պատվեր ձևակերպելու համար ավելացրեք ապրանքներ tab.am կատալոգից կամ օգտագործեք Կոդ Կոդով որոնումը:
+            Պատվեր ձևակերպելու համար ավելացրեք ապրանքներ tab.am կատալոգից կամ օգտագործեք Կոդով որոնումը:
           </p>
         </div>
         <Link

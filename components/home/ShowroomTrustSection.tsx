@@ -27,7 +27,7 @@ export default function ShowroomTrustSection() {
 
             <p className="text-on-dark text-sm sm:text-base leading-relaxed font-normal">
               Ավելի քան 500 քմ ցուցասրահ Երևանում, որտեղ ներկայացված են առաջատար եվրոպական և ռուսական
-              բրենդների ծորակները, ջեռուցման կաթսաները, ինստալացիաները և սանկերամիկան:
+              բրենդների ծորակները, լվացարանները, ցնցուղները և սանկերամիկան:
             </p>
 
             {/* Features List */}

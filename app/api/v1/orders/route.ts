@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     const confirmation: OrderConfirmation = {
       orderId,
-      status: 'reserved_in_armsoft',
+      status: 'reserved',
       subtotal,
       discount,
       shippingCost,

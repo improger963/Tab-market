@@ -10,27 +10,35 @@ import {
   OrderConfirmation,
   ApiResponse,
   TrackedOrderDetails,
+  OrderTrackingStep,
+  DeliveryMethod,
   LoginPayload,
   RegisterPayload,
   UpdateProfilePayload,
   AddressInput,
   OrderStatus,
+  ORDER_STATUS,
   User,
   UserAddress,
   UserOrderItem,
   UserOrderSummary,
 } from '@/types/api';
 import { Product, Category } from '@/types';
+import { products } from '@/data/products';
+import { categories } from '@/data/categories';
 import {
   TRACKING_FIXTURES,
   ORDER_NOT_FOUND_MESSAGE,
   buildDynamicFixture,
 } from '@/services/trackingFixtures';
 import { AUTH_HY } from '@/lib/copy/authHy';
+import { DELIVERY_CONFIG } from '@/lib/config';
+import { displayTitle, formatDateDDMMYYYY } from '@/lib/utils';
 import {
   asAddressPayload,
   asAddresses,
   asAddressesPayload,
+  asOrder,
   asOrderPayload,
   asOrdersPayload,
   asUser,
@@ -40,12 +48,74 @@ import {
 const API_BASE = typeof window !== 'undefined' ? '/api/v1' : 'http://localhost:3000/api/v1';
 
 /**
+ * Static-hosting probe latch. On a pure SPA host (Vercel serving only
+ * `index.html`) every `/api/v1/*` path 404s or answers with the HTML document.
+ * The first such response proves there is no backend on this origin, so
+ * `apiAbsent` is latched for the rest of the page session and every later call
+ * is served from the client-side mock adapter below without touching the
+ * network again. A genuine backend (dev API, Laravel) never latches the flag,
+ * because 401/409/422/429 and valid JSON bodies are not treated as absence.
+ */
+let apiAbsent = false;
+
+function markApiAbsent(status: number, contentType: string): void {
+  if (status === 404 || !contentType.includes('application/json')) apiAbsent = true;
+}
+
+/** True once the response proves the body is a real API JSON envelope. */
+function isJsonResponse(res: Response): boolean {
+  return res.ok && (res.headers.get('content-type') ?? '').includes('application/json');
+}
+
+/**
  * Generates a new order id in the canonical `TAB-xxxxx` format.
  * Order-number ownership lives in the API layer, never in a component, so the
  * Laravel backend can adopt the exact same contract.
  */
 export function generateOrderId(): string {
   return `TAB-${Math.floor(10000 + Math.random() * 90000)}`;
+}
+
+/**
+ * Client-side mirror of the `/products` handler for a host without a backend:
+ * filters the bundled assortment with the same query parameters, so the
+ * paginated envelope keeps its shape. `search` deliberately stays simple here
+ * (literal substring); the customer-facing spotlight owns translit matching.
+ */
+function filterProductsLocally(query: URLSearchParams): PaginatedResponse<Product> {
+  const get = (key: string) => query.get(key) || undefined;
+  let list = products;
+
+  const category = get('category');
+  if (category) list = list.filter((p) => p.categorySlug === category);
+  const brand = get('brand');
+  if (brand) list = list.filter((p) => p.brand === brand);
+  const search = get('search');
+  if (search) {
+    const needle = search.toLowerCase();
+    list = list.filter((p) =>
+      `${p.title} ${p.brand} ${p.code} ${p.categoryName}`.toLowerCase().includes(needle)
+    );
+  }
+  if (query.get('inStockOnly') === 'true') list = list.filter((p) => p.inStock);
+  const minPrice = Number(get('minPrice'));
+  if (Number.isFinite(minPrice)) list = list.filter((p) => p.price >= minPrice);
+  const maxPrice = Number(get('maxPrice'));
+  if (Number.isFinite(maxPrice)) list = list.filter((p) => p.price <= maxPrice);
+
+  const sortBy = get('sortBy');
+  if (sortBy === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);
+  else if (sortBy === 'price-desc') list = [...list].sort((a, b) => b.price - a.price);
+
+  const perPage = Math.max(1, Number(get('limit')) || 24);
+  const page = Math.max(1, Number(get('page')) || 1);
+  const total = list.length;
+  const lastPage = Math.max(1, Math.ceil(total / perPage));
+  return {
+    success: true,
+    data: list.slice((page - 1) * perPage, page * perPage),
+    pagination: { currentPage: page, lastPage, perPage, total },
+  };
 }
 
 export async function fetchProducts(params?: ProductFilterParams): Promise<PaginatedResponse<Product>> {
@@ -63,58 +133,170 @@ export async function fetchProducts(params?: ProductFilterParams): Promise<Pagin
     if (params.limit) query.set('limit', params.limit.toString());
   }
 
-  const res = await fetch(`${API_BASE}/products?${query.toString()}`, {
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    throw new Error('Ապրանքների բեռնման սխալ');
+  // Static hosting without a backend: the bundled assortment answers the same
+  // contract, so the Network tab never fills with 404s on every page view.
+  if (apiAbsent) return filterProductsLocally(query);
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/products?${query.toString()}`, {
+      cache: 'no-store',
+    });
+  } catch {
+    return filterProductsLocally(query);
   }
+  markApiAbsent(res.status, res.headers.get('content-type') ?? '');
+  if (!isJsonResponse(res)) return filterProductsLocally(query);
   const json: PaginatedResponse<Product> = await res.json();
   return json;
 }
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
-  const res = await fetch(`${API_BASE}/products/${slug}`, {
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    return null;
+  if (apiAbsent) return products.find((p) => p.slug === slug) ?? null;
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/products/${slug}`, {
+      cache: 'no-store',
+    });
+  } catch {
+    return products.find((p) => p.slug === slug) ?? null;
+  }
+  markApiAbsent(res.status, res.headers.get('content-type') ?? '');
+  if (!isJsonResponse(res)) {
+    return apiAbsent ? (products.find((p) => p.slug === slug) ?? null) : null;
   }
   const json: ApiResponse<Product> = await res.json();
   return json.data;
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  const res = await fetch(`${API_BASE}/categories`, {
-    next: { revalidate: 3600 },
-  });
-  if (!res.ok) {
-    return [];
+  // `categories.ts` already recomputes truthful per-category counts from the
+  // live assortment, so the static fallback is the same data the API serves.
+  if (apiAbsent) return categories;
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/categories`, {
+      cache: 'no-store',
+    });
+  } catch {
+    return categories;
   }
+  markApiAbsent(res.status, res.headers.get('content-type') ?? '');
+  if (!isJsonResponse(res)) return apiAbsent ? categories : [];
   const json: ApiResponse<Category[]> = await res.json();
   return json.data;
 }
 
 export async function searchProducts(query: string): Promise<Product[]> {
   if (!query || query.trim() === '') return [];
-  const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`, {
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    return [];
+  if (apiAbsent) return filterProductsLocally(new URLSearchParams({ search: query })).data;
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`, {
+      cache: 'no-store',
+    });
+  } catch {
+    return filterProductsLocally(new URLSearchParams({ search: query })).data;
+  }
+  markApiAbsent(res.status, res.headers.get('content-type') ?? '');
+  if (!isJsonResponse(res)) {
+    return apiAbsent ? filterProductsLocally(new URLSearchParams({ search: query })).data : [];
   }
   const json: ApiResponse<Product[]> = await res.json();
   return json.data;
 }
 
+/**
+ * Static-hosting mirror of the `/coupons/validate` registry. The codes and
+ * percentages are identical to `useCart.applyCoupon`, which is the same table
+ * the dev API serves, so a promo entered on Vercel behaves exactly as locally.
+ */
+const CLIENT_COUPONS: Record<string, { discountPercent: number; freeShipping: boolean }> = {
+  TAB10: { discountPercent: 10, freeShipping: false },
+  VARPET: { discountPercent: 15, freeShipping: false },
+  FREE: { discountPercent: 0, freeShipping: true },
+};
+
+export function clientCouponDiscount(code: string | undefined | null): number {
+  if (!code) return 0;
+  const entry = CLIENT_COUPONS[code.trim().toUpperCase()];
+  return entry ? entry.discountPercent : 0;
+}
+
 export async function submitOrder(payload: CreateOrderPayload): Promise<OrderConfirmation> {
-  const res = await fetch(`${API_BASE}/orders`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+  // Validate the lines against the real assortment first — this runs both for
+  // the live API (mirroring its 422) and as the pure client-side mock.
+  const lines = payload.items.map((item) => {
+    const catalog = products.find(
+      (p) => p.id === item.productId || p.code === item.productCode
+    );
+    if (!catalog) throw new Error('Ապրանքների ցանկում չկա: Ստուգեք կազմը և կրկին փորձեք:');
+    if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 999) {
+      throw new Error('Ապրանքների քանակը անվավեր է:');
+    }
+    // Totals are always recomputed from catalog truth, never trusted from the
+    // client copy of the payload.
+    return { unitPrice: catalog.price, quantity: item.quantity };
   });
+  const subtotal = lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0);
+  const coupon = CLIENT_COUPONS[(payload.couponCode ?? '').trim().toUpperCase()];
+  const discount = coupon ? Math.round((subtotal * coupon.discountPercent) / 100) : 0;
+  // Same shipping truth as the config: Yerevan delivery and pickup are free,
+  // regional courier is the flat configured cost, a FREE promo zeroes it.
+  const baseShipping = payload.delivery.method === 'regional_delivery' ? DELIVERY_CONFIG.regionalCost : 0;
+  const shippingCost = coupon?.freeShipping ? 0 : baseShipping;
+  const total = Math.max(0, subtotal - discount + shippingCost);
+  const createdAt = new Date().toISOString();
+
+  // With no backend on this origin the whole confirmation is produced here.
+  if (apiAbsent) {
+    const number = generateOrderId();
+    persistClientOrder({
+      id: number,
+      number,
+      createdAt,
+      status: ORDER_STATUS.RECEIVED,
+      currentStatus: ORDER_STATUS.RECEIVED,
+      total,
+      items: payload.items.map((item) => {
+        const catalog = products.find(
+          (p) => p.id === item.productId || p.code === item.productCode
+        );
+        return {
+          productId: String(item.productId),
+          title: catalog ? displayTitle(catalog.title) : item.productCode,
+          image: catalog?.images[0] ?? null,
+          quantity: item.quantity,
+        };
+      }),
+      customerName: payload.customer.fullName,
+      phone: payload.customer.phone,
+      paymentMethod: clientPaymentLabel(payload.payment.method),
+      ...(payload.delivery.method === 'showroom_pickup'
+        ? { deliveryMethod: payload.delivery.method, deliveryAddress: DELIVERY_CONFIG.pickupAddress }
+        : {}),
+    });
+    return { orderId: number, status: 'confirmed', subtotal, discount, shippingCost, total, createdAt };
+  }
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new Error('Հնարավոր չեղավ ուղարկել պատվերը: Կրկին փորձեք:');
+  }
+  const contentType = res.headers.get('content-type') ?? '';
+  markApiAbsent(res.status, contentType);
+  if (apiAbsent) return submitOrder(payload); // latch just fell: serve fully client-side
+  if (!isJsonResponse(res)) {
+    throw new Error(res.ok ? 'Պատվերի պատասխանը խոտված է' : 'Պատվերի ձևակերպման սխալ');
+  }
   const json = await res.json();
-  if (!res.ok || !json.success) {
+  if (!json.success) {
     throw new Error(json.message || 'Պատվերի ձևակերպման սխալ');
   }
   return json.data;
@@ -123,11 +305,27 @@ export async function submitOrder(payload: CreateOrderPayload): Promise<OrderCon
 export async function validateCoupon(
   code: string
 ): Promise<{ valid: boolean; discountPercent: number; message: string }> {
-  const res = await fetch(`${API_BASE}/coupons/validate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code }),
-  });
+  if (apiAbsent) {
+    const entry = CLIENT_COUPONS[code.trim().toUpperCase()];
+    if (!entry) throw new Error('Անվավեր պրոմոկոդ');
+    return { valid: true, discountPercent: entry.discountPercent, message: 'Պրոմոկոդը կիրառված է' };
+  }
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/coupons/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+  } catch {
+    throw new Error('Հնարավոր չեղավ ստուգել պրոմոկոդը');
+  }
+  const contentType = res.headers.get('content-type') ?? '';
+  markApiAbsent(res.status, contentType);
+  if (apiAbsent) return validateCoupon(code); // latch just fell: answer from the client registry
+  if (!isJsonResponse(res)) {
+    throw new Error(res.ok ? 'Պատվերի պատասխանը խոտված է' : 'Անվավեր պրոմոկոդ');
+  }
   const json = await res.json();
   if (!res.ok || !json.success) {
     throw new Error(json.message || 'Անվավեր պրոմոկոդ');
@@ -136,11 +334,18 @@ export async function validateCoupon(
 }
 
 /**
- * Resolves a tracked order entirely client-side from the fixtures, throwing a
- * clean Armenian "not found" message (never a raw JSON parse error).
+ * Resolves a tracked order entirely client-side, throwing a clean Armenian
+ * "not found" message (never a raw JSON parse error). Lookup priority: orders
+ * created on this device (the local ledger carries their real lines and total),
+ * then the seeded fixtures, then a generic in-progress view for any well
+ * formed `TAB-XXXXX` id.
  */
 function resolveTrackedOrder(orderId: string, phone: string): TrackedOrderDetails {
   const id = orderId.trim().toUpperCase();
+  const local = readClientOrders().find((o) => o.number === id);
+  if (local) {
+    return phone.trim() ? { ...trackedOrderFromClientRecord(local), phone: phone.trim() } : trackedOrderFromClientRecord(local);
+  }
   const fixture = TRACKING_FIXTURES[id];
   if (fixture) {
     return phone.trim() ? { ...fixture, phone: phone.trim() } : fixture;
@@ -152,24 +357,30 @@ function resolveTrackedOrder(orderId: string, phone: string): TrackedOrderDetail
 }
 
 export async function trackOrder(orderId: string, phone: string): Promise<TrackedOrderDetails> {
-  try {
-    const res = await fetch(
-      `${API_BASE}/orders/track?orderId=${encodeURIComponent(orderId)}&phone=${encodeURIComponent(phone)}`,
-      {
-        cache: 'no-store',
+  // The latched probe (or a network/HTML response) means there is no backend:
+  // resolve purely from client state instead of fetching again.
+  if (!apiAbsent) {
+    try {
+      const res = await fetch(
+        `${API_BASE}/orders/track?orderId=${encodeURIComponent(orderId)}&phone=${encodeURIComponent(phone)}`,
+        {
+          cache: 'no-store',
+        }
+      );
+      markApiAbsent(res.status, res.headers.get('content-type') ?? '');
+      // Only trust genuine JSON. A Vite SPA fallback (index.html), a non-2xx
+      // status, or a malformed body falls through to the client-side fixtures,
+      // so the customer never sees `Unexpected token '<' ... is not valid JSON`.
+      if (isJsonResponse(res)) {
+        const json = (await res.json()) as ApiResponse<TrackedOrderDetails>;
+        if (json?.success && json.data) return json.data;
+        throw new Error(json?.message || ORDER_NOT_FOUND_MESSAGE);
       }
-    );
-    const contentType = res.headers.get('content-type') ?? '';
-    // Only trust genuine JSON. A Vite SPA fallback (index.html), a non-2xx
-    // status, or a malformed body falls through to the client-side fixtures,
-    // so the customer never sees `Unexpected token '<' ... is not valid JSON`.
-    if (res.ok && contentType.includes('application/json')) {
-      const json = (await res.json()) as ApiResponse<TrackedOrderDetails>;
-      if (json?.success && json.data) return json.data;
-      throw new Error(json?.message || ORDER_NOT_FOUND_MESSAGE);
+    } catch (error) {
+      // A real "not found" verdict from a live API must surface as written;
+      // anything else (parse failure, offline) drops to the client resolution.
+      if (error instanceof Error && error.message === ORDER_NOT_FOUND_MESSAGE) throw error;
     }
-  } catch {
-    // Network / parse failure — resolve from fixtures below instead.
   }
   return resolveTrackedOrder(orderId, phone);
 }
@@ -269,6 +480,17 @@ async function accountRequest<T>(
   read: (data: unknown) => T | null,
   body?: Record<string, unknown>
 ): Promise<T> {
+  // The probe was already conclusive on this origin: skip the network and
+  // throw the same 404 the absent backend would return, so every caller's
+  // static-hosting fallback answers without another 404 entry in the console.
+  if (apiAbsent) {
+    throw new AccountApiError({
+      status: 404,
+      code: ACCOUNT_ERROR.serverError,
+      message: AUTH_HY.ERR_UNKNOWN,
+    });
+  }
+
   let res: Response;
   try {
     res = await fetch(`${API_BASE}${path}`, {
@@ -289,6 +511,10 @@ async function accountRequest<T>(
     });
   }
 
+  // Capture the header before the body is consumed: a non-JSON error body is
+  // the SPA fallback document, which proves there is no API on this origin.
+  const errorContentType = res.headers.get('content-type') ?? '';
+
   let payload: unknown = null;
   try {
     payload = await res.json();
@@ -301,6 +527,7 @@ async function accountRequest<T>(
     : null) as { success?: unknown; data?: unknown; error?: EnvelopeError } | null;
 
   if (!res.ok) {
+    markApiAbsent(res.status, errorContentType);
     const error = envelope?.error;
     throw new AccountApiError({
       status: res.status,
@@ -403,6 +630,189 @@ function readClientAddresses(): UserAddress[] {
 
 function writeClientAddresses(addresses: UserAddress[]): void {
   writeClientJson(CLIENT_ADDRESSES_KEY, addresses);
+}
+
+// ---------------------------------------------------------------------------
+// Client order ledger (static hosting)
+// ---------------------------------------------------------------------------
+//
+// On a host without a backend, a placed order must still appear in the account
+// list and remain trackable by its `TAB-XXXXX` number. Every simulated order —
+// from the mock `submitOrder` or from checkout's failed `attachOrder` — is
+// appended here under a single localStorage key, so the whole funnel
+// (checkout → account orders → order tracking) closes without any server.
+
+/** A `UserOrderSummary` plus the handful of fields tracking renders. */
+interface ClientOrderRecord extends UserOrderSummary {
+  customerName: string;
+  phone: string;
+  paymentMethod: string;
+  deliveryMethod?: DeliveryMethod;
+  deliveryAddress?: string;
+  currentStatus?: OrderStatus;
+}
+
+const CLIENT_ORDERS_KEY = 'tab_client_orders';
+
+function readClientOrders(): ClientOrderRecord[] {
+  const raw = readClientJson(CLIENT_ORDERS_KEY);
+  if (!Array.isArray(raw)) return [];
+  const out: ClientOrderRecord[] = [];
+  for (const entry of raw) {
+    const summary = asOrder(entry);
+    if (!summary) continue;
+    const record = entry as Record<string, unknown>;
+    out.push({
+      ...summary,
+      customerName: typeof record.customerName === 'string' ? record.customerName : FALLBACK_CUSTOMER_NAME,
+      phone: typeof record.phone === 'string' ? record.phone : '',
+      paymentMethod: typeof record.paymentMethod === 'string' ? record.paymentMethod : 'Կանխիկ',
+      ...(typeof record.deliveryMethod === 'string'
+        ? { deliveryMethod: record.deliveryMethod as DeliveryMethod }
+        : {}),
+      ...(typeof record.deliveryAddress === 'string' ? { deliveryAddress: record.deliveryAddress } : {}),
+      ...(typeof record.currentStatus === 'string' &&
+      (Object.values(ORDER_STATUS) as string[]).includes(record.currentStatus)
+        ? { currentStatus: record.currentStatus as OrderStatus }
+        : {}),
+    });
+  }
+  return out;
+}
+
+/** Newest first: the account list and the tracking lookup both read it this way. */
+function persistClientOrder(record: ClientOrderRecord): void {
+  const list = readClientOrders().filter((o) => o.number !== record.number);
+  list.unshift(record);
+  writeClientJson(CLIENT_ORDERS_KEY, list.slice(0, 50));
+}
+
+/** Human label for the payment method token the checkout form submits. */
+function clientPaymentLabel(method: string): string {
+  switch (method) {
+    case 'idram':
+      return 'Idram';
+    case 'telcell':
+      return 'Telcell';
+    case 'card':
+      // Բանկային քարտ
+      return '\u0532\u0561\u0576\u056f\u0561\u0575\u056b\u0576 \u0584\u0561\u0580\u057f';
+    default:
+      // Կանխիկ (cash)
+      return '\u053f\u0561\u0576\u056d\u056b\u056f';
+  }
+}
+
+/**
+ * Files a just-placed order in the local ledger. Checkout calls this for every
+ * order (guest or signed-in), so tracking and the account list work even when
+ * `attachOrder` had no backend to talk to. Payment and delivery arrive as the
+ * raw form tokens; only known ones are translated, the rest stay verbatim.
+ */
+export function recordClientOrder(input: {
+  number: string;
+  status: OrderStatus;
+  total: number;
+  items: UserOrderItem[];
+  customerName: string;
+  phone: string;
+  paymentMethod?: string;
+  deliveryMethod?: string;
+}): void {
+  const delivery =
+    input.deliveryMethod === 'showroom_pickup'
+      ? // Pickup address truth comes from the shared config.
+        DELIVERY_CONFIG.pickupAddress
+      : undefined;
+  persistClientOrder({
+    id: input.number,
+    number: input.number,
+    createdAt: new Date().toISOString(),
+    status: input.status,
+    currentStatus: input.status,
+    total: input.total,
+    items: input.items,
+    customerName: input.customerName || FALLBACK_CUSTOMER_NAME,
+    phone: input.phone,
+    paymentMethod: input.paymentMethod ? clientPaymentLabel(input.paymentMethod) : clientPaymentLabel('cash'),
+    ...(delivery ? { deliveryMethod: 'showroom_pickup' as DeliveryMethod, deliveryAddress: delivery } : {}),
+  });
+}
+
+const STATUS_ORDER: OrderStatus[] = [
+  ORDER_STATUS.RECEIVED,
+  ORDER_STATUS.PROCESSING,
+  ORDER_STATUS.READY_FOR_PICKUP,
+  ORDER_STATUS.IN_TRANSIT,
+  ORDER_STATUS.DELIVERED,
+];
+
+/**
+ * Timeline copy for a locally filed order, keyed by status index. Armenian is
+ * written as unicode escapes (homoglyph-safe policy) and every codepoint below
+ * sits inside U+0530–U+058F.
+ */
+const CLIENT_TIMELINE_STEPS: ReadonlyArray<Omit<OrderTrackingStep, 'isCompleted' | 'isCurrent'>> = [
+  {
+    id: 'step-1',
+    title: '\u054a\u0561\u057f\u057e\u0565\u0580\u0568 \u054d\u057f\u0561\u056e\u057e\u0561\u056e \u0567', // Պատվերը Ստացված է
+    description: '\u054a\u0561\u057f\u057e\u0565\u0580\u0568 \u0563\u0580\u0561\u0576\u0581\u057e\u0565\u056c \u0567 \u0570\u0561\u0574\u0561\u056f\u0561\u0580\u0563\u0578\u0582\u0574', // Պատվերը գրանցվել է համակարգում
+  },
+  {
+    id: 'step-2',
+    title: '\u0544\u0577\u0561\u056f\u057e\u0578\u0582\u0574 \u0567 \u057d\u0580\u0561\u0570\u0578\u0582\u0574', // Մշակվում է սրահում
+    description: '\u054d\u057f\u0578\u0582\u0563\u057e\u0578\u0582\u0574 \u0567\u056f \u0561\u057a\u0580\u0561\u0576\u0584\u0576\u0565\u0580\u0568 \u0578\u0582 \u0570\u0561\u0577\u057e\u0578\u0580\u0561\u056f\u0578\u0582\u0574 \u057a\u0561\u0570\u0565\u057d\u057f\u0561\u0575\u056b\u0576', // Ստուգվում են ապրանքները և հասցրոգռում պահեստային
+  },
+  {
+    id: 'step-3',
+    title: '\u054a\u0561\u057f\u0580\u0561\u057d\u057f \u0567 \u054d\u057f\u0561\u0581\u0574\u0561\u0576', // Պատրաստ է Ստացման
+    description: '\u054a\u0561\u057f\u057e\u0565\u0580\u0568 \u0561\u0574\u0580\u0561\u0563\u0580\u057e\u0561\u056e \u0567 \u057d\u0580\u0561\u0570\u0578\u0582\u0574', // Պատվերը ամրագրված է սրահում
+  },
+  {
+    id: 'step-4',
+    title: '\u0533\u0576\u0561\u056c\u0578\u0582\u0574 \u0567 \u0578\u0582\u0572\u0572\u0561\u056c\u0578\u0582\u0574', // Գնալում է Ուղղությամբ -> in transit
+    description: '\u0531\u057c\u0561\u0584\u056b\u0579\u0568 \u0577\u0561\u0580\u0574\u057e\u0578\u0582\u0574 \u0567 \u0564\u0565\u057a\u056b \u0570\u0561\u057d\u0581\u0565', // Առաքիչը շարժվում է դեպի հասցե
+  },
+  {
+    id: 'step-5',
+    title: '\u0540\u0561\u0576\u0571\u0576\u057e\u0561\u056e \u0567', // Հանձնված է
+    description: '\u054a\u0561\u057f\u057e\u0565\u0580\u0568 \u0561\u057e\u0561\u0580\u057f\u057e\u0561\u056e \u0567', // Պատվերը ավարտված է
+  },
+];
+
+/** Renders the local ledger entry as a full tracking payload. */
+function trackedOrderFromClientRecord(record: ClientOrderRecord): TrackedOrderDetails {
+  const current = record.currentStatus ?? record.status;
+  const reached = Math.max(0, STATUS_ORDER.indexOf(current));
+  return {
+    orderId: record.number,
+    createdAt: record.createdAt,
+    customerName: record.customerName,
+    phone: record.phone,
+    deliveryMethod: record.deliveryMethod ?? 'showroom_pickup',
+    ...(record.deliveryAddress ? { deliveryAddress: record.deliveryAddress } : {}),
+    paymentMethod: record.paymentMethod,
+    paymentStatus: 'pending',
+    currentStatus: current,
+    timeline: CLIENT_TIMELINE_STEPS.map((step, index) => ({
+      ...step,
+      timestamp: index === 0 ? formatDateDDMMYYYY(record.createdAt) : undefined,
+      isCompleted: index <= reached,
+      isCurrent: index === reached,
+    })),
+    items: record.items.map((item, index) => {
+      const catalog = products.find((p) => String(p.id) === item.productId);
+      return {
+        id: index + 1,
+        code: catalog?.code ?? item.productId,
+        title: catalog ? displayTitle(catalog.title) : item.title,
+        image: item.image ?? catalog?.images[0] ?? '',
+        quantity: item.quantity,
+        price: catalog?.price ?? 0,
+      };
+    }),
+    totalAmount: record.total,
+  };
 }
 
 /** Stand-in for a database id; shaped so `identifier()` in the guards accepts it. */
@@ -571,22 +981,52 @@ export async function deleteAddress(id: string): Promise<UserAddress[]> {
   }
 }
 
-export function listOrders(): Promise<UserOrderSummary[]> {
-  return accountRequest('GET', '/me/orders', asOrdersPayload);
+export async function listOrders(): Promise<UserOrderSummary[]> {
+  try {
+    return await accountRequest('GET', '/me/orders', asOrdersPayload);
+  } catch (error) {
+    // Static hosting: the local ledger is the order history for this device.
+    if (!isStaticDeploymentError(error)) throw error;
+    return readClientOrders();
+  }
 }
 
 /**
  * Attaches a just-placed order to the signed-in customer. Mock-only bridge:
  * Laravel links the order to `Auth::user()` when it creates it, so the checkout
- * behaviour stays while this call disappears.
+ * behaviour stays while this call disappears. On a host without a backend the
+ * order is filed in the local ledger instead, keeping the account list and the
+ * tracking page working.
  */
-export function attachOrder(input: {
+export async function attachOrder(input: {
   number: string;
   status: OrderStatus;
   total: number;
   items: UserOrderItem[];
 }): Promise<UserOrderSummary> {
-  return accountRequest('POST', '/me/orders', asOrderPayload, { ...input });
+  try {
+    return await accountRequest('POST', '/me/orders', asOrderPayload, { ...input });
+  } catch (error) {
+    if (!isStaticDeploymentError(error)) throw error;
+    const summary: UserOrderSummary = {
+      id: input.number,
+      number: input.number,
+      createdAt: new Date().toISOString(),
+      status: input.status,
+      total: input.total,
+      items: input.items,
+    };
+    const user = readClientUser();
+    recordClientOrder({
+      number: input.number,
+      status: input.status,
+      total: input.total,
+      items: input.items,
+      customerName: user?.fullName ?? FALLBACK_CUSTOMER_NAME,
+      phone: user?.phone ?? '',
+    });
+    return summary;
+  }
 }
 
 /**

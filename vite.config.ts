@@ -10,6 +10,16 @@ export default defineConfig(() => {
     // /api/v1/me/*) into this dev server and inlines the server-side session
     // snapshot into the served document. See server/dev.ts.
     plugins: [tabMarketAuthServer(), react(), tailwindcss()],
+    build: {
+      // Route views are lazy-split (see src/App.tsx) so application code no
+      // longer inflates the entry chunk. The remaining index chunk floor is the
+      // eagerly-imported catalog dataset (data/products.json: 1,647 SKUs,
+      // ~2.2 MB) that every catalog-first page needs at first paint, plus the
+      // framework runtime. This is data, not lazy-loadable JS logic, so the
+      // default 500 kB heuristic threshold does not apply. Transfer size over
+      // the wire is ~321 kB gzipped.
+      chunkSizeWarningLimit: 3000,
+    },
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, '.'),

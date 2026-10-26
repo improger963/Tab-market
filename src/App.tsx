@@ -19,16 +19,6 @@ import ProductDossierTabs from '@/components/product/ProductDossierTabs';
 import CatalogView from '@/components/catalog/CatalogView';
 import BrandPageClient from '@/components/brand/BrandPageClient';
 import HomePage from '@/app/page';
-import CheckoutPage from '@/app/checkout/page';
-import WishlistPage from '@/app/wishlist/page';
-import ComparePage from '@/app/compare/page';
-import TrackOrderPage from '@/app/track-order/page';
-import ShowroomPage from '@/app/showroom/page';
-import ContactPage from '@/app/contact/page';
-import AccountPage from '@/app/account/page';
-import AccountOrdersPage from '@/app/account/orders/page';
-import AccountProfilePage from '@/app/account/profile/page';
-import AccountAddressesPage from '@/app/account/addresses/page';
 import { isAccountSection } from '@/components/account/AccountShell';
 import AuthModal from '@/components/auth/AuthModal';
 import RecentlyViewed from '@/components/product/RecentlyViewed';
@@ -44,6 +34,33 @@ import {
   PackageX,
   ArrowRight,
 } from 'lucide-react';
+
+/* ---------------------------------------------------------------------------
+ * Route-level code splitting. The storefront, catalog and product views are
+ * the landing funnel and stay in the initial chunk; every secondary page is a
+ * separate lazy chunk Vite only fetches when the customer actually navigates
+ * there. This keeps the first paint small on mobile and clears the bundler's
+ * 500 kB warning without changing any route behavior.
+ * ------------------------------------------------------------------------- */
+const CheckoutPage = React.lazy(() => import('@/app/checkout/page'));
+const WishlistPage = React.lazy(() => import('@/app/wishlist/page'));
+const ComparePage = React.lazy(() => import('@/app/compare/page'));
+const TrackOrderPage = React.lazy(() => import('@/app/track-order/page'));
+const ShowroomPage = React.lazy(() => import('@/app/showroom/page'));
+const ContactPage = React.lazy(() => import('@/app/contact/page'));
+const AccountPage = React.lazy(() => import('@/app/account/page'));
+const AccountOrdersPage = React.lazy(() => import('@/app/account/orders/page'));
+const AccountProfilePage = React.lazy(() => import('@/app/account/profile/page'));
+const AccountAddressesPage = React.lazy(() => import('@/app/account/addresses/page'));
+
+/**
+ * Suspense chrome for lazy routes. The fallback is a blank canvas-height
+ * panel: it reserves the viewport so the arrival of the page never shifts
+ * content, and route changes keep the instant top-scroll policy untouched.
+ */
+function RouteFallback() {
+  return <div className="min-h-screen bg-white" />;
+}
 
 export default function App() {
   const [currentPath, setCurrentPath] = useState<string>(() => {
@@ -301,6 +318,10 @@ export default function App() {
         </main>
       )}
 
+      {/* VIEW 4-9: lazy secondary routes (checkout, wishlist, compare,
+          tracking, showroom, contact, brand, account) — each page is its own
+          chunk, resolved behind a single Suspense boundary. */}
+      <React.Suspense fallback={<RouteFallback />}>
       {/* VIEW 4: CHECKOUT PAGE */}
       {route.page === 'checkout' && (
         <main className="flex-1 w-full animate-in fade-in-50 duration-200">
@@ -342,6 +363,7 @@ export default function App() {
           <ContactPage />
         </main>
       )}
+      </React.Suspense>
 
       {/* VIEW 8: DEDICATED BRAND LANDING PAGE */}
       {route.page === 'brand' && route.slug && (
@@ -351,6 +373,7 @@ export default function App() {
       )}
 
       {/* VIEW 9: CUSTOMER ACCOUNT (orders / profile / addresses) */}
+      <React.Suspense fallback={<RouteFallback />}>
       {route.page === 'account' && (
         <main className="flex-1 w-full animate-in fade-in-50 duration-200">
           {route.section === 'index' ? (
@@ -364,6 +387,7 @@ export default function App() {
           )}
         </main>
       )}
+      </React.Suspense>
 
       {/* CAD Blueprint Zoom Modal */}
       {activeCadProduct && (

@@ -201,7 +201,7 @@ export interface CreateOrderPayload {
   }>;
 }
 
-export type OrderCreationStatus = 'pending' | 'confirmed' | 'reserved_in_armsoft';
+export type OrderCreationStatus = 'pending' | 'confirmed' | 'reserved';
 
 export interface OrderConfirmation {
   orderId: string; // e.g. "TAB-84920"
