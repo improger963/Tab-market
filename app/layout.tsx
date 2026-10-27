@@ -59,7 +59,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="hy" className={`${inter.variable} ${jakarta.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen bg-white text-slate-800 antialiased flex flex-col font-sans selection:bg-[#2563EB] selection:text-white w-full pb-shell">
+      <body className="min-h-screen bg-surface text-body antialiased flex flex-col font-sans selection:bg-accent selection:text-surface w-full pb-shell">
         <TopBar />
         <Header />
         <main className="flex-1 w-full bg-white">{children}</main>

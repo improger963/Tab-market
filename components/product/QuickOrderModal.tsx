@@ -54,7 +54,7 @@ export default function QuickOrderModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 z-overlay overflow-y-auto flex items-end sm:items-center justify-center p-0 sm:p-4"
       role="dialog"
       aria-modal="true"
     >
@@ -65,7 +65,7 @@ export default function QuickOrderModal({
       />
 
       {/* Modal Dialog / Mobile Bottom Sheet */}
-      <div className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-panel shadow-e2 border border-line overflow-hidden z-10 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 max-h-[92dvh] flex flex-col">
+      <div className="relative w-full max-w-lg bg-white rounded-t-panel sm:rounded-panel shadow-e2 border border-line overflow-hidden z-10 animate-in slide-in-from-bottom duration-200 max-h-[92dvh] flex flex-col">
         {/* Mobile drag handle */}
         <div className="sm:hidden flex justify-center pt-2.5 pb-1 bg-ink">
           <div className="w-12 h-1.5 rounded-full bg-body" />

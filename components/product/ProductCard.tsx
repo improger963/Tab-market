@@ -168,7 +168,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             src={product.images[0]}
             alt={product.title}
             className="h-full w-full bg-canvas"
-            imgClassName="object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
+            imgClassName="object-contain group-hover:scale-105 transition-transform duration-sheet ease-precision"
           />
         </Link>
 
@@ -182,7 +182,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={handleCopyCode}
               title={TEXT.T_COPY_CODE}
               aria-label={`${TEXT.T_COPY_CODE} ${product.code}`}
-              className="pointer-events-auto inline-flex max-w-full items-center gap-1 rounded-control border border-line/60 bg-surface/90 px-2 py-0.5 font-mono text-[10px] tabular-nums text-body shadow-e1 backdrop-blur-md transition-colors duration-hover hover:border-accent/40 hover:text-ink cursor-pointer active:scale-[0.98]"
+              className="pointer-events-auto inline-flex max-w-full items-center gap-1 rounded-control border border-line/60 bg-surface/90 px-2 py-0.5 font-mono text-caption tabular-nums text-body shadow-e1 backdrop-blur-md transition-colors duration-hover hover:border-accent/40 hover:text-ink cursor-pointer active:scale-[0.98]"
             >
               <span className="truncate font-bold text-ink">{product.code}</span>
               {copied ? (
@@ -262,7 +262,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="flex flex-1 flex-col justify-between gap-2 pt-3">
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2 text-xs min-h-[1rem]">
-            <span className="truncate text-[11px] font-semibold uppercase tracking-wider text-muted">
+            <span className="truncate text-caption font-semibold uppercase tracking-wider text-muted">
               {product.brand}
             </span>
             {product.rating ? (

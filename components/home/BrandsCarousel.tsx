@@ -133,7 +133,7 @@ export default function BrandsCarousel() {
           >
             <Link
               href={`/brand/${brand.slug}`}
-              className="group h-full bg-white p-5 rounded-panel border border-line hover:border-accent hover:shadow-e2 transition-all duration-300 flex flex-col justify-between cursor-pointer relative overflow-hidden block"
+              className="group h-full bg-white p-5 rounded-panel border border-line hover:border-accent hover:shadow-e2 transition-[border-color,box-shadow] duration-sheet flex flex-col justify-between cursor-pointer relative overflow-hidden block"
             >
               {/* Listing count - the only claim a card makes besides the name */}
               <div className="flex items-center justify-between mb-4">

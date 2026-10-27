@@ -132,14 +132,14 @@ export default function Header() {
           >
             {/* Architectural monogram: a midnight tile that ignites to Royal
                 Blue and lifts on hover — the flagship emblem. */}
-            <span className="relative hidden h-10 w-10 shrink-0 items-center justify-center rounded-control bg-ink shadow-e1 transition-all duration-hover ease-precision group-hover:-translate-y-0.5 group-hover:bg-accent group-hover:shadow-e2 sm:flex">
+            <span className="relative hidden h-10 w-10 shrink-0 items-center justify-center rounded-control bg-ink shadow-e1 transition-[background-color,box-shadow,transform] duration-hover ease-precision group-hover:-translate-y-0.5 group-hover:bg-accent group-hover:shadow-e2 sm:flex">
               <Droplets className="h-5 w-5 text-white" aria-hidden="true" />
             </span>
             <span className="flex flex-col">
-              <span className="text-xl leading-none font-extrabold tracking-tighter text-ink drop-shadow-[0_1px_0_rgba(255,255,255,0.6)] transition-colors duration-hover group-hover:text-accent sm:text-2xl lg:text-[1.7rem]">
+              <span className="text-xl leading-none font-extrabold tracking-tighter text-ink drop-shadow-inner-light transition-colors duration-hover group-hover:text-accent sm:text-2xl lg:text-[1.7rem]">
                 TAB<span className="text-accent group-hover:text-ink">.AM</span>
               </span>
-              <span className="mt-0.5 hidden text-[9px] font-bold uppercase tracking-[0.16em] text-muted transition-colors duration-hover group-hover:text-ink sm:block">
+              <span className="mt-0.5 hidden text-caption font-bold uppercase tracking-widest text-muted transition-colors duration-hover group-hover:text-ink sm:block">
                 ՍԱՆՏԵԽՆԻԿԱՅԻ ԽԱՆՈՒԹ-ՍՐԱՀ
               </span>
             </span>
@@ -155,7 +155,7 @@ export default function Header() {
               <LayoutGrid className="w-4 h-4 text-white" />
               <span className="hidden md:inline">Կատալոգ</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-on-dark transition-transform duration-200 ${
+                className={`w-3.5 h-3.5 text-on-dark transition-transform duration-hover ${
  isMegaMenuOpen ? 'rotate-180' : ''
  }`}
               />
@@ -239,7 +239,7 @@ export default function Header() {
           >
             <ArrowLeftRight className="w-4 h-4" />
             {compCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 ring-2 ring-surface">
+              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-caption font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 ring-2 ring-surface">
                 {compCount}
               </span>
             )}
@@ -253,7 +253,7 @@ export default function Header() {
           >
             <Heart className="w-4 h-4 text-accent" />
             {wishCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 ring-2 ring-surface animate-heart-pop">
+              <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-caption font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 ring-2 ring-surface animate-heart-pop">
                 {wishCount}
               </span>
             )}
@@ -317,7 +317,7 @@ export default function Header() {
               <ShoppingBag className="w-4 h-4 text-white" />
               {count > 0 && (
                 <span
-                  className={`absolute -top-2 -right-2 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 ring-2 ring-surface transition-transform duration-300 ${
+                  className={`absolute -top-2 -right-2 bg-accent text-white text-caption font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none shadow-e1 ring-2 ring-surface transition-transform duration-hover ${
  isCartBumping ? 'scale-125' : 'scale-100'
  }`}
                 >

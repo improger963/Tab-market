@@ -74,7 +74,7 @@ export default function HeroBanner() {
         ) : null}
 
         {subtitle ? (
-          <p className="line-clamp-3 max-w-[52ch] text-[15px] leading-relaxed text-body sm:text-base sm:leading-relaxed lg:text-lg lg:leading-relaxed">
+          <p className="line-clamp-3 max-w-[52ch] text-sm leading-relaxed text-body sm:text-base sm:leading-relaxed lg:text-lg lg:leading-relaxed">
             {subtitle}
           </p>
         ) : null}
@@ -151,7 +151,7 @@ export default function HeroBanner() {
             <span className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-accent/5 blur-3xl" />
             <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-line-strong/70 to-transparent" />
             <span className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-surface/70 to-transparent" />
-            <span className="select-none bg-gradient-to-b from-ink/80 to-ink/50 bg-clip-text text-5xl font-bold tracking-tight text-transparent drop-shadow-[0_18px_24px_rgba(15,23,42,0.10)] sm:text-6xl">
+            <span className="select-none bg-gradient-to-b from-ink/80 to-ink/50 bg-clip-text text-5xl font-bold tracking-tight text-transparent drop-shadow-ink-soft sm:text-6xl">
               tab.am
             </span>
           </div>
@@ -191,11 +191,11 @@ function ShowroomCard({
       }
     >
       {/* Eyebrow: names the card so the address reads as a destination. */}
-      <p className="text-[10px] font-bold uppercase tracking-widest text-accent">
+      <p className="text-caption font-bold text-accent">
         {HY.OUR_SHOWROOM}
       </p>
 
-      <p className="mt-1 text-[13px] font-semibold leading-snug text-ink">
+      <p className="mt-1 text-sm font-semibold leading-snug text-ink">
         {showroom.address}
       </p>
 

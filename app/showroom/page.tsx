@@ -183,7 +183,7 @@ export default function ShowroomPage() {
                   height={image.height}
                   loading="lazy"
                   decoding="async"
-                  className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-300 [@media(hover:hover)]:hover:scale-[1.03]"
+                  className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-sheet [@media(hover:hover)]:hover:scale-[1.03]"
                 />
               </div>
             ))}

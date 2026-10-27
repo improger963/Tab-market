@@ -192,7 +192,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
       {/* CAD Full Zoom Modal */}
       {isCadZoomed && product.blueprintImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-overlay flex items-center justify-center p-4 bg-ink/80 backdrop-blur-sm">
           <div className="bg-white rounded-panel max-w-3xl w-full p-4 space-y-4 shadow-e2 border border-line">
             <div className="flex items-center justify-between pb-2 border-b border-line">
               <span className="font-bold text-sm text-ink">

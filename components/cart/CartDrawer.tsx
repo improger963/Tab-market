@@ -142,7 +142,7 @@ export default function CartDrawer() {
       role="dialog"
       aria-modal="true"
       aria-label="Գնումների զամբյուղ"
-      className={`fixed inset-0 z-sheet overflow-hidden transition-all duration-300 ${
+      className={`fixed inset-0 z-sheet overflow-hidden transition-[visibility] duration-sheet ${
  isDrawerOpen ? 'visible pointer-events-auto' : 'invisible pointer-events-none'
  }`}
     >
@@ -150,7 +150,7 @@ export default function CartDrawer() {
       <div
         onClick={closeDrawer}
         aria-hidden="true"
-        className={`fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity duration-sheet ${
  isDrawerOpen ? 'opacity-100' : 'opacity-0'
  }`}
       />
@@ -158,14 +158,14 @@ export default function CartDrawer() {
       <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:left-auto md:right-0 max-w-full flex md:pl-10 justify-end items-end md:items-stretch">
         <div
           ref={drawerRef}
-          className={`w-full md:w-screen md:max-w-md bg-surface shadow-e2 flex flex-col max-h-[92dvh] md:max-h-full h-auto md:h-full rounded-t-3xl md:rounded-t-none md:border-l border-line transition-transform duration-300 ease-precision ${
+          className={`w-full md:w-screen md:max-w-md bg-surface shadow-e2 flex flex-col max-h-[92dvh] md:max-h-full h-auto md:h-full rounded-t-panel md:rounded-t-none md:border-l border-line transition-transform duration-sheet ease-precision ${
  isDrawerOpen
  ? 'translate-y-0 md:translate-x-0'
  : 'translate-y-full md:translate-y-0 md:translate-x-full'
  }`}
         >
           {/* Mobile pull handle */}
-          <div className="md:hidden flex justify-center pt-2.5 pb-1 bg-ink rounded-t-3xl">
+          <div className="md:hidden flex justify-center pt-2.5 pb-1 bg-ink rounded-t-panel">
             <div className="w-12 h-1.5 rounded-full bg-white/20" />
           </div>
 

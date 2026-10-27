@@ -760,7 +760,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
           <div
             ref={drawerPanelRef}
             tabIndex={-1}
-            className="fixed inset-x-0 bottom-0 max-h-[85dvh] bg-white rounded-t-3xl shadow-e2 flex flex-col z-10 outline-none animate-in slide-in-from-bottom duration-300"
+            className="fixed inset-x-0 bottom-0 max-h-[85dvh] bg-white rounded-t-panel shadow-e2 flex flex-col z-sheet outline-none animate-in slide-in-from-bottom duration-sheet"
           >
             {/* iOS Drag Handle */}
             <div className="flex justify-center pt-3 pb-1">

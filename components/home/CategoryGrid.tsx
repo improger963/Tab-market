@@ -27,13 +27,13 @@ export default function CategoryGrid() {
           <Link
             key={category.id}
             href={`/category/${category.slug}`}
-            className="group relative h-48 sm:h-72 rounded-panel overflow-hidden border border-line bg-white shadow-e1 hover:border-accent hover:shadow-e2 transition-all duration-300 flex flex-col justify-end p-3 sm:p-5 cursor-pointer"
+            className="group relative h-48 sm:h-72 rounded-panel overflow-hidden border border-line bg-white shadow-e1 hover:border-accent hover:shadow-e2 transition-[border-color,box-shadow] duration-sheet flex flex-col justify-end p-3 sm:p-5 cursor-pointer"
           >
             {/* Background Image with Zoom */}
             <img
               src={category.image}
               alt={category.title}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-sheet ease-precision"
               loading="lazy"
             />
 
@@ -46,7 +46,7 @@ export default function CategoryGrid() {
                 <span className="px-2.5 py-0.5 rounded-full bg-accent text-white text-xs font-bold tracking-wide shadow-e1">
                   {category.itemCount} տեսականի
                 </span>
-                <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-accent text-white flex items-center justify-center transition-all duration-300">
+                <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-accent text-white flex items-center justify-center transition-colors duration-sheet">
                   <ArrowUpRight className="w-4 h-4" />
                 </div>
               </div>

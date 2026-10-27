@@ -97,7 +97,7 @@ function TrackOrderContent() {
 
       {/* Order Results (Timeline & Summary) */}
       {order && (
-        <div className="space-y-8 animate-in fade-in duration-300">
+        <div className="space-y-8 animate-in fade-in duration-sheet">
           <OrderStatusTimeline timeline={order.timeline} />
           <OrderDetailsSummary order={order} />
         </div>

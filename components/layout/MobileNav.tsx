@@ -112,7 +112,7 @@ export default function MobileNav() {
         <div className="relative">
           <Heart className={`w-5 h-5 ${isWishlist ? 'fill-accent text-accent' : 'text-on-dark'}`} />
           {isMounted && wishCount > 0 && (
-            <span className="absolute -top-1.5 -right-2 bg-accent text-white text-[10px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center tabular-nums leading-none shadow-e1">
+            <span className="absolute -top-1.5 -right-2 bg-accent text-white text-caption font-bold w-4 h-4 rounded-full flex items-center justify-center tabular-nums leading-none shadow-e1">
               {wishCount > 99 ? '99+' : wishCount}
             </span>
           )}
@@ -130,7 +130,7 @@ export default function MobileNav() {
         <div className="relative">
           <ShoppingBag className="w-5 h-5 text-on-dark" />
           {isMounted && count > 0 && (
-            <span className="absolute -top-1.5 -right-2 bg-accent text-white text-[10px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center tabular-nums leading-none shadow-e1">
+            <span className="absolute -top-1.5 -right-2 bg-accent text-white text-caption font-bold w-4 h-4 rounded-full flex items-center justify-center tabular-nums leading-none shadow-e1">
               {count > 99 ? '99+' : count}
             </span>
           )}

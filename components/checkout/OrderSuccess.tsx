@@ -47,7 +47,7 @@ export default function OrderSuccess({ orderData, orderNumber }: OrderSuccessPro
 
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-panel border border-line p-8 sm:p-12 shadow-e1 text-center space-y-8 animate-in zoom-in-95 duration-200">
-      <div className="w-20 h-20 rounded-full bg-success/10 text-success flex items-center justify-center mx-auto animate-in fade-in zoom-in-50 duration-300">
+      <div className="w-20 h-20 rounded-full bg-success/10 text-success flex items-center justify-center mx-auto animate-in fade-in zoom-in-50 duration-sheet">
         <CheckCircle2 className="w-12 h-12" />
       </div>
 

@@ -204,7 +204,7 @@ export default function LiveSearch({
           aria-activedescendant={
             isOpen && selectedIndex >= 0 ? `${listboxId}-opt-${selectedIndex}` : undefined
           }
-          className="w-full h-11 pl-11 pr-24 rounded-full bg-white hover:bg-canvas/70 focus:bg-white text-ink text-base md:text-sm border border-line focus:border-accent focus:ring-4 focus:ring-accent/15 transition-all duration-200 placeholder:text-muted font-normal shadow-e1"
+          className="w-full h-11 pl-11 pr-24 rounded-full bg-white hover:bg-canvas/70 focus:bg-white text-ink text-base md:text-sm border border-line focus:border-accent focus:ring-4 focus:ring-accent/15 transition-[background-color,border-color,box-shadow] duration-hover placeholder:text-muted font-normal shadow-e1"
         />
 
         {/* Left search icon */}
@@ -227,7 +227,7 @@ export default function LiveSearch({
             </kbd>
           )}
 
-          <span className="text-xs font-semibold uppercase px-1.5 py-0.5 bg-ink text-white rounded tracking-wider shadow-e1">
+          <span className="text-xs font-semibold px-1.5 py-0.5 bg-ink text-white rounded-control shadow-e1">
             Կոդ
           </span>
         </div>
@@ -235,7 +235,7 @@ export default function LiveSearch({
 
       {/* Instant Spotlight Dropdown with backdrop-blur chrome */}
       {(isOpen || isOverlayMode) && debouncedQuery && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-50 shadow-e2 rounded-panel border border-line bg-white/95 backdrop-blur-sm max-h-[60dvh] sm:max-h-[440px] overflow-y-auto overscroll-contain divide-y divide-line animate-in fade-in-50 slide-in-from-top-1 duration-150">
+        <div className="absolute top-full left-0 right-0 mt-2 z-overlay shadow-e2 rounded-panel border border-line bg-white/95 backdrop-blur-sm max-h-[60dvh] sm:max-h-[440px] overflow-y-auto overscroll-contain divide-y divide-line animate-in fade-in-50 slide-in-from-top-1 duration-hover">
           {filteredProducts.length === 0 ? (
             <div className="p-8 text-center space-y-2">
               <div className="w-10 h-10 rounded-full bg-canvas text-muted flex items-center justify-center mx-auto">

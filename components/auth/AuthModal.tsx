@@ -446,7 +446,7 @@ export default function AuthModal({ className }: AuthModalProps) {
 
           {import.meta.env.DEV && devCredentials ? (
             <div className="mt-4 rounded-control border border-dashed border-line-strong bg-canvas p-3">
-              <p className="text-[11px] text-muted mb-2">
+              <p className="text-caption text-muted mb-2">
                 {AUTH_HY.DEV_QUICK_LOGIN} · {maskPhone(devCredentials.phone)}
               </p>
               <button

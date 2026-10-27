@@ -178,7 +178,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
             {product.brand ? (
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted">
+              <p className="text-caption font-bold uppercase tracking-widest text-muted">
                 {product.brand}
               </p>
             ) : null}
@@ -319,7 +319,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               id="main-add-to-cart-btn"
               type="button"
               onClick={handleAddToCart}
-              className={`btn-tactile flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-control px-6 py-3.5 text-sm font-semibold text-white shadow-e1 transition-all duration-200 ease-precision hover:-translate-y-0.5 hover:bg-accent hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
+              className={`btn-tactile flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-control px-6 py-3.5 text-sm font-semibold text-white shadow-e1 transition-[transform,background-color,box-shadow] duration-hover ease-precision hover:-translate-y-0.5 hover:bg-accent hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
  addState === 'added' ? 'bg-success' : 'bg-ink hover:bg-accent'
  }`}
             >

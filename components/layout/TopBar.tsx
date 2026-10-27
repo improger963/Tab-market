@@ -41,7 +41,7 @@ export default function TopBar() {
           </Link>
 
           {DELIVERY_CONFIG.yerevanFreeAlways ? (
-            <span className="hidden shrink-0 items-center gap-1.5 rounded-full border border-accent/40 bg-gradient-to-r from-accent/25 to-accent/10 px-3 py-0.5 text-xs font-bold tracking-wide text-white shadow-[0_0_16px_-4px_rgba(37,99,235,0.45)] md:inline-flex">
+            <span className="hidden shrink-0 items-center gap-1.5 rounded-full border border-accent/40 bg-gradient-to-r from-accent/25 to-accent/10 px-3 py-0.5 text-caption font-bold tracking-wide text-white shadow-glow-accent md:inline-flex">
               <Truck className="h-3.5 w-3.5 shrink-0 text-white" aria-hidden="true" />
               <span>{HY.FREE_DELIVERY_YEREVAN}</span>
             </span>

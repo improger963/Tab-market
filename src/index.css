@@ -48,6 +48,12 @@
   --color-slate-800: #1e293b;
   --color-slate-900: #0f172a; /* alias: ink */
 
+  /* ---- Type scale addition: semantic caption (>=12px a11y floor) ---------
+     Every small label previously used an arbitrary `text-[Npx]` (9–11px,
+     below the AA floor). `text-caption` is the ONE sanctioned small-text size. */
+  --text-caption: 0.75rem; /* 12px */
+  --text-caption--line-height: 1.35rem;
+
   /* ---- Radius: exactly four shapes ---------------------------------------
      card (1rem) · panel (1.5rem) · control (0.75rem) · full (chips) */
   --radius-card: 1rem; /* rounded-card */
@@ -63,6 +69,14 @@
     0 1px 2px 0 rgba(15, 23, 42, 0.04);
   --shadow-e2: 0 20px 40px -12px rgba(15, 23, 42, 0.12),
     0 8px 16px -8px rgba(15, 23, 42, 0.08);
+
+  /* Ambient accent glow (TopBar live badge) + decorative drop-shadows that
+     were previously hard-coded rgba() values scattered across components.
+     Registered centrally so no call site needs an arbitrary shadow. */
+  --shadow-glow-accent: 0 0 16px -4px rgba(37, 99, 235, 0.45);
+  --drop-shadow-accent-glow: 0 4px 8px rgba(37, 99, 235, 0.18);
+  --drop-shadow-ink-soft: 0 18px 24px rgba(15, 23, 42, 0.1);
+  --drop-shadow-inner-light: 0 1px 0 rgba(255, 255, 255, 0.6);
 
   /* ---- Motion tokens -----------------------------------------------------
      120ms press · 200ms hover/color · 280ms sheets/drawers.
