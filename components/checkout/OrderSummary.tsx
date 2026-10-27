@@ -64,7 +64,7 @@ export default function OrderSummary({
   };
 
   return (
-    <div className="sticky top-24 bg-white p-6 sm:p-7 rounded-panel border border-line shadow-e1 space-y-6">
+    <div className="bg-white p-6 sm:p-7 rounded-panel border border-line shadow-e1 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-canvas">
         <h2 className="text-base font-semibold text-ink">
@@ -109,7 +109,7 @@ export default function OrderSummary({
 
       {/* Interactive Promo Code Form */}
       <div className="p-3.5 rounded-panel bg-canvas border border-line space-y-2">
-        <span className="text-xs font-semibold text-muted block">
+        <span id="co-promo-label" className="text-xs font-semibold text-muted block">
           Զեղչի կոդ
         </span>
         {!appliedCoupon ? (
@@ -118,7 +118,11 @@ export default function OrderSummary({
               <Tag className="w-3.5 h-3.5 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
+                id="co-promo"
                 value={couponInput}
+                aria-labelledby="co-promo-label"
+                aria-invalid={Boolean(couponError)}
+                aria-describedby={couponError ? 'co-promo-error' : undefined}
                 onChange={(e) => {
                   setCouponInput(e.target.value);
                   setCouponError(null);
@@ -129,7 +133,7 @@ export default function OrderSummary({
             </div>
             <button
               type="submit"
-              className="px-4 h-9 rounded-control bg-ink hover:bg-accent text-white text-xs font-bold transition-all cursor-pointer"
+              className="btn-tactile px-4 h-9 rounded-control bg-ink hover:bg-accent text-white text-xs font-bold transition-colors duration-hover cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
             >
               Կիրառել
             </button>
@@ -148,7 +152,7 @@ export default function OrderSummary({
             <button
               type="button"
               onClick={removeCoupon}
-              className="text-xs text-danger hover:underline font-bold ml-2 shrink-0 cursor-pointer"
+              className="text-xs text-danger hover:text-danger hover:underline font-bold ml-2 shrink-0 cursor-pointer rounded-control px-1 min-h-[32px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
             >
               Հեռացնել
             </button>
@@ -156,7 +160,7 @@ export default function OrderSummary({
         )}
 
         {couponError && (
-          <p className="text-xs text-danger flex items-center gap-1 font-medium">
+          <p id="co-promo-error" role="alert" className="text-xs text-danger flex items-center gap-1 font-medium">
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>{couponError}</span>
           </p>
@@ -205,7 +209,8 @@ export default function OrderSummary({
         type="button"
         disabled={isSubmitting || items.length === 0}
         onClick={onSubmit}
-        className="w-full min-h-[52px] py-4 px-6 rounded-control bg-ink hover:bg-accent active:scale-98 disabled:opacity-50 text-white font-bold text-sm transition-all shadow-e1 flex items-center justify-center gap-2 cursor-pointer"
+        aria-busy={isSubmitting}
+        className="btn-tactile w-full min-h-[52px] py-4 px-6 rounded-control bg-ink hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold text-sm transition-colors duration-hover shadow-e1 flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
       >
         {isSubmitting ? (
           <>

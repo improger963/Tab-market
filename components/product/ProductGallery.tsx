@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Camera,
   Layers,
@@ -58,6 +58,23 @@ export default function ProductGallery({
   const [isZoomed, setIsZoomed] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  // Keyboard + focus model for the CAD lightbox: Escape dismisses, focus moves
+  // into the dialog on open and returns to the trigger on close.
+  const blueprintModalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!isBlueprintModalOpen) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    requestAnimationFrame(() => blueprintModalRef.current?.focus({ preventScroll: true }));
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsBlueprintModalOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      previouslyFocused?.focus?.({ preventScroll: true });
+    };
+  }, [isBlueprintModalOpen]);
 
   const currentImage = resolveImageUrl(images[selectedImageIndex] || images[0]);
   const resolvedBlueprint = resolveImageUrl(blueprintImage);
@@ -265,7 +282,9 @@ export default function ProductGallery({
           onClick={() => setIsBlueprintModalOpen(false)}
         >
           <div
-            className="flex max-h-[90dvh] w-full max-w-3xl flex-col overflow-y-auto rounded-panel border border-line bg-surface shadow-e2"
+            ref={blueprintModalRef}
+            tabIndex={-1}
+            className="flex max-h-[90dvh] w-full max-w-3xl flex-col overflow-y-auto rounded-panel border border-line bg-surface shadow-e2 outline-none"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-surface p-4">

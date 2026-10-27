@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   FileCheck2,
   Ruler,
@@ -65,6 +65,23 @@ export default function ProductDossierTabs({ product }: ProductDossierTabsProps)
   const [dossierTab, setDossierTab] = useState<TabId>('specs');
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const tabListRef = useRef<HTMLDivElement>(null);
+
+  // Keyboard + focus model for the CAD spotlight modal: Escape dismisses, focus
+  // moves into the dialog on open and returns to the trigger on close.
+  const zoomModalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!isZoomOpen) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    requestAnimationFrame(() => zoomModalRef.current?.focus({ preventScroll: true }));
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsZoomOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      previouslyFocused?.focus?.({ preventScroll: true });
+    };
+  }, [isZoomOpen]);
 
   const hasBlueprint = !!resolveImageUrl(product.blueprintImage);
   // Only render spec rows that carry real customer data; the internal SKU row
@@ -250,7 +267,9 @@ export default function ProductDossierTabs({ product }: ProductDossierTabsProps)
           onClick={() => setIsZoomOpen(false)}
         >
           <div
-            className="w-full max-w-3xl overflow-hidden rounded-panel border border-line/20 bg-ink shadow-e2"
+            ref={zoomModalRef}
+            tabIndex={-1}
+            className="w-full max-w-3xl overflow-hidden rounded-panel border border-line/20 bg-ink shadow-e2 outline-none"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-line/20 p-4">
