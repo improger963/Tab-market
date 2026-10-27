@@ -151,8 +151,14 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="card-lux group relative flex h-full flex-col justify-between rounded-card p-3 sm:p-4">
       {/* 1. Pedestal: ice-white canvas, product floats centered, zero crop.
-          Gentle 500ms scale on hover — the sculpture breathes with you. */}
-      <div className="relative m-0 aspect-square overflow-hidden rounded-card bg-canvas p-4 sm:m-0">
+          A still gallery spotlight falls from the top so the canvas reads as
+          deep architecture, not a flat box. Gentle 500ms scale on hover —
+          the sculpture breathes with you. */}
+      <div className="relative m-0 aspect-square overflow-hidden rounded-card border border-line/50 bg-canvas p-4 sm:m-0">
+        <span
+          aria-hidden="true"
+          className="card-spotlight pointer-events-none absolute inset-0 rounded-card"
+        />
         <Link
           href={`/product/${product.slug}`}
           className="block h-full w-full cursor-pointer focus:outline-hidden"

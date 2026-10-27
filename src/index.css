@@ -132,7 +132,13 @@ body {
 @layer utilities {
   /* ---- Ice chrome: placeholders / pedestals ONLY (never text or buttons) */
   .bg-ice-chrome {
-    background: linear-gradient(135deg, #f1f5f9 0%, #ffffff 50%, #e2e8f0 100%);
+    background: linear-gradient(
+      135deg,
+      #f8fafc 0%,
+      #ffffff 35%,
+      #f1f5f9 62%,
+      #e2e8f0 100%
+    );
   }
   .ring-ice {
     box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
@@ -167,14 +173,14 @@ body {
 
   /* Standard card: e1 ambient at rest; on pointer devices it floats 4px up
      with a deep e2 bloom and a whisper of Royal Blue at the border, reading
-     as an architectural pedestal lift. */
+     as an architectural pedestal lift (300ms sculpture motion). */
   .card-lux {
     background-color: var(--color-surface);
     border: 1px solid var(--color-line);
     box-shadow: var(--shadow-e1);
-    transition: transform var(--duration-hover) var(--ease-precision),
-      box-shadow var(--duration-hover) var(--ease-precision),
-      border-color var(--duration-hover) var(--ease-precision);
+    transition: transform 300ms var(--ease-precision),
+      box-shadow 300ms var(--ease-precision),
+      border-color 300ms var(--ease-precision);
   }
   @media (hover: hover) and (pointer: fine) {
     .card-lux:hover {
@@ -182,6 +188,16 @@ body {
       border-color: rgba(37, 99, 235, 0.4);
       box-shadow: var(--shadow-e2);
     }
+  }
+
+  /* Gallery spotlight overlay for product pedestals: a still, soft top light
+     that gives the ice canvas depth (purely decorative, palette-locked). */
+  .card-spotlight {
+    background: radial-gradient(
+      115% 75% at 50% 0%,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(241, 245, 249, 0) 68%
+    );
   }
 
   /* Hero ambient wash: barely-there azure morning light behind editorial
@@ -195,13 +211,14 @@ body {
       linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   }
 
-  /* Glass "showroom" layer (hero card, floating chips). */
+  /* Glass "showroom" layer (hero card, floating chips). e2 bloom so the
+     frosted panel reads as a floating pedestal over the visual. */
   .glass-surface {
     background-color: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: var(--shadow-e1);
+    box-shadow: var(--shadow-e2);
   }
 
   /* Display type: fluid headline scale, tight tracking (sentence case only). */

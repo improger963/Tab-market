@@ -50,7 +50,7 @@ export default function HeroBanner() {
     <section
       aria-label={title || 'tab.am'}
       lang="hy"
-      className="overflow-hidden rounded-panel border border-line bg-surface shadow-e2 lg:grid lg:grid-cols-12 lg:h-[clamp(360px,56dvh,560px)]"
+      className="overflow-hidden rounded-panel border border-line/80 bg-surface shadow-e2 ring-ice lg:grid lg:grid-cols-12 lg:h-[clamp(360px,56dvh,560px)]"
     >
       {/* ---- Copy column: editorial morning-light wash behind the headline -- */}
       <div className="flex flex-col justify-center gap-3 bg-hero-ambient p-5 hyphens-auto break-words sm:gap-5 sm:p-10 lg:col-span-7 lg:gap-6 lg:p-12">
@@ -83,7 +83,7 @@ export default function HeroBanner() {
         <div className="flex flex-col items-stretch gap-2.5 pt-1 sm:flex-row sm:items-center sm:gap-3">
           <Link
             href={primaryCta.href}
-            className="btn-tactile inline-flex min-h-[48px] items-center justify-center rounded-control bg-ink px-8 py-3.5 text-sm font-semibold text-white shadow-e1 transition-all duration-hover ease-precision hover:bg-accent hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            className="btn-tactile inline-flex min-h-[48px] items-center justify-center rounded-control bg-ink px-8 py-3.5 text-sm font-semibold text-white shadow-e1 transition-all duration-hover ease-precision hover:-translate-y-0.5 hover:bg-accent hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
             {primaryCta.label}
           </Link>
@@ -94,7 +94,7 @@ export default function HeroBanner() {
               {...(secondaryCta.href.startsWith('http')
                 ? { target: '_blank', rel: 'noopener noreferrer' }
                 : {})}
-              className="btn-tactile inline-flex min-h-[48px] items-center justify-center gap-1.5 self-start rounded-control px-1 py-2 text-sm font-semibold text-ink underline-offset-4 hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:self-auto sm:justify-center sm:rounded-control sm:border sm:border-line sm:bg-surface sm:px-8 sm:py-3.5 sm:shadow-e0 sm:no-underline sm:transition-all sm:duration-hover sm:ease-precision sm:hover:border-accent/40 sm:hover:text-accent sm:hover:shadow-e1"
+              className="btn-tactile inline-flex min-h-[48px] items-center justify-center gap-1.5 self-start rounded-control border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink shadow-e0 sm:justify-center sm:px-8 sm:py-3.5 sm:shadow-e1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-all duration-hover ease-precision hover:-translate-y-0.5 hover:border-accent/40 hover:text-accent hover:shadow-e2"
             >
               {secondaryCta.label}
             </a>
@@ -144,10 +144,14 @@ export default function HeroBanner() {
             aria-hidden="true"
             className="relative flex w-full items-center justify-center overflow-hidden bg-ice-chrome ring-ice"
           >
-            {/* Ambient spotlight: a cool morning glow falling from top-right */}
+            {/* Ambient lighting: a cool morning glow falling from top-right,
+                mirrored by a soft floor wash, and a hairline plinth edge —
+                still light, never animated. */}
             <span className="pointer-events-none absolute -top-16 right-4 h-56 w-56 rounded-full bg-accent/10 blur-3xl" />
+            <span className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-accent/5 blur-3xl" />
+            <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-line-strong/70 to-transparent" />
             <span className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-surface/70 to-transparent" />
-            <span className="select-none bg-gradient-to-b from-ink/80 to-ink/50 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-6xl">
+            <span className="select-none bg-gradient-to-b from-ink/80 to-ink/50 bg-clip-text text-5xl font-bold tracking-tight text-transparent drop-shadow-[0_18px_24px_rgba(15,23,42,0.10)] sm:text-6xl">
               tab.am
             </span>
           </div>

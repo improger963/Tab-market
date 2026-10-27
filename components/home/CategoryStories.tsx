@@ -81,8 +81,9 @@ export default function CategoryStories() {
                 >
                   {/* Pedestal circle: real image or neutral icon placeholder.
                       On hover it ignites: Royal-Blue border, ambient ring
-                      glow and a soft elevated bloom. */}
-                  <span className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-line bg-canvas transition-all duration-300 ease-out ring-2 ring-transparent ring-offset-2 ring-offset-surface group-hover:border-accent group-hover:shadow-e2 group-hover:ring-accent/20 group-hover:scale-[1.04] sm:h-20 sm:w-20">
+                      glow and a soft elevated bloom — a spotlighted medallion,
+                      lit from within by a still ice-chrome wash. */}
+                  <span className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-line bg-ice-chrome shadow-e0 ring-2 ring-transparent ring-offset-2 ring-offset-surface transition-all duration-300 ease-out group-hover:border-accent group-hover:shadow-e2 group-hover:ring-accent/20 group-hover:scale-[1.06] sm:h-20 sm:w-20">
                     {img ? (
                       <img
                         src={img}
@@ -91,10 +92,10 @@ export default function CategoryStories() {
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                       />
                     ) : (
-                      <Icon className="h-7 w-7 text-accent transition-transform duration-300 ease-out group-hover:scale-110" aria-hidden="true" />
+                      <Icon className="h-7 w-7 text-accent drop-shadow-[0_4px_8px_rgba(37,99,235,0.18)] transition-transform duration-300 ease-out group-hover:scale-110" aria-hidden="true" />
                     )}
                   </span>
-                  <span className="line-clamp-2 min-h-[2rem] text-xs font-medium leading-tight text-body transition-colors duration-hover group-hover:text-ink">
+                  <span className="line-clamp-2 min-h-[2rem] text-xs font-medium leading-tight text-body transition-colors duration-hover group-hover:text-ink group-hover:font-semibold">
                     {cat.title}
                   </span>
                 </Link>

@@ -127,16 +127,21 @@ export default function Header() {
         <div className="flex items-center gap-3 md:gap-4 shrink-0" ref={menuRef}>
           <Link
             href="/"
-            className="flex flex-col group cursor-pointer focus:outline-hidden"
+            className="flex items-center gap-2.5 group cursor-pointer focus:outline-hidden"
             aria-label="tab.am Գլխավոր էջ"
           >
-            <div className="flex items-center gap-1">
-              <span className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tighter text-ink group-hover:text-accent transition-colors duration-hover">
-                TAB<span className="text-accent">.AM</span>
+            {/* Architectural monogram: a midnight tile that ignites to Royal
+                Blue and lifts on hover — the flagship emblem. */}
+            <span className="relative hidden h-10 w-10 shrink-0 items-center justify-center rounded-control bg-ink shadow-e1 transition-all duration-hover ease-precision group-hover:-translate-y-0.5 group-hover:bg-accent group-hover:shadow-e2 sm:flex">
+              <Droplets className="h-5 w-5 text-white" aria-hidden="true" />
+            </span>
+            <span className="flex flex-col">
+              <span className="text-xl leading-none font-extrabold tracking-tighter text-ink drop-shadow-[0_1px_0_rgba(255,255,255,0.6)] transition-colors duration-hover group-hover:text-accent sm:text-2xl lg:text-[1.7rem]">
+                TAB<span className="text-accent group-hover:text-ink">.AM</span>
               </span>
-            </div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted -mt-0.5 group-hover:text-ink transition-colors duration-hover hidden sm:block">
-              ՍԱՆՏԵԽՆԻԿԱՅԻ ԽԱՆՈՒԹ-ՍՐԱՀ
+              <span className="mt-0.5 hidden text-[9px] font-bold uppercase tracking-[0.16em] text-muted transition-colors duration-hover group-hover:text-ink sm:block">
+                ՍԱՆՏԵԽՆԻԿԱՅԻ ԽԱՆՈՒԹ-ՍՐԱՀ
+              </span>
             </span>
           </Link>
 

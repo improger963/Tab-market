@@ -152,7 +152,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-6 rounded-panel border border-line/80 bg-surface p-5 shadow-e1 sm:p-8">
+      <div className="space-y-6 rounded-panel border border-line/80 bg-surface p-5 shadow-e2 ring-ice sm:p-8">
         {/* Category + rating */}
         <div className="flex items-center justify-between gap-2">
           <Link
@@ -257,9 +257,14 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           )}
         </div>
 
-        {/* Price block — the visual anchor: ice pedestal, midnight numerals */}
-        <div className="space-y-2 rounded-card border border-line/70 bg-canvas p-5">
-          <div className="flex flex-wrap items-baseline gap-3">
+        {/* Price block — the visual anchor: ice pedestal under a still
+            gallery spotlight, midnight numerals floating on top */}
+        <div className="relative overflow-hidden rounded-card border border-line/70 bg-canvas p-5">
+          <span
+            aria-hidden="true"
+            className="card-spotlight pointer-events-none absolute inset-0"
+          />
+          <div className="relative flex flex-wrap items-baseline gap-3">
             <span className="text-3xl font-bold tracking-tight text-ink tabular-nums sm:text-4xl">
               {formatAMD(product.price)}
             </span>
@@ -314,7 +319,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
               id="main-add-to-cart-btn"
               type="button"
               onClick={handleAddToCart}
-              className={`btn-tactile flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-control px-6 py-3.5 text-sm font-semibold text-white shadow-e1 transition-all duration-200 ease-precision hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
+              className={`btn-tactile flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-control px-6 py-3.5 text-sm font-semibold text-white shadow-e1 transition-all duration-200 ease-precision hover:-translate-y-0.5 hover:bg-accent hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
  addState === 'added' ? 'bg-success' : 'bg-ink hover:bg-accent'
  }`}
             >
@@ -358,9 +363,9 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
             {highlights.map((chip) => (
               <div
                 key={chip.label}
-                className="flex items-start gap-3 rounded-card border border-line/80 bg-canvas p-3.5 shadow-e0 transition-all duration-hover ease-precision hover:border-accent/30 hover:bg-surface hover:shadow-e1"
+                className="group/chip flex items-start gap-3 rounded-card border border-line/80 bg-canvas p-3.5 shadow-e0 transition-all duration-hover ease-precision hover:border-accent/30 hover:bg-surface hover:shadow-e1"
               >
-                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-control border border-line/60 bg-surface shadow-e0">
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-control border border-line/60 bg-ice-chrome shadow-e0 transition-colors duration-hover group-hover/chip:border-accent/30">
                   <chip.Icon className="h-4 w-4 text-accent" aria-hidden="true" />
                 </span>
                 <p className="leading-snug text-body pt-1">
