@@ -110,6 +110,38 @@ const RAW_CATEGORIES: Category[] = [
     itemCount: 24,
     icon: 'Filter',
   },
+  {
+    id: 13,
+    title: '\u053e\u0578\u0580\u0561\u056f\u0576\u0565\u0580',
+    slug: 'tsorakner',
+    image: 'https://tab.am/image/cache/catalog/vivien/tsorak/model/Q7263model-1024x1024.jpg',
+    itemCount: 759,
+    icon: 'Droplets',
+  },
+  {
+    id: 14,
+    title: '\u0551\u0576\u0581\u0578\u0582\u0572\u056b \u0570\u0561\u057e\u0561\u0584\u0561\u056e\u0578\u0582\u0576\u0565\u0580',
+    slug: 'tsntsughi-havakatsuner',
+    image: 'https://tab.am/image/cache/catalog/18243-1024x1024.png',
+    itemCount: 354,
+    icon: 'ShowerHead',
+  },
+  {
+    id: 15,
+    title: '\u054d\u0561\u0576\u056f\u0565\u0580\u0561\u0574\u056b\u056f\u0561',
+    slug: 'sankeramika',
+    image: 'https://tab.am/image/cache/catalog/11.09.2025/AS889-1024x1024.jpg',
+    itemCount: 224,
+    icon: 'Box',
+  },
+  {
+    id: 16,
+    title: '\u053c\u056b\u056f\u057e\u056b\u0564\u0561\u0581\u056b\u0561',
+    slug: 'clearance',
+    image: 'https://tab.am/image/cache/catalog/vivien/tsorak/corak/Q9209coraksev-1024x1024.jpg',
+    itemCount: 200,
+    icon: 'Sparkles',
+  },
 ];
 
 /**

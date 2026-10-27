@@ -9,7 +9,45 @@
 import { Product } from '../types';
 import raw from './products.json';
 
-/** Full live price list (1647 SKUs) imported from products.xlsx. */
-export const products: Product[] = raw as unknown as Product[];
+/**
+ * Crawler bucket slug -> storefront canonical slug.
+ *
+ * tab.am (OpenCart) emits mixed-case / underscore / trailing-digit category
+ * slugs and uses "-1" for the clearance lot, while the rest of the app
+ * (data/categories.ts, /category/[slug], catalog filters, services/api, the
+ * v1 API route and related-product lookups) matches on lowercase-hyphen
+ * slugs. Reconciling once at this read boundary keeps every exact match
+ * working without hand-editing products.json (which the crawler rewrites with
+ * raw slugs on every run). Armenian category NAMES are left untouched — only
+ * the ASCII slug is normalized, so no source text is ever re-typed.
+ */
+const CATEGORY_SLUG_ALIASES: Record<string, string> = {
+  'Tsntsugh_yev_khoghovak': 'tsntsugh-yev-khoghovak',
+  'Hosakner1': 'hosakner',
+  'Tsntsughi-havakatsuner': 'tsntsughi-havakatsuner',
+  'Sankeramika': 'sankeramika',
+  'Higiyenayi-paraganer': 'higiyenayi-paraganer',
+  'Lvatsaran-paharanov': 'lvatsaran-paharanov',
+  'Sifon': 'sifon',
+  'Aksesuarner': 'aksesuarner',
+  'Choranotsner': 'choranotsner',
+  'Hayeliner': 'hayeliner',
+  'Pakan': 'pakan',
+  'Logasenyaki-varaguyri-dzogher': 'logasenyaki-varaguyri-dzogher',
+  '-1': 'clearance',
+  // already canonical: tsorakner, khohanotsi-lvatsaran, odapvokhichner
+};
+
+/** Raw slug -> canonical slug (explicit alias, else lowercase + hyphenate). */
+export function canonicalCategorySlug(slug: string): string {
+  const s = String(slug);
+  return CATEGORY_SLUG_ALIASES[s] ?? s.toLowerCase().replace(/_/g, '-');
+}
+
+/** Full live catalog from products.json with category slugs reconciled. */
+export const products: Product[] = (raw as unknown as Product[]).map((p) => {
+  const slug = canonicalCategorySlug(p.categorySlug);
+  return slug === p.categorySlug ? p : { ...p, categorySlug: slug };
+});
 
 export default products;
