@@ -150,7 +150,7 @@ export default function CartDrawer() {
       <div
         onClick={closeDrawer}
         aria-hidden="true"
-        className={`fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity duration-sheet ${
+        className={`fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity duration-sheet cursor-pointer ${
  isDrawerOpen ? 'opacity-100' : 'opacity-0'
  }`}
       />

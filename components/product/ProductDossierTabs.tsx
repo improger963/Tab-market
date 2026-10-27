@@ -260,7 +260,7 @@ export default function ProductDossierTabs({ product }: ProductDossierTabsProps)
       {/* CAD spotlight modal */}
       {isZoomOpen && hasBlueprint && (
         <div
-          className="fixed inset-0 z-overlay flex animate-fade-in items-center justify-center bg-ink/80 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-overlay flex animate-fade-in cursor-pointer items-center justify-center bg-ink/80 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-label={TEXT.CAD_GTSAGIR}
@@ -269,7 +269,7 @@ export default function ProductDossierTabs({ product }: ProductDossierTabsProps)
           <div
             ref={zoomModalRef}
             tabIndex={-1}
-            className="w-full max-w-3xl overflow-hidden rounded-panel border border-line/20 bg-ink shadow-e2 outline-none"
+            className="w-full max-w-3xl cursor-default overflow-hidden rounded-panel border border-line/20 bg-ink shadow-e2 outline-none"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-line/20 p-4">

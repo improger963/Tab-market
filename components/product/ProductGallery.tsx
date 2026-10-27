@@ -275,7 +275,7 @@ export default function ProductGallery({
       {/* Blueprint lightbox */}
       {isBlueprintModalOpen && resolvedBlueprint && (
         <div
-          className="fixed inset-0 z-overlay flex animate-fade-in items-center justify-center bg-ink/80 p-3 backdrop-blur-sm sm:p-4"
+          className="fixed inset-0 z-overlay flex animate-fade-in cursor-pointer items-center justify-center bg-ink/80 p-3 backdrop-blur-sm sm:p-4"
           role="dialog"
           aria-modal="true"
           aria-label={`${title} ${TEXT.T_CAD}`}
@@ -284,7 +284,7 @@ export default function ProductGallery({
           <div
             ref={blueprintModalRef}
             tabIndex={-1}
-            className="flex max-h-[90dvh] w-full max-w-3xl flex-col overflow-y-auto rounded-panel border border-line bg-surface shadow-e2 outline-none"
+            className="flex max-h-[90dvh] w-full max-w-3xl cursor-default flex-col overflow-y-auto rounded-panel border border-line bg-surface shadow-e2 outline-none"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-surface p-4">

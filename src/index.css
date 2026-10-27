@@ -143,6 +143,33 @@ body {
   font-family: var(--font-sans);
 }
 
+/*
+ * Cursor semantics — single source of truth.
+ * Native <button> defaults to the ARROW cursor (Tailwind v4 preflight does not
+ * change it), so before this rule some buttons read as non-clickable while
+ * scattered `cursor-pointer` utilities handled the rest. One base rule makes
+ * every actionable control read as clickable, and signals non-interactivity
+ * when disabled. `<a>`/`<Link>` already show `pointer` natively. Utilities in
+ * `@layer utilities` (`cursor-pointer`, `cursor-zoom-in`, `cursor-default` …)
+ * still override these defaults where a different cursor is intentional.
+ */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  input[type="button"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="reset"]:not(:disabled),
+  input[type="file"]::file-selector-button,
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  input:disabled {
+    cursor: not-allowed;
+  }
+}
+
 @layer utilities {
   /* ---- Ice chrome: placeholders / pedestals ONLY (never text or buttons) */
   .bg-ice-chrome {

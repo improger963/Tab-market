@@ -236,7 +236,7 @@ export default function AuthModal({ className }: AuthModalProps) {
         tabIndex={isAuthModalOpen ? 0 : -1}
         aria-label={AUTH_HY.MODAL_CLOSE}
         onClick={closeAuthModal}
-        className="absolute inset-0 bg-ink/70 backdrop-blur-sm animate-fade-in cursor-default"
+        className="absolute inset-0 bg-ink/70 backdrop-blur-sm animate-fade-in cursor-pointer"
       />
 
       <div

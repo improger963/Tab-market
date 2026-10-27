@@ -61,7 +61,7 @@ export default function QuickOrderModal({
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity animate-in fade-in"
+        className="fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity animate-in fade-in cursor-pointer"
       />
 
       {/* Modal Dialog / Mobile Bottom Sheet */}

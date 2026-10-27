@@ -752,7 +752,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
           className="fixed inset-0 z-sheet lg:hidden overflow-hidden"
         >
           <div
-            className="fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+            className="fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity animate-in fade-in duration-200 cursor-pointer"
             onClick={() => setIsMobileDrawerOpen(false)}
             aria-hidden="true"
           />
