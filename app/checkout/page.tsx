@@ -189,16 +189,19 @@ export default function CheckoutPage() {
     if (isSubmitting || submitTokenRef.current) return; // prevent double-submit
 
     if (!formData.fullName.trim()) {
-      alert('Խնդրում ենք լրացնել Ձեր անունը և ազգանունը:');
+      queueMicrotask(() => document.getElementById('co-fullName')?.focus());
+      useToast.getState().showToast('Խնդրում ենք լրացնել Ձեր անունը և ազգանունը:');
       return;
     }
     const normalizedPhone = normalizeArPhone(formData.phone);
     if (!normalizedPhone) {
-      alert('Խնդրում ենք լրացնել հեռախոսահամարը ճիշտ ձևաչափով՝ +374 (XX) XX-XX-XX:');
+      queueMicrotask(() => document.getElementById('co-phone')?.focus());
+      useToast.getState().showToast('Խնդրում ենք լրացնել հեռախոսահամարը ճիշտ ձևաչափով՝ +374 (XX) XX-XX-XX:');
       return;
     }
     if (formData.deliveryMethod === 'yerevan' && !formData.addressStreet.trim()) {
-      alert('Խնդրում ենք լրացնել Երևանի առաքման հասցեն (փողոց, շենք):');
+      queueMicrotask(() => document.getElementById('co-street')?.focus());
+      useToast.getState().showToast('Խնդրում ենք լրացնել Երևանի առաքման հասցեն (փողոց, շենք):');
       return;
     }
 

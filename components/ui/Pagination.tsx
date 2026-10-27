@@ -27,7 +27,7 @@ interface PaginationProps {
  */
 function pageWindow(current: number, last: number): (number | '…')[] {
   if (last <= 1) return [];
-  const wanted = new Set<number>([1, last, current - 1, current, current + 2]);
+  const wanted = new Set<number>([1, last, current - 1, current, current + 1]);
   const pages = [...wanted]
     .filter((n) => n >= 1 && n <= last)
     .sort((a, b) => a - b);
@@ -57,7 +57,7 @@ export default function Pagination({
   const pageNumbers = pageWindow(page, last);
 
   const base =
-    'min-h-[44px] min-w-[44px] px-3 rounded-control text-xs font-bold tabular-nums transition-colors duration-hover ease-precision cursor-pointer inline-flex items-center justify-center gap-1.5 btn-tactile';
+    'min-h-[44px] min-w-[44px] px-3 rounded-control text-xs font-bold tabular-nums transition-colors duration-hover ease-precision cursor-pointer inline-flex items-center justify-center gap-1.5 btn-tactile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
   return (
     <nav

@@ -137,6 +137,8 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
   const resultsTopRef = useRef<HTMLDivElement | null>(null);
   // Set only by explicit pagination clicks; consumed after the new page renders.
   const pendingPageScrollRef = useRef(false);
+  // Focusable container for the mobile filter sheet (dialog focus management).
+  const drawerPanelRef = useRef<HTMLDivElement | null>(null);
 
   const { addItem, openDrawer } = useCart();
   const { showCartToast } = useToast();
@@ -210,20 +212,48 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
     return () => clearTimeout(timer);
   }, [filters, sortBy, isMounted, page, priceBounds]);
 
-  // Lock body scroll and allow Escape to dismiss the mobile filter sheet (no layout jump).
+  // Lock body scroll, trap focus inside the mobile filter sheet, and let
+  // Escape dismiss it. Focus is moved into the dialog on open and restored to
+  // the toggle on close so keyboard/AT users are never dropped at page top.
   useEffect(() => {
     if (!isMobileDrawerOpen) return;
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = 'hidden';
     if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const panel = drawerPanelRef.current;
+    requestAnimationFrame(() => panel?.focus({ preventScroll: true }));
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsMobileDrawerOpen(false);
+      if (e.key === 'Escape') {
+        setIsMobileDrawerOpen(false);
+        return;
+      }
+      // Keep Tab cycling within the dialog panel (lightweight focus trap).
+      if (e.key !== 'Tab' || !panel) return;
+      const focusables = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!panel.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
       window.removeEventListener('keydown', handleKeyDown);
+      previouslyFocused?.focus?.({ preventScroll: true });
     };
   }, [isMobileDrawerOpen]);
 
@@ -413,7 +443,10 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
               <button
                 type="button"
                 onClick={() => setIsMobileDrawerOpen(true)}
-                className="lg:hidden min-h-[44px] px-4 py-2.5 rounded-control bg-ink text-white text-xs font-bold flex items-center gap-2 shadow-e1 cursor-pointer btn-tactile"
+                aria-haspopup="dialog"
+                aria-expanded={isMobileDrawerOpen}
+                aria-controls="mobile-filter-sheet"
+                className="lg:hidden min-h-[44px] px-4 py-2.5 rounded-control bg-ink text-white text-xs font-bold flex items-center gap-2 shadow-e1 cursor-pointer btn-tactile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
               >
                 <SlidersHorizontal className="w-4 h-4 text-accent" aria-hidden="true" />
                 <span>Ֆիլտրեր</span>
@@ -479,7 +512,8 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   <button
                     type="button"
                     onClick={() => updateFilters((p) => ({ ...p, category: null }))}
-                    className="hover:text-ink cursor-pointer"
+                    aria-label={`${HY.REMOVE} ${activeCategory?.title ?? ''}`}
+                    className="inline-flex min-h-[24px] min-w-[24px] items-center justify-center rounded-full hover:text-ink hover:bg-accent/10 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     <X className="w-3 h-3" aria-hidden="true" />
                   </button>
@@ -491,7 +525,8 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                   <button
                     type="button"
                     onClick={() => updateFilters((p) => ({ ...p, inStockOnly: false }))}
-                    className="hover:text-ink cursor-pointer"
+                    aria-label={`${HY.REMOVE} ${HY.IN_STOCK_SHOWROOM}`}
+                    className="inline-flex min-h-[24px] min-w-[24px] items-center justify-center rounded-full hover:text-ink hover:bg-success/10 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     <X className="w-3 h-3" aria-hidden="true" />
                   </button>
@@ -508,7 +543,8 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                     onClick={() =>
                       updateFilters((p) => ({ ...p, brands: p.brands.filter((x) => x !== b) }))
                     }
-                    className="hover:text-ink cursor-pointer"
+                    aria-label={`${HY.REMOVE} ${b}`}
+                    className="inline-flex min-h-[24px] min-w-[24px] items-center justify-center rounded-full hover:text-ink hover:bg-line/70 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     <X className="w-3 h-3" aria-hidden="true" />
                   </button>
@@ -517,7 +553,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="text-xs font-bold text-danger hover:text-danger underline underline-offset-2 ml-1 cursor-pointer"
+                className="inline-flex min-h-[36px] items-center rounded-control px-2 text-xs font-bold text-danger hover:text-danger underline underline-offset-2 ml-1 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
               >
                 Մաքրել բոլորը
               </button>
@@ -651,10 +687,17 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
                             {formatAMD(product.price)}
                           </td>
                           <td className="p-3.5 hidden md:table-cell whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-success bg-success/10 px-2 py-0.5 rounded border border-success">
-                              <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
-                              Առկա 
-                            </span>
+                            {product.inStock ? (
+                              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-success bg-success/10 px-2 py-0.5 rounded border border-success">
+                                <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
+                                {HY.IN_STOCK_SHOWROOM}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-muted bg-canvas px-2 py-0.5 rounded border border-line-strong">
+                                <span className="w-1.5 h-1.5 rounded-full bg-faint"></span>
+                                {HY.BACK_ORDER}
+                              </span>
+                            )}
                           </td>
                           <td className="p-3.5 text-right whitespace-nowrap">
                             <button
@@ -701,14 +744,24 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
 
       {/* Mobile Filters Native iOS-style Bottom Sheet (< 1024px) */}
       {isMobileDrawerOpen && (
-        <div className="fixed inset-0 z-sheet lg:hidden overflow-hidden">
+        <div
+          id="mobile-filter-sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-filter-title"
+          className="fixed inset-0 z-sheet lg:hidden overflow-hidden"
+        >
           <div
             className="fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
             onClick={() => setIsMobileDrawerOpen(false)}
             aria-hidden="true"
           />
 
-          <div className="fixed inset-x-0 bottom-0 max-h-[85dvh] bg-white rounded-t-3xl shadow-e2 flex flex-col z-10 animate-in slide-in-from-bottom duration-300">
+          <div
+            ref={drawerPanelRef}
+            tabIndex={-1}
+            className="fixed inset-x-0 bottom-0 max-h-[85dvh] bg-white rounded-t-3xl shadow-e2 flex flex-col z-10 outline-none animate-in slide-in-from-bottom duration-300"
+          >
             {/* iOS Drag Handle */}
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-12 h-1.5 rounded-full bg-line-strong" />
@@ -718,7 +771,7 @@ export default function CatalogView({ initialCategorySlug }: CatalogViewProps) {
             <div className="px-5 py-3 border-b border-line flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-accent" />
-                <h3 className="font-bold text-sm text-ink">
+                <h3 id="mobile-filter-title" className="font-bold text-sm text-ink">
                   Ֆիլտրեր {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
                 </h3>
               </div>

@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   ShoppingBag,
@@ -63,6 +63,15 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [addState, setAddState] = useState<'idle' | 'loading' | 'added'>('idle');
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false);
+
+  // Direction for the quantity roll micro-interaction: compare against the
+  // last committed value so the number slides up on increment, down on decrement.
+  const prevQuantityRef = useRef(quantity);
+  const qtyRoll =
+    quantity > prevQuantityRef.current ? 'up' : quantity < prevQuantityRef.current ? 'down' : 'none';
+  useEffect(() => {
+    prevQuantityRef.current = quantity;
+  }, [quantity]);
   const [isHeartPopping, setIsHeartPopping] = useState(false);
 
   const isWishlisted = isInWishlist(product.id);
@@ -281,7 +290,12 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 <Minus className="h-4 w-4" />
               </button>
 
-              <span className="w-10 text-center text-sm font-bold text-ink tabular-nums">
+              <span
+                key={quantity}
+                className={`w-10 text-center text-sm font-bold text-ink tabular-nums ${
+                  qtyRoll === 'up' ? 'animate-qty-roll-up' : qtyRoll === 'down' ? 'animate-qty-roll-down' : ''
+                }`}
+              >
                 {quantity}
               </span>
 

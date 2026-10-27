@@ -81,6 +81,29 @@ export default function CheckoutForm({
     }
   };
 
+  // Roving arrow-key navigation for a radiogroup: Left/Up and Right/Down move
+  // the selection to the neighbouring card and focus it (native radio pattern),
+  // wrapping at the ends. Space/Enter activation stays on each card.
+  const navRadioGroup =
+    (onSelect: (value: string) => void) => (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const group = e.currentTarget;
+      const radios = Array.from(
+        group.querySelectorAll<HTMLElement>('[role="radio"][data-value]'),
+      );
+      if (radios.length < 2) return;
+      const activeEl = document.activeElement as HTMLElement | null;
+      let idx = radios.findIndex((r) => r === activeEl || r.contains(activeEl));
+      if (idx === -1) idx = radios.findIndex((r) => r.getAttribute('aria-checked') === 'true');
+      if (idx === -1) return;
+      let next: number;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (idx + 1) % radios.length;
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (idx - 1 + radios.length) % radios.length;
+      else return;
+      e.preventDefault();
+      onSelect(radios[next].dataset.value as string);
+      radios[next].focus();
+    };
+
   // Armenian phone auto-formatter — canonical +374 (XX) XX-XX-XX grouping
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateField('phone', formatArPhone(e.target.value));
@@ -105,12 +128,13 @@ export default function CheckoutForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-xs font-bold text-body mb-1">
+            <label htmlFor="co-fullName" className="block text-xs font-bold text-body mb-1">
               Անուն, Ազգանուն <span className="text-danger">*</span>
             </label>
             <div className="relative">
               <input
                 type="text"
+                id="co-fullName"
                 required
                 value={data.fullName}
                 onChange={(e) => updateField('fullName', e.target.value)}
@@ -122,7 +146,7 @@ export default function CheckoutForm({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-body mb-1">
+            <label htmlFor="co-phone" className="block text-xs font-bold text-body mb-1">
               Հեռախոսահամար <span className="text-danger">*</span>
             </label>
             <div className="relative flex items-center">
@@ -132,6 +156,7 @@ export default function CheckoutForm({
               </div>
               <input
                 type="tel"
+                id="co-phone"
                 required
                 value={data.phone}
                 onChange={handlePhoneChange}
@@ -142,12 +167,13 @@ export default function CheckoutForm({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-body mb-1">
+            <label htmlFor="co-email" className="block text-xs font-bold text-body mb-1">
               Էլ. Փոստ <span className="text-muted font-normal">(ըստ ցանկության)</span>
             </label>
             <div className="relative">
               <input
                 type="email"
+                id="co-email"
                 value={data.email}
                 onChange={(e) => updateField('email', e.target.value)}
                 placeholder="օր.՝ armen@example.am"
@@ -170,10 +196,11 @@ export default function CheckoutForm({
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" role="radiogroup" aria-label="Ստացման եղանակ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" onKeyDown={navRadioGroup((v) => updateField('deliveryMethod', v as DeliveryType))} role="radiogroup" aria-label="Ստացման եղանակ">
           {/* Option 1: Yerevan Delivery */}
           <div
             role="radio"
+            data-value="yerevan"
             aria-checked={data.deliveryMethod === 'yerevan'}
             tabIndex={data.deliveryMethod === 'yerevan' ? 0 : -1}
             onClick={() => updateField('deliveryMethod', 'yerevan')}
@@ -207,6 +234,7 @@ export default function CheckoutForm({
           {/* Option 2: Showroom Pickup */}
           <div
             role="radio"
+            data-value="pickup"
             aria-checked={data.deliveryMethod === 'pickup'}
             tabIndex={data.deliveryMethod === 'pickup' ? 0 : -1}
             onClick={() => updateField('deliveryMethod', 'pickup')}
@@ -261,11 +289,12 @@ export default function CheckoutForm({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-body mb-1">
+                <label htmlFor="co-street" className="block text-xs font-semibold text-body mb-1">
                   Փողոց, Շենք <span className="text-danger">*</span>
                 </label>
                 <input
                   type="text"
+                  id="co-street"
                   required={data.deliveryMethod === 'yerevan'}
                   value={data.addressStreet}
                   onChange={(e) => updateField('addressStreet', e.target.value)}
@@ -275,11 +304,12 @@ export default function CheckoutForm({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-body mb-1">
+                <label htmlFor="co-apt" className="block text-xs font-semibold text-body mb-1">
                   Բնակարան / Մուտք / Հարկ
                 </label>
                 <input
                   type="text"
+                  id="co-apt"
                   value={data.addressApartment}
                   onChange={(e) => updateField('addressApartment', e.target.value)}
                   placeholder="բն. 14, 2-րդ մուտք, 4-րդ հարկ"
@@ -312,7 +342,7 @@ export default function CheckoutForm({
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5" role="radiogroup" aria-label="Վճարման եղանակ">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5" onKeyDown={navRadioGroup((v) => updateField('paymentMethod', v as PaymentType))} role="radiogroup" aria-label="Վճարման եղանակ">
           {PAYMENT_OPTIONS.map((item) => {
             const Icon = item.icon;
             const isSelected = data.paymentMethod === item.id;
@@ -320,6 +350,7 @@ export default function CheckoutForm({
               <div
                 key={item.id}
                 role="radio"
+                data-value={item.id}
                 aria-checked={isSelected}
                 tabIndex={isSelected ? 0 : -1}
                 onClick={() => updateField('paymentMethod', item.id)}
@@ -348,11 +379,12 @@ export default function CheckoutForm({
 
         {/* Order Notes */}
         <div className="pt-2">
-          <label className="block text-xs font-bold text-body mb-1">
+          <label htmlFor="co-notes" className="block text-xs font-bold text-body mb-1">
             Նշումներ պատվերի վերաբերյալ <span className="text-muted font-normal">(ըստ ցանկության)</span>
           </label>
           <textarea
             rows={2}
+            id="co-notes"
             value={data.orderNotes}
             onChange={(e) => updateField('orderNotes', e.target.value)}
             placeholder="Հարկ, դոմոֆոնի կոդ կամ առաքման հատուկ ժամ..."

@@ -38,9 +38,14 @@ export default function CategoryNavStrip({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollBy = (offset: number) => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-    }
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    // Honour the user's motion preference: instant jump when reduced motion
+    // is requested, smooth glide otherwise.
+    const reduce =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollBy({ left: offset, behavior: reduce ? 'auto' : 'smooth' });
   };
 
   const getCategoryIcon = (iconName: string) => {
@@ -75,22 +80,26 @@ export default function CategoryNavStrip({
 
   return (
     <div className="relative w-full bg-white border-y border-line shadow-e1 py-3 px-4 sm:px-6 group">
-      {/* Scroll Left Arrow (Desktop Hover) */}
+      {/* Scroll Left Arrow (mouse-only affordance, revealed on hover). Hidden
+          from AT + tab order: its label is not localised and keyboard users
+          reach every chip directly (the strip scrolls focused items into view). */}
       <button
         type="button"
         onClick={() => scrollBy(-280)}
-        aria-label="Scroll left"
-        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/95 shadow-e1 border border-line text-body hover:text-accent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hidden sm:flex"
+        aria-hidden="true"
+        tabIndex={-1}
+        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/95 shadow-e1 border border-line text-body hover:text-accent hover:shadow-e2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hidden sm:flex"
       >
         <ChevronLeft className="w-4 h-4" aria-hidden="true" />
       </button>
 
-      {/* Scroll Right Arrow (Desktop Hover) */}
+      {/* Scroll Right Arrow (mouse-only affordance, revealed on hover) */}
       <button
         type="button"
         onClick={() => scrollBy(280)}
-        aria-label="Scroll right"
-        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/95 shadow-e1 border border-line text-body hover:text-accent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hidden sm:flex"
+        aria-hidden="true"
+        tabIndex={-1}
+        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/95 shadow-e1 border border-line text-body hover:text-accent hover:shadow-e2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hidden sm:flex"
       >
         <ChevronRight className="w-4 h-4" aria-hidden="true" />
       </button>
@@ -105,7 +114,8 @@ export default function CategoryNavStrip({
           <button
             type="button"
             onClick={() => onSelectCategory && onSelectCategory(null)}
-            className={`min-h-[44px] px-4 py-2 rounded-control text-xs font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 border ${
+            aria-pressed={selectedCategorySlug === null}
+            className={`btn-tactile min-h-[44px] px-4 py-2 rounded-control text-xs font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 border ${
  selectedCategorySlug === null
  ? 'bg-ink text-white border-ink shadow-e1'
  : 'hover:bg-canvas text-body border-line'
@@ -138,7 +148,8 @@ export default function CategoryNavStrip({
                 key={cat.id}
                 type="button"
                 onClick={() => onSelectCategory && onSelectCategory(cat.slug)}
-                className={`min-h-[44px] px-4 py-2 rounded-control text-xs font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 border ${
+                aria-pressed={isSelected}
+                className={`btn-tactile min-h-[44px] px-4 py-2 rounded-control text-xs font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 border ${
  isSelected
  ? 'bg-ink text-white border-ink shadow-e1'
  : 'hover:bg-canvas text-body border-line'

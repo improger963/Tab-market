@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import {
   RotateCcw,
   Check,
@@ -73,6 +73,11 @@ export default function FilterSidebar({
   isMobileDrawer = false,
   onCloseMobileDrawer,
 }: FilterSidebarProps) {
+  // A stable per-instance prefix for accordion panel ids: the sidebar is
+  // rendered twice at once (desktop rail + mobile sheet), so `useId` keeps the
+  // aria-controls/id links unique instead of colliding on a shared constant.
+  const uid = useId();
+
   // Collapsible section states
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     categories: true,
@@ -169,6 +174,8 @@ export default function FilterSidebar({
         <div
           role="button"
           tabIndex={0}
+          aria-expanded={openSections.categories}
+          aria-controls={`${uid}-categories`}
           onClick={() => toggleSection('categories')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -176,7 +183,7 @@ export default function FilterSidebar({
               toggleSection('categories');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 active:bg-line/80 transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
         >
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-muted" />
@@ -211,7 +218,7 @@ export default function FilterSidebar({
         </div>
 
         {openSections.categories && (
-          <div className="p-3 space-y-1 border-t border-canvas">
+          <div id={`${uid}-categories`} className="p-3 space-y-1 border-t border-canvas animate-fade-in">
             <button
               type="button"
               onClick={() => onChange((prev) => ({ ...prev, category: null }))}
@@ -257,6 +264,8 @@ export default function FilterSidebar({
         <div
           role="button"
           tabIndex={0}
+          aria-expanded={openSections.colors}
+          aria-controls={`${uid}-colors`}
           onClick={() => toggleSection('colors')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -264,7 +273,7 @@ export default function FilterSidebar({
               toggleSection('colors');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 active:bg-line/80 transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
         >
           <div className="flex items-center gap-2">
             <Palette className="w-4 h-4 text-muted" />
@@ -299,7 +308,7 @@ export default function FilterSidebar({
         </div>
 
         {openSections.colors && (
-          <div className="p-3 border-t border-canvas">
+          <div id={`${uid}-colors`} className="p-3 border-t border-canvas animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {COLOR_SWATCHES.map((swatch) => {
                 const isSelected = filters.colors.includes(swatch.id);
@@ -308,7 +317,7 @@ export default function FilterSidebar({
                     key={swatch.id}
                     type="button"
                     onClick={() => toggleArrayItem('colors', swatch.id)}
-                    className={`min-h-[42px] px-3 py-2 rounded-control border text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`btn-tactile min-h-[42px] px-3 py-2 rounded-control border text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
  isSelected
  ? 'border-accent bg-accent/5 text-ink ring-2 ring-accent/20 shadow-e1'
  : 'border-line bg-canvas hover:bg-white hover:border-line-strong text-body'
@@ -337,6 +346,8 @@ export default function FilterSidebar({
         <div
           role="button"
           tabIndex={0}
+          aria-expanded={openSections.diameters}
+          aria-controls={`${uid}-diameters`}
           onClick={() => toggleSection('diameters')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -344,7 +355,7 @@ export default function FilterSidebar({
               toggleSection('diameters');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 active:bg-line/80 transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
         >
           <div className="flex items-center gap-2">
             <Ruler className="w-4 h-4 text-muted" />
@@ -379,7 +390,7 @@ export default function FilterSidebar({
         </div>
 
         {openSections.diameters && (
-          <div className="p-3 border-t border-canvas">
+          <div id={`${uid}-diameters`} className="p-3 border-t border-canvas animate-fade-in">
             <div className="flex flex-wrap gap-2">
               {DIAMETERS.map((d) => {
                 const isChecked = filters.diameters.includes(d.id);
@@ -388,7 +399,7 @@ export default function FilterSidebar({
                     key={d.id}
                     type="button"
                     onClick={() => toggleArrayItem('diameters', d.id)}
-                    className={`min-h-[38px] px-3.5 py-1.5 rounded-control border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`btn-tactile min-h-[38px] px-3.5 py-1.5 rounded-control border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
  isChecked
  ? 'bg-ink text-white border-ink shadow-e1'
  : 'bg-canvas text-body border-line hover:border-line-strong hover:bg-white'
@@ -409,6 +420,8 @@ export default function FilterSidebar({
         <div
           role="button"
           tabIndex={0}
+          aria-expanded={openSections.brandsMaterials}
+          aria-controls={`${uid}-brandsMaterials`}
           onClick={() => toggleSection('brandsMaterials')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -416,7 +429,7 @@ export default function FilterSidebar({
               toggleSection('brandsMaterials');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 active:bg-line/80 transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
         >
           <div className="flex items-center gap-2">
             <Briefcase className="w-4 h-4 text-muted" />
@@ -451,7 +464,7 @@ export default function FilterSidebar({
         </div>
 
         {openSections.brandsMaterials && (
-          <div className="p-3 border-t border-canvas space-y-4">
+          <div id={`${uid}-brandsMaterials`} className="p-3 border-t border-canvas space-y-4 animate-fade-in">
             {/* Brands subset */}
             <div className="space-y-2">
               <span className="text-xs font-semibold text-muted block">
@@ -467,7 +480,7 @@ export default function FilterSidebar({
                       key={brand}
                       type="button"
                       onClick={() => toggleArrayItem('brands', brand)}
-                      className={`min-h-[34px] px-3 py-1 rounded-control border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                      className={`btn-tactile min-h-[34px] px-3 py-1 rounded-control border text-xs font-semibold flex items-center gap-1.5 transition-colors duration-hover cursor-pointer ${
  isChecked
  ? 'bg-accent text-white border-accent shadow-e1'
  : 'bg-canvas text-body border-line hover:border-line-strong hover:bg-white'
@@ -517,6 +530,8 @@ export default function FilterSidebar({
         <div
           role="button"
           tabIndex={0}
+          aria-expanded={openSections.price}
+          aria-controls={`${uid}-price`}
           onClick={() => toggleSection('price')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -524,7 +539,7 @@ export default function FilterSidebar({
               toggleSection('price');
             }
           }}
-          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 transition-colors cursor-pointer select-none"
+          className="w-full p-3.5 flex items-center justify-between bg-canvas hover:bg-line/60 active:bg-line/80 transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
         >
           <div className="flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-muted" />
@@ -563,7 +578,7 @@ export default function FilterSidebar({
         </div>
 
         {openSections.price && (
-          <div className="p-3 border-t border-canvas space-y-3">
+          <div id={`${uid}-price`} className="p-3 border-t border-canvas space-y-3 animate-fade-in">
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <span className="text-xs text-muted font-semibold block mb-1">Սկսած՝</span>

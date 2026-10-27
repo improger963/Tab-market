@@ -55,19 +55,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <Link href="/" className="hover:text-accent transition-colors shrink-0">
           Գլխավոր
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" />
+        <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
         <Link href="/catalog" className="hover:text-accent transition-colors shrink-0">
           Կատալոգ
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" />
+        <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
         <Link
           href={`/category/${product.categorySlug}`}
           className="hover:text-accent transition-colors shrink-0"
         >
           {product.categoryName}
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" />
-        <span className="text-ink font-bold truncate max-w-xs sm:max-w-md shrink-0">
+        <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
+        <span className="text-ink font-bold truncate max-w-xs sm:max-w-md shrink-0" aria-current="page">
           {product.title}
         </span>
       </nav>
@@ -83,8 +83,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
           />
         </div>
 
-        {/* Buy Box: 2nd on mobile (immediately following gallery), right 5 cols on desktop (sticky top-28 spanning gallery and specs) */}
-        <div className="lg:col-span-5 lg:row-span-2 lg:sticky lg:top-28">
+        {/* Buy Box: 2nd on mobile (immediately following gallery), right 5 cols on desktop (sticky, offset by the real header stack so it never tucks under the sticky nav) */}
+        <div className="lg:col-span-5 lg:row-span-2 lg:sticky lg:top-[calc(var(--topbar-h)+var(--header-h)+1rem)]">
           <ProductDetailView product={product} />
         </div>
 

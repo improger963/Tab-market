@@ -219,16 +219,17 @@ export default function ProductCard({ product }: ProductCardProps) {
             <button
               type="button"
               onClick={handleToggleWishlist}
+              aria-pressed={isWishlisted}
               title={isWishlisted ? TEXT.T_REMOVE_FAV : TEXT.T_ADD_FAV}
               aria-label={isWishlisted ? TEXT.T_REMOVE_FAV : TEXT.T_ADD_FAV}
-              className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-line/60 bg-surface/90 shadow-e1 backdrop-blur-md transition-colors duration-hover ease-precision ${
+              className={`btn-tactile flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-line/60 bg-surface/90 shadow-e1 backdrop-blur-md transition-colors duration-hover ease-precision ${
  isWishlisted
- ? 'text-danger'
+ ? 'text-danger border-danger/30 hover:bg-danger/5'
  : 'text-body hover:bg-surface hover:text-ink'
  } ${isHeartPopping ? 'animate-heart-pop' : ''}`}
             >
               <Heart
-                className={`h-4 w-4 ${isWishlisted ? 'fill-accent text-accent' : ''}`}
+                className={`h-4 w-4 ${isWishlisted ? 'fill-danger text-danger' : ''}`}
                 aria-hidden="true"
               />
             </button>
@@ -236,11 +237,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             <button
               type="button"
               onClick={handleToggleCompare}
+              aria-pressed={isCompared}
               title={isCompared ? TEXT.T_REMOVE_CMP : TEXT.T_COMPARE}
               aria-label={isCompared ? TEXT.T_REMOVE_CMP : TEXT.T_COMPARE}
-              className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-line/60 bg-surface/90 shadow-e1 backdrop-blur-md transition-colors duration-hover ease-precision ${
+              className={`btn-tactile flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-line/60 bg-surface/90 shadow-e1 backdrop-blur-md transition-colors duration-hover ease-precision ${
  isCompared
- ? 'text-accent'
+ ? 'text-accent border-accent/30 hover:bg-accent/5'
  : 'text-body hover:bg-surface hover:text-ink'
  }`}
             >
