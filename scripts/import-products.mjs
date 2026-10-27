@@ -21,7 +21,7 @@
  *
  * Run: node scripts/import-products.mjs
  */
-import { writeFileSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ExcelJS from 'exceljs';
@@ -29,6 +29,12 @@ import ExcelJS from 'exceljs';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = join(ROOT, 'products.xlsx');
 const OUT = join(ROOT, 'data', 'products.from-xlsx.json');
+
+if (!existsSync(SRC)) {
+  console.error(`✖ Source file not found: ${SRC}
+  Expected products.xlsx in the project root. Check you are running inside the repo and the file exists.`);
+  process.exit(1);
+}
 
 /** Cell value -> plain string (handles rich text / linked / formula results). */
 function txt(v) {
