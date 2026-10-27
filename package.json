@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "import:products": "node scripts/import-products.mjs"
+    "import:products": "node scripts/import-products.mjs",
+        "crawl": "node scripts/crawl-tab.mjs",
+        "crawl:dry": "node scripts/crawl-tab.mjs --limit-products 20 --no-cache"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -33,10 +35,14 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.21",
+    "cheerio": "^1.2.0",
     "esbuild": "^0.28.0",
+    "exceljs": "^4.4.0",
+    "p-limit": "^7.3.3",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.6.7"
   }
 }

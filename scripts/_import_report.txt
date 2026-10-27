@@ -1,0 +1,180 @@
+sheet rows: 1663
+code word from header: ԿՈԴ (codepoints 53f 548 534)
+cleaned titles still containing the code word: 0
+categories in sheet: 13 (clearance excluded from taxonomy: 1 bucket)
+
+category taxonomy (slug <- source):
+  tsntsugh-yev-khoghovak  <- tab.am url path  | 276 rows
+  khohanotsi-lvatsaran  <- tab.am url path  | 236 rows
+  higiyenayi-paraganer  <- tab.am url path  | 177 rows
+  lvatsaran-paharanov  <- tab.am url path  | 149 rows
+  sifon  <- tab.am url path  | 145 rows
+  aksesuarner  <- tab.am url path  | 122 rows
+  hayeliner  <- tab.am url path  | 81 rows
+  pakan  <- tab.am url path  | 73 rows
+  choranotsner  <- tab.am url path  | 69 rows
+  hosakner  <- tab.am url path  | 63 rows
+  logasenyaki-varaguyri-dzogher  <- tab.am url path  | 32 rows
+  odapvokhichner  <- tab.am url path  | 24 rows
+  ! no price in sheet -> code 13032 :: Խոհանոցի լվացարան ներկառուցվող ULGRAN 400-05 Գրաֆիտ, 450x450x220 մմ
+
+recovered missing codes from title/url: 61
+products still without a code: 0
+clearance rows reclassified: 216 (by shared title prefix: 81, by word evidence: 135, unresolved: 0)
+rows without a price (kept, shown as price-on-request): 1
+descriptions that only repeat the spec table (dropped): 171
+products written: 1647
+unique slugs: 1647
+rows without images: 0
+
+brands resolved: 1343/1647; distinct brands: 61; listings the list leaves without a brand: 304
+all brands by product count:
+  VIEIR -> 217
+  GANZER -> 205
+  ULGRAN -> 167
+  KALDO -> 95
+  HANSEN -> 86
+  LA MARIA -> 61
+  BERTT -> 49
+  GRANALLIANCE -> 36
+  LIDER -> 28
+  LEMARK -> 27
+  UNICORN -> 24
+  LEDEME -> 23
+  AQUANT -> 21
+  IMARK -> 20
+  ERA -> 19
+  GATO -> 17
+  MILLANO -> 16
+  BERTA -> 15
+  GUNTHER -> 12
+  ITAP -> 12
+  MCPOLOO -> 11
+  ARDO -> 10
+  FMARK -> 10
+  GERHANS -> 10
+  TIM -> 9
+  HESTIA -> 9
+  GEMMA -> 9
+  ONIKA -> 8
+  ACCOONA -> 8
+  COMFORTY -> 7
+  HAIBA -> 7
+  DECORA -> 7
+  PODA -> 7
+  MATRIX -> 6
+  BETTA -> 5
+  KATANA -> 5
+  FIRMER -> 5
+  SAVOL -> 5
+  WELA -> 5
+  MONOFLEX -> 5
+  SENA -> 4
+  HANSENPRO -> 4
+  IBERGRIF -> 4
+  ARCO -> 4
+  FEST -> 3
+  AOKSER -> 3
+  AURAMAX -> 3
+  DIKALAN -> 2
+  BRNOU -> 2
+  LINCE -> 2
+  BT -> 2
+  YAGA -> 2
+  MAXSTONE -> 2
+  OZBEST -> 1
+  TATKRAFT -> 1
+  BRIZO -> 1
+  IDDIS -> 1
+  MS ARCO -> 1
+  MONOLIT -> 1
+  QUADRO -> 1
+  FLORENTINA -> 1
+
+clearance reclassification (target category -> rows):
+  hosakner -> 182
+  lvatsaran-paharanov -> 16
+  khohanotsi-lvatsaran -> 7
+  tsntsugh-yev-khoghovak -> 6
+  higiyenayi-paraganer -> 5
+
+products per category:
+  tsntsugh-yev-khoghovak -> 282
+  hosakner -> 245
+  khohanotsi-lvatsaran -> 243
+  higiyenayi-paraganer -> 182
+  lvatsaran-paharanov -> 149
+  sifon -> 145
+  aksesuarner -> 122
+  hayeliner -> 81
+  pakan -> 73
+  choranotsner -> 69
+  logasenyaki-varaguyri-dzogher -> 32
+  odapvokhichner -> 24
+
+category signature words (used for tile photos):
+  logasenyaki-varaguyri-dzogher <- վարագույրի (count 32, share 1.00)
+  lvatsaran-paharanov <- հայելիով (count 61, share 1.00)
+  khohanotsi-lvatsaran <- խոհանոցի (count 236, share 1.00)
+  higiyenayi-paraganer <- հիգիենիկ (count 156, share 1.00)
+  aksesuarner <- կախիչ (count 74, share 1.00)
+  sifon <- սիֆոն (count 59, share 1.00)
+  hayeliner <- լուսավորմամբ (count 64, share 1.00)
+  hosakner <- հոսակ (count 63, share 1.00)
+  tsntsugh-yev-khoghovak <- գլխիկ (count 116, share 1.00)
+  pakan <- ջրի (count 13, share 1.00)
+  choranotsner <- չորանոց (count 69, share 1.00)
+  odapvokhichner <- օդափոխիչ (count 24, share 1.00)
+
+top evidence words per category:
+  logasenyaki-varaguyri-dzogher: վարագույրի(32/1.00), ձող(32/1.00), լոգասենյակի(32/0.97), անկյուն(10/0.83), օվալ(8/0.53)
+  aksesuarner: կախիչ(74/1.00), սրբիչի(40/0.98), թղթի(20/1.00), զուգարանի(19/1.00), օճառաման(18/1.00)
+  lvatsaran-paharanov: դարակով(71/0.87), հայելիով(61/1.00), կոդ՝(61/1.00), պահարանով(68/0.83), ջրակայուն(41/1.00)
+  hayeliner: հայելի(81/0.89), լուսավորմամբ(64/1.00), սենսորային(63/1.00), անջատիչով(63/1.00), փայտային(4/0.80)
+  higiyenayi-paraganer: հիգիենիկ(156/1.00), խառնիչ(150/1.00), ցնցուղով(144/1.00), ներկառուցվող(86/0.68), ծորակ(22/1.00)
+  hosakner: հոսակ(63/1.00), երկկողմանի(17/1.00), սատին(6/1.00), ոսկեգույն(6/0.35)
+  choranotsner: չորանոց(69/1.00), էլեկտրական(21/1.00)
+  sifon: համար(122/0.75), լվացարանի(97/0.91), սիֆոն(59/1.00), զուգարանակոնքի(25/0.68), գոֆրե(16/1.00)
+  tsntsugh-yev-khoghovak: ցնցուղի(200/0.96), գլխիկ(116/1.00), խողովակ(63/0.79), ցնցուղ(50/0.89), ձեռքի(41/1.00)
+  pakan: փական(64/0.55), ջրի(13/1.00), մարտկոցի(12/1.00), չորանոցի(10/1.00), օդահան(5/1.00)
+  odapvokhichner: օդափոխիչ(24/1.00)
+  khohanotsi-lvatsaran: խոհանոցի(236/1.00), լվացարան(236/0.65), մոխրագույն(49/0.83), քվարցե(29/1.00), բեժ(27/0.96)
+
+clearance assignment, one representative per product type found:
+  lvatsaran-paharanov  <-  Լոգասենյակի պահարան, MILLANO Կառոլինա 60, 600x480x415 մմ Սև
+  lvatsaran-paharanov  <-  Լվացարան պահարանով L109pvc-A60 white 610x470x860 մմ Ջրակայուն
+  higiyenayi-paraganer  <-  Լվացարանի ծորակ MCPOLOO MFA20306 Սև
+  khohanotsi-lvatsaran  <-  Խոհանոցի ծորակ DIKALAN B5156 Սև-Մատվի
+  hosakner  <-  Հոսակ 100x100 մմ Քրոմ
+  hosakner  <-  Հոսակ 3.2-60սմ, Z175-25-29, Գրաֆիտ
+  hosakner  <-  Հոսակ 3․2-40սմ, Z175-25-22, Մատվի
+  hosakner  <-  Հոսակ ARDO 80x200 մմ Սև
+  hosakner  <-  Հոսակ GANZER T002-P Ոսկի 100x100 մմ
+  hosakner  <-  Հոսակ մագնիսական փականով ARDO F-172 Քրոմ 100x100 մմ
+  hosakner  <-  Հոսակ մեխանիկական փականով AD 1984 100x700 մմ Մատվի
+  hosakner  <-  Հոսակ սալիկի տեղով Imark Katana 70x1000 մմ Մատվի
+  hosakner  <-  Հոսակի մագնիսական կափույր ARDO 40 մմ
+  higiyenayi-paraganer  <-  Ներկառուցվող ցնցուղի հավաքածու Gunther SH-223
+  lvatsaran-paharanov  <-  Պահարան լվացարանի համար MILLANO Կառոլինա 60, 600x500x550 մմ Ջրակ
+  tsntsugh-yev-khoghovak  <-  Ցնցուղի հավաքածու 25-5 Սև
+
+clearance rows with a close runner-up category (12):
+  Լվացարան պահարանով 0.195 | Լոգասենյակի վարագույրի ձողեր 0.145  <-  Լոգասենյակի պահարան, MILLANO Կառոլինա 60, 600x480x415 մմ Սև
+  Հիգիենայի պարագաներ 0.124 | Սիֆոններ 0.091  <-  Լվացարանի ծորակ MCPOLOO MFA20306 Սև
+  Հիգիենայի պարագաներ 0.124 | Սիֆոններ 0.091  <-  Լվացարանի ծորակ McPoloo MFA20295B Սև
+  խոհանոցի լվացարան 0.150 | Հիգիենայի պարագաներ 0.124  <-  Խոհանոցի ծորակ DIKALAN B5156 Սև-Մատվի
+  խոհանոցի լվացարան 0.150 | Հիգիենայի պարագաներ 0.124  <-  Խոհանոցի ծորակ ճկվող 1397 Սև/Քրոմ
+  խոհանոցի լվացարան 0.150 | Հիգիենայի պարագաներ 0.124  <-  Խոհանոցի ծորակ ճկվող BRNOU 617/9
+  Հիգիենայի պարագաներ 0.329 | Ցնցուղ և խողովակ 0.166  <-  Ներկառուցվող ցնցուղի հավաքածու Gunther SH-223
+  Հիգիենայի պարագաներ 0.329 | Ցնցուղ և խողովակ 0.166  <-  Ներկառուցվող ցնցուղի հավաքածու Gunther SH-224
+  խոհանոցի լվացարան 0.159 | Հիգիենայի պարագաներ 0.128  <-  խոհանոցի ծորակ FMARK FM4166W Սպիտակ
+  խոհանոցի լվացարան 0.150 | Հիգիենայի պարագաներ 0.124  <-  խոհանոցի ծորակ HAIBA HB4166-8
+  խոհանոցի լվացարան 0.159 | Հիգիենայի պարագաներ 0.128  <-  խոհանոցի ծորակ LEBED ZF-301010WF Սպիտակ
+  խոհանոցի լվացարան 0.159 | Հիգիենայի պարագաներ 0.128  <-  խոհանոցի ծորակ սպիտակ BRNOU
+
+gallery images: 2691 (avg 1.63 per product)
+blueprint images: 42, products with a real discount: 1623, with brand: 1343, with prose description: 1476
+
+data/products.json bytes: 2278880
+
+brands written to data/brands.ts: 61

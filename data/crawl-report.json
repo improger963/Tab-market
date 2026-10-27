@@ -1,0 +1,261 @@
+{
+  "timestamp": "2026-10-27T11:18:26.717Z",
+  "runtime": "130s",
+  "requests": 3164,
+  "cacheHits": 3148,
+  "categories": [
+    {
+      "category": "tsorakner",
+      "name": "Ծորակներ",
+      "expected": 759,
+      "navBadge": 772,
+      "found": 759,
+      "subcategories": [
+        {
+          "slug": "khohanotsi-tsorak",
+          "expected": 215
+        },
+        {
+          "slug": "Lvatsarani-tsorak",
+          "expected": 342
+        },
+        {
+          "slug": "Tsorakner-karrutsvogh",
+          "expected": 75
+        },
+        {
+          "slug": "Tsorak-pati",
+          "expected": 5
+        },
+        {
+          "slug": "Logarani-tsorak",
+          "expected": 126
+        }
+      ],
+      "pages": 0
+    },
+    {
+      "category": "Tsntsughi-havakatsuner",
+      "name": "Ցնցուղի հավաքածուներ",
+      "expected": 354,
+      "navBadge": 361,
+      "found": 354,
+      "subcategories": [
+        {
+          "slug": "Tsntsughi_paraganer",
+          "expected": 237
+        },
+        {
+          "slug": "Nerkarrutsvogh-tsntsugh",
+          "expected": 117
+        }
+      ],
+      "pages": 0
+    },
+    {
+      "category": "Higiyenayi-paraganer",
+      "name": "Հիգիենայի պարագաներ",
+      "expected": 179,
+      "navBadge": 179,
+      "found": 179,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "Aksesuarner",
+      "name": "Լոգ․ աքսեսուարներ",
+      "expected": 122,
+      "navBadge": 742,
+      "found": 122,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "khohanotsi-lvatsaran",
+      "name": "խոհանոցի լվացարան",
+      "expected": 236,
+      "navBadge": 236,
+      "found": 236,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "Lvatsaran-paharanov",
+      "name": "Լվացարան պահարանով",
+      "expected": 149,
+      "navBadge": 149,
+      "found": 149,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "Sankeramika",
+      "name": "Սանկերամիկա",
+      "expected": 223,
+      "navBadge": 224,
+      "found": 224,
+      "subcategories": [
+        {
+          "slug": "Zugaranakonk",
+          "expected": 33
+        },
+        {
+          "slug": "Zugaranner-kakhovi",
+          "expected": 27
+        },
+        {
+          "slug": "Logasenyaki-lvatsaran",
+          "expected": 116
+        },
+        {
+          "slug": "Kochak-mekhanizmi",
+          "expected": 26
+        },
+        {
+          "slug": "Bidener",
+          "expected": 7
+        },
+        {
+          "slug": "Mekhanizm-nerkarrutsvogh",
+          "expected": 15
+        }
+      ],
+      "pages": 0
+    },
+    {
+      "category": "Hosakner1",
+      "name": "Հոսակներ",
+      "expected": 63,
+      "navBadge": 63,
+      "found": 63,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "Hayeliner",
+      "name": "Հայելիներ",
+      "expected": 81,
+      "navBadge": 81,
+      "found": 81,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "Choranotsner",
+      "name": "Չորանոցներ",
+      "expected": 103,
+      "navBadge": 69,
+      "found": 103,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "Logasenyaki-varaguyri-dzogher",
+      "name": "Լոգասենյակի վարագույրի ձողեր",
+      "expected": 32,
+      "navBadge": 32,
+      "found": 32,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "Pakan",
+      "name": "Փականներ",
+      "expected": 72,
+      "navBadge": 73,
+      "found": 73,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "odapvokhichner",
+      "name": "Օդափոխիչներ",
+      "expected": 24,
+      "navBadge": 24,
+      "found": 24,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "Sifon",
+      "name": "Սիֆոններ",
+      "expected": 145,
+      "navBadge": 145,
+      "found": 145,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "Tsntsugh_yev_khoghovak",
+      "name": "Ցնցուղ և խողովակ",
+      "expected": 346,
+      "navBadge": 346,
+      "found": 346,
+      "subcategories": [],
+      "pages": 0
+    },
+    {
+      "category": "-1",
+      "name": "Լիկվիդացիա",
+      "expected": 216,
+      "navBadge": 216,
+      "found": 216,
+      "subcategories": [],
+      "pages": 0
+    }
+  ],
+  "totalUnique": 3089,
+  "skipped": 0,
+  "errors": 0,
+  "withImage": 3089,
+  "withPrice": 3088,
+  "withBrand": 2843,
+  "withSpecs": 3065,
+  "fallbackCodes": 0,
+  "clearanceOnly": 216,
+  "sitemap": {
+    "inScopeTotal": 3104,
+    "categoriesWithBaseline": 16
+  },
+  "gates": [
+    {
+      "name": "Category reconciliation (sitemap baseline)",
+      "pass": true
+    },
+    {
+      "name": "Title+sourceId coverage",
+      "pass": true
+    },
+    {
+      "name": "Price coverage",
+      "pass": true
+    },
+    {
+      "name": "Slug uniqueness",
+      "pass": true
+    },
+    {
+      "name": "Valid prices",
+      "pass": true
+    },
+    {
+      "name": "Clean titles",
+      "pass": true
+    },
+    {
+      "name": "Volume vs prev",
+      "pass": true
+    },
+    {
+      "name": "Sitemap zero-loss coverage",
+      "pass": true
+    }
+  ],
+  "diff": {
+    "added": "0",
+    "removed": "0",
+    "priceChanged": "3060: 9209, 5932, 8991, 8678, 8289, 5796, 7856, 17315, 17357, 17140",
+    "availabilityChanged": "0",
+    "imageChanged": "0"
+  }
+}

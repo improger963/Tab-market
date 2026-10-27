@@ -7,6 +7,10 @@ coverage/
 .env*
 !.env.example
 products.xlsx
-scripts
+# Crawler temp/utility scripts (underscore prefix = local-only)
+scripts/_*.mjs
+scripts/_*.ts
+# Crawl HTTP cache and checkpoint state
+.cache/
 # Server-only account store: holds password hashes and session ids, never commit.
 server/data/
